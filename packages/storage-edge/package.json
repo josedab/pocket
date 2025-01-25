@@ -1,0 +1,68 @@
+{
+  "name": "@pocket/storage-edge",
+  "version": "0.1.0",
+  "description": "Edge runtime storage adapters for Pocket database (Cloudflare D1, Durable Objects)",
+  "keywords": [
+    "pocket",
+    "cloudflare",
+    "d1",
+    "durable-objects",
+    "edge",
+    "storage",
+    "database"
+  ],
+  "license": "MIT",
+  "author": "Pocket Contributors",
+  "type": "module",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs",
+      "types": "./dist/index.d.ts"
+    },
+    "./d1": {
+      "import": "./dist/d1-adapter.js",
+      "require": "./dist/d1-adapter.cjs",
+      "types": "./dist/d1-adapter.d.ts"
+    },
+    "./durable-objects": {
+      "import": "./dist/durable-objects-adapter.js",
+      "require": "./dist/durable-objects-adapter.cjs",
+      "types": "./dist/durable-objects-adapter.d.ts"
+    }
+  },
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint src --ext .ts",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "clean": "rm -rf dist"
+  },
+  "dependencies": {
+    "@pocket/core": "workspace:*",
+    "rxjs": "^7.8.1"
+  },
+  "peerDependencies": {
+    "@cloudflare/workers-types": ">=4.0.0"
+  },
+  "peerDependenciesMeta": {
+    "@cloudflare/workers-types": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20231218.0",
+    "@types/node": "^20.10.0",
+    "tsup": "^8.0.0",
+    "typescript": "^5.3.0",
+    "vitest": "^1.1.0"
+  }
+}
