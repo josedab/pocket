@@ -414,6 +414,60 @@
   color: var(--ifm-color-emphasis-600);
 }
 
+/* Playground section */
+.playgroundSection {
+  padding: 4rem 0;
+  background: var(--ifm-color-emphasis-100);
+}
+
+.playgroundLoading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  padding: 4rem;
+  background: var(--ifm-background-surface-color);
+  border: 1px solid var(--ifm-color-emphasis-300);
+  border-radius: 8px;
+  color: var(--ifm-color-content);
+}
+
+.playgroundSpinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid var(--ifm-color-emphasis-200);
+  border-top-color: var(--ifm-color-primary);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.playgroundLinks {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 1.5rem;
+  font-size: 0.9rem;
+}
+
+.playgroundLinks a {
+  color: var(--ifm-color-primary);
+}
+
+.playgroundLinks a:hover {
+  text-decoration: underline;
+}
+
+.linkSeparator {
+  color: var(--ifm-color-emphasis-400);
+}
+
 /* Responsive */
 @media screen and (max-width: 996px) {
   .heroBanner {

@@ -593,6 +593,376 @@ export default App;
 };
 
 /**
+ * Offline-First Sync Example
+ *
+ * Demonstrates how Pocket works offline and syncs when connected.
+ */
+export const offlineSyncExample: PlaygroundExample = {
+  name: 'Offline-First Sync',
+  description: 'Work offline and sync when connected',
+  openFile: 'src/App.tsx',
+  files: {
+    'src/main.tsx': `import React from 'react';
+import ReactDOM from 'react-dom/client';
+import { PocketProvider } from '@pocket/react';
+import { Database } from '@pocket/core';
+import App from './App';
+
+const db = Database.create({
+  name: 'offline-sync-example',
+  storage: 'memory',
+});
+
+ReactDOM.createRoot(document.getElementById('root')!).render(
+  <React.StrictMode>
+    <PocketProvider database={db}>
+      <App />
+    </PocketProvider>
+  </React.StrictMode>
+);
+`,
+    'src/App.tsx': `import { useState } from 'react';
+import { useLiveQuery, usePocket, useSyncStatus } from '@pocket/react';
+
+interface Note {
+  _id: string;
+  title: string;
+  content: string;
+  updatedAt: Date;
+  synced: boolean;
+}
+
+function App() {
+  const { db } = usePocket();
+  const { data: notes } = useLiveQuery<Note>(
+    'notes',
+    (query) => query.orderBy('updatedAt', 'desc')
+  );
+  const syncStatus = useSyncStatus();
+
+  const [isOnline, setIsOnline] = useState(true);
+  const [title, setTitle] = useState('');
+  const [content, setContent] = useState('');
+
+  const addNote = async () => {
+    if (!title.trim()) return;
+
+    await db.collection('notes').insert({
+      title,
+      content,
+      updatedAt: new Date(),
+      synced: isOnline, // Mark as synced only if online
+    });
+
+    setTitle('');
+    setContent('');
+  };
+
+  const toggleOnline = () => {
+    setIsOnline(!isOnline);
+  };
+
+  return (
+    <div style={{ padding: '2rem', maxWidth: '700px', margin: '0 auto' }}>
+      <h1>Offline-First Notes</h1>
+
+      {/* Connection Status */}
+      <div style={{
+        display: 'flex',
+        alignItems: 'center',
+        gap: '1rem',
+        marginBottom: '1.5rem',
+        padding: '1rem',
+        background: isOnline ? '#e8f5e9' : '#fff3e0',
+        borderRadius: '8px',
+      }}>
+        <div style={{
+          width: '12px',
+          height: '12px',
+          borderRadius: '50%',
+          background: isOnline ? '#4caf50' : '#ff9800',
+        }} />
+        <span style={{ flex: 1 }}>
+          {isOnline ? 'Online - Changes sync automatically' : 'Offline - Changes saved locally'}
+        </span>
+        <button onClick={toggleOnline} style={{ padding: '0.5rem 1rem' }}>
+          Go {isOnline ? 'Offline' : 'Online'}
+        </button>
+      </div>
+
+      {/* Add Note Form */}
+      <div style={{ marginBottom: '1.5rem' }}>
+        <input
+          type="text"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          placeholder="Note title..."
+          style={{ width: '100%', padding: '0.75rem', marginBottom: '0.5rem' }}
+        />
+        <textarea
+          value={content}
+          onChange={(e) => setContent(e.target.value)}
+          placeholder="Note content..."
+          style={{ width: '100%', padding: '0.75rem', minHeight: '100px' }}
+        />
+        <button
+          onClick={addNote}
+          style={{ marginTop: '0.5rem', padding: '0.75rem 1.5rem' }}
+        >
+          Add Note
+        </button>
+      </div>
+
+      {/* Notes List */}
+      <div>
+        <h2>Notes ({notes.length})</h2>
+        {notes.map((note) => (
+          <div
+            key={note._id}
+            style={{
+              padding: '1rem',
+              marginBottom: '1rem',
+              border: '1px solid #ddd',
+              borderRadius: '8px',
+              borderLeft: note.synced ? '4px solid #4caf50' : '4px solid #ff9800',
+            }}
+          >
+            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+              <h3 style={{ margin: 0 }}>{note.title}</h3>
+              <span style={{
+                fontSize: '0.8rem',
+                padding: '0.25rem 0.5rem',
+                background: note.synced ? '#e8f5e9' : '#fff3e0',
+                borderRadius: '4px',
+              }}>
+                {note.synced ? 'Synced' : 'Pending'}
+              </span>
+            </div>
+            <p style={{ margin: '0.5rem 0', color: '#666' }}>{note.content}</p>
+            <span style={{ fontSize: '0.8rem', color: '#888' }}>
+              {new Date(note.updatedAt).toLocaleString()}
+            </span>
+          </div>
+        ))}
+        {notes.length === 0 && (
+          <p style={{ textAlign: 'center', color: '#888', padding: '2rem' }}>
+            No notes yet. Add one above!
+          </p>
+        )}
+      </div>
+    </div>
+  );
+}
+
+export default App;
+`,
+  },
+};
+
+/**
+ * Relationships Example
+ *
+ * Demonstrates document relationships and joins.
+ */
+export const relationshipsExample: PlaygroundExample = {
+  name: 'Relationships',
+  description: 'Document relationships with nested queries',
+  openFile: 'src/App.tsx',
+  files: {
+    'src/main.tsx': `import React from 'react';
+import ReactDOM from 'react-dom/client';
+import { PocketProvider } from '@pocket/react';
+import { Database } from '@pocket/core';
+import App from './App';
+
+const db = Database.create({
+  name: 'relationships-example',
+  storage: 'memory',
+});
+
+// Seed sample data
+const seedData = async () => {
+  // Create authors
+  const authors = [
+    { _id: 'author-1', name: 'Alice', bio: 'Tech writer' },
+    { _id: 'author-2', name: 'Bob', bio: 'Science blogger' },
+  ];
+
+  for (const author of authors) {
+    await db.collection('authors').insert(author);
+  }
+
+  // Create posts with author references
+  const posts = [
+    { _id: 'post-1', title: 'Getting Started', authorId: 'author-1', likes: 42 },
+    { _id: 'post-2', title: 'Advanced Tips', authorId: 'author-1', likes: 28 },
+    { _id: 'post-3', title: 'Science of Data', authorId: 'author-2', likes: 35 },
+  ];
+
+  for (const post of posts) {
+    await db.collection('posts').insert(post);
+  }
+
+  // Create comments with post references
+  const comments = [
+    { postId: 'post-1', text: 'Great article!', user: 'Charlie' },
+    { postId: 'post-1', text: 'Very helpful', user: 'Diana' },
+    { postId: 'post-2', text: 'Learned a lot', user: 'Eve' },
+  ];
+
+  for (const comment of comments) {
+    await db.collection('comments').insert(comment);
+  }
+};
+
+seedData();
+
+ReactDOM.createRoot(document.getElementById('root')!).render(
+  <React.StrictMode>
+    <PocketProvider database={db}>
+      <App />
+    </PocketProvider>
+  </React.StrictMode>
+);
+`,
+    'src/App.tsx': `import { useLiveQuery, usePocket } from '@pocket/react';
+
+interface Author {
+  _id: string;
+  name: string;
+  bio: string;
+}
+
+interface Post {
+  _id: string;
+  title: string;
+  authorId: string;
+  likes: number;
+}
+
+interface Comment {
+  _id: string;
+  postId: string;
+  text: string;
+  user: string;
+}
+
+function App() {
+  const { db } = usePocket();
+  const { data: authors } = useLiveQuery<Author>('authors');
+  const { data: posts } = useLiveQuery<Post>(
+    'posts',
+    (query) => query.orderBy('likes', 'desc')
+  );
+  const { data: comments } = useLiveQuery<Comment>('comments');
+
+  // Helper to get author for a post
+  const getAuthor = (authorId: string) =>
+    authors.find((a) => a._id === authorId);
+
+  // Helper to get comments for a post
+  const getComments = (postId: string) =>
+    comments.filter((c) => c.postId === postId);
+
+  // Helper to get post count for an author
+  const getPostCount = (authorId: string) =>
+    posts.filter((p) => p.authorId === authorId).length;
+
+  return (
+    <div style={{ padding: '2rem', maxWidth: '800px', margin: '0 auto' }}>
+      <h1>Blog with Relationships</h1>
+
+      {/* Authors Section */}
+      <section style={{ marginBottom: '2rem' }}>
+        <h2>Authors</h2>
+        <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
+          {authors.map((author) => (
+            <div
+              key={author._id}
+              style={{
+                padding: '1rem',
+                border: '1px solid #ddd',
+                borderRadius: '8px',
+                minWidth: '200px',
+              }}
+            >
+              <h3 style={{ margin: '0 0 0.5rem' }}>{author.name}</h3>
+              <p style={{ margin: '0 0 0.5rem', color: '#666' }}>{author.bio}</p>
+              <span style={{
+                fontSize: '0.8rem',
+                padding: '0.25rem 0.5rem',
+                background: '#e3f2fd',
+                borderRadius: '4px',
+              }}>
+                {getPostCount(author._id)} posts
+              </span>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Posts Section */}
+      <section>
+        <h2>Posts (by popularity)</h2>
+        {posts.map((post) => {
+          const author = getAuthor(post.authorId);
+          const postComments = getComments(post._id);
+
+          return (
+            <div
+              key={post._id}
+              style={{
+                padding: '1.5rem',
+                marginBottom: '1rem',
+                border: '1px solid #ddd',
+                borderRadius: '8px',
+              }}
+            >
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
+                <h3 style={{ margin: 0 }}>{post.title}</h3>
+                <span style={{ color: '#f44336' }}>❤️ {post.likes}</span>
+              </div>
+
+              <p style={{ margin: '0 0 1rem', color: '#666' }}>
+                By <strong>{author?.name ?? 'Unknown'}</strong>
+              </p>
+
+              {/* Comments */}
+              <div style={{ borderTop: '1px solid #eee', paddingTop: '1rem' }}>
+                <h4 style={{ margin: '0 0 0.5rem', fontSize: '0.9rem' }}>
+                  Comments ({postComments.length})
+                </h4>
+                {postComments.map((comment) => (
+                  <div
+                    key={comment._id}
+                    style={{
+                      padding: '0.5rem',
+                      marginBottom: '0.5rem',
+                      background: '#f5f5f5',
+                      borderRadius: '4px',
+                    }}
+                  >
+                    <strong>{comment.user}:</strong> {comment.text}
+                  </div>
+                ))}
+                {postComments.length === 0 && (
+                  <p style={{ color: '#888', fontSize: '0.9rem' }}>No comments yet</p>
+                )}
+              </div>
+            </div>
+          );
+        })}
+      </section>
+    </div>
+  );
+}
+
+export default App;
+`,
+  },
+};
+
+/**
  * All available playground examples
  */
 export const allExamples: PlaygroundExample[] = [
@@ -600,6 +970,8 @@ export const allExamples: PlaygroundExample[] = [
   reactiveExample,
   searchExample,
   schemaExample,
+  offlineSyncExample,
+  relationshipsExample,
 ];
 
 export default allExamples;

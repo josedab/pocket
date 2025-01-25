@@ -1,0 +1,77 @@
+/**
+ * Copy Button styles
+ */
+
+.copyButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  background: var(--ifm-color-emphasis-200);
+  color: var(--ifm-color-content);
+  border: 1px solid var(--ifm-color-emphasis-300);
+  border-radius: 4px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.copyButton:hover {
+  background: var(--ifm-color-emphasis-300);
+  border-color: var(--ifm-color-emphasis-400);
+}
+
+.copyButton.copied {
+  background: var(--ifm-color-success-contrast-background);
+  border-color: var(--ifm-color-success);
+  color: var(--ifm-color-success);
+}
+
+.label {
+  font-weight: 500;
+}
+
+/* Code block corner button */
+.codeButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  background: var(--ifm-color-emphasis-200);
+  color: var(--ifm-color-content-secondary);
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  opacity: 0.7;
+}
+
+.codeButton:hover {
+  background: var(--ifm-color-emphasis-300);
+  color: var(--ifm-color-content);
+  opacity: 1;
+}
+
+.codeButton.copied {
+  background: var(--ifm-color-success-contrast-background);
+  color: var(--ifm-color-success);
+  opacity: 1;
+}
+
+/* Dark mode */
+[data-theme='dark'] .copyButton {
+  background: var(--ifm-color-emphasis-200);
+}
+
+[data-theme='dark'] .copyButton:hover {
+  background: var(--ifm-color-emphasis-300);
+}
+
+[data-theme='dark'] .codeButton {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+[data-theme='dark'] .codeButton:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
