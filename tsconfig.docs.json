@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "noEmit": true,
+    "skipLibCheck": true,
+    "jsx": "react-jsx",
+    "downlevelIteration": true
+  },
+  "include": [
+    "packages/core/src/**/*",
+    "packages/react/src/**/*",
+    "packages/sync/src/**/*",
+    "packages/server/src/**/*",
+    "packages/storage-indexeddb/src/**/*",
+    "packages/storage-opfs/src/**/*",
+    "packages/storage-memory/src/**/*"
+  ],
+  "exclude": ["node_modules", "dist", "**/*.test.ts", "**/*.test.tsx"]
+}
