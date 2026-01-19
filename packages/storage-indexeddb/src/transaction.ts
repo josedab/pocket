@@ -56,15 +56,15 @@ export function promisifyRequest<T>(request: IDBRequest<T>): Promise<T> {
 /**
  * Promise wrapper for cursor iteration
  */
-export async function iterateCursor<T>(
+export async function iterateCursor(
   request: IDBRequest<IDBCursorWithValue | null>,
-  callback: (value: T, cursor: IDBCursorWithValue) => boolean | void
+  callback: (value: unknown, cursor: IDBCursorWithValue) => boolean | undefined
 ): Promise<void> {
   return new Promise<void>((resolve, reject) => {
     request.onsuccess = (): void => {
       const cursor = request.result;
       if (cursor) {
-        const shouldContinue = callback(cursor.value as T, cursor);
+        const shouldContinue = callback(cursor.value as unknown, cursor);
         if (shouldContinue !== false) {
           cursor.continue();
         } else {
@@ -89,12 +89,12 @@ export async function collectCursor<T>(
 ): Promise<T[]> {
   const results: T[] = [];
 
-  await iterateCursor<T>(request, (value): boolean | void => {
-    results.push(value);
+  await iterateCursor(request, (value): boolean | undefined => {
+    results.push(value as T);
     if (limit && results.length >= limit) {
       return false;
     }
-    return;
+    return undefined;
   });
 
   return results;

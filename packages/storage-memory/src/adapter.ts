@@ -12,7 +12,7 @@ import {
   type StorageQuery,
   type StorageStats,
 } from '@pocket/core';
-import { Observable, Subject } from 'rxjs';
+import { Subject, type Observable } from 'rxjs';
 
 /**
  * In-memory document store
@@ -116,7 +116,7 @@ class MemoryDocumentStore<T extends Document> implements DocumentStore<T> {
   }
 
   async count(query?: StorageQuery<T>): Promise<number> {
-    if (!query || !query.spec.filter) {
+    if (!query?.spec.filter) {
       return this.documents.size;
     }
 

@@ -11,7 +11,7 @@ import type {
   StorageStats,
 } from '@pocket/core';
 import { QueryExecutor, matchesFilter } from '@pocket/core';
-import { Observable, Subject } from 'rxjs';
+import { type Observable, Subject } from 'rxjs';
 import type { WorkerRequest, WorkerResponse } from './worker.js';
 
 /**
@@ -109,7 +109,7 @@ class OPFSDocumentStore<T extends Document> implements DocumentStore<T> {
   async delete(id: string): Promise<void> {
     const existing = await this.get(id);
 
-    await this.adapter.workerRequest<void>({
+    await this.adapter.workerRequest<undefined>({
       type: 'delete',
       collection: this.name,
       id,
@@ -135,7 +135,7 @@ class OPFSDocumentStore<T extends Document> implements DocumentStore<T> {
 
   async count(query?: StorageQuery<T>): Promise<number> {
     const docs = await this.getAll();
-    if (!query || !query.spec.filter) {
+    if (!query?.spec.filter) {
       return docs.length;
     }
     return docs.filter((doc) => matchesFilter(doc, query.spec.filter!)).length;
@@ -161,7 +161,7 @@ class OPFSDocumentStore<T extends Document> implements DocumentStore<T> {
   async clear(): Promise<void> {
     const docs = await this.getAll();
 
-    await this.adapter.workerRequest<void>({
+    await this.adapter.workerRequest<undefined>({
       type: 'clear',
       collection: this.name,
     });
