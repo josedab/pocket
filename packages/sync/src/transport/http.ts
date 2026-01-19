@@ -136,7 +136,7 @@ export class HttpTransport implements SyncTransport {
     };
 
     if (this.config.authToken) {
-      headers['Authorization'] = `Bearer ${this.config.authToken}`;
+      headers.Authorization = `Bearer ${this.config.authToken}`;
     }
 
     return headers;

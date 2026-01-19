@@ -31,12 +31,12 @@ export class RollbackManager {
   /**
    * Rollback a specific update
    */
-  async rollback<T extends Document>(updateId: string): Promise<boolean> {
-    const update = this.optimisticManager.get(updateId) as OptimisticUpdate<T> | undefined;
+  async rollback(updateId: string): Promise<boolean> {
+    const update = this.optimisticManager.get(updateId);
     if (!update) return false;
 
     try {
-      const collection = this.getCollection<T>(update.collection);
+      const collection = this.getCollection<Document>(update.collection);
 
       switch (update.change.operation) {
         case 'insert':

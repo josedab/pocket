@@ -1,5 +1,5 @@
 import type { ChangeEvent, Database, Document } from '@pocket/core';
-import { BehaviorSubject, Observable, Subject, Subscription, takeUntil } from 'rxjs';
+import { BehaviorSubject, Subject, takeUntil, type Observable, type Subscription } from 'rxjs';
 import { CheckpointManager } from './checkpoint.js';
 import { ConflictResolver, detectConflict, type ConflictStrategy } from './conflict.js';
 import { createLogger, noopLogger, type Logger, type LoggerOptions } from './logger.js';
@@ -109,11 +109,11 @@ export class SyncEngine {
       this.logger = noopLogger;
     } else if (config.logger && 'debug' in config.logger && 'info' in config.logger) {
       // Custom logger provided
-      this.logger = config.logger as Logger;
+      this.logger = config.logger;
     } else {
       // Create logger from options
       this.logger = createLogger({
-        ...(config.logger as LoggerOptions),
+        ...config.logger!,
         context: 'SyncEngine',
       });
     }
@@ -308,7 +308,7 @@ export class SyncEngine {
    * Destroy the sync engine
    */
   destroy(): void {
-    this.stop();
+    void this.stop();
     this.destroy$.next();
     this.destroy$.complete();
     this.status$.complete();
@@ -341,7 +341,7 @@ export class SyncEngine {
       const collection = this.database.collection(name);
       const subscription = collection.changes().subscribe((event) => {
         if (!event.isFromSync) {
-          this.handleLocalChange(name, event);
+          void this.handleLocalChange(name, event);
         }
       });
 
@@ -512,16 +512,14 @@ export class SyncEngine {
   private startPullInterval(): void {
     if (this.pullIntervalId) return;
 
-    this.pullIntervalId = setInterval(async () => {
+    this.pullIntervalId = setInterval(() => {
       if (this.transport.isConnected() && this.status$.getValue() === 'idle') {
-        try {
-          await this.pull();
-        } catch (error) {
+        this.pull().catch((error: unknown) => {
           // Will retry next interval
           this.logger.warn('Pull interval failed, will retry', {
             error: error instanceof Error ? error.message : String(error),
           });
-        }
+        });
       }
     }, this.config.pullInterval);
   }
@@ -541,18 +539,16 @@ export class SyncEngine {
       this.status$.next('offline');
     });
 
-    this.transport.onReconnect(async () => {
+    this.transport.onReconnect(() => {
       this.logger.info('Reconnected to sync server');
       this.status$.next('idle');
       // Sync on reconnect
       if (this.isRunning) {
-        try {
-          await this.forceSync();
-        } catch (error) {
+        this.forceSync().catch((error: unknown) => {
           this.logger.warn('Sync on reconnect failed', {
             error: error instanceof Error ? error.message : String(error),
           });
-        }
+        });
       }
     });
   }
