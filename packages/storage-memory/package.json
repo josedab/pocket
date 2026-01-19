@@ -1,6 +1,6 @@
 {
   "name": "@pocket/storage-memory",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "In-memory storage adapter for Pocket database (testing/development)",
   "keywords": [
     "pocket",
