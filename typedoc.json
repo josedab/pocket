@@ -1,0 +1,34 @@
+{
+  "$schema": "https://typedoc.org/schema.json",
+  "tsconfig": "./tsconfig.docs.json",
+  "entryPoints": [
+    "packages/core/src/index.ts",
+    "packages/react/src/index.ts",
+    "packages/sync/src/index.ts",
+    "packages/server/src/index.ts",
+    "packages/storage-indexeddb/src/index.ts",
+    "packages/storage-opfs/src/index.ts",
+    "packages/storage-memory/src/index.ts"
+  ],
+  "out": "docs/api",
+  "name": "Pocket API Documentation",
+  "readme": "README.md",
+  "plugin": ["typedoc-plugin-markdown"],
+  "excludePrivate": true,
+  "excludeProtected": true,
+  "excludeInternal": true,
+  "includeVersion": true,
+  "categorizeByGroup": true,
+  "categoryOrder": ["Database", "Collection", "Query", "Storage", "Sync", "React", "Server", "*"],
+  "navigationLinks": {
+    "GitHub": "https://github.com/pocket-db/pocket",
+    "npm": "https://www.npmjs.com/package/pocket"
+  },
+  "sort": ["source-order", "alphabetical"],
+  "visibilityFilters": {
+    "protected": false,
+    "private": false,
+    "inherited": true,
+    "external": false
+  }
+}

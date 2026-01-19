@@ -1,0 +1,117 @@
+version: '3'
+
+vars:
+  NODE_VERSION: 20
+
+tasks:
+  default:
+    desc: Show available tasks
+    cmds:
+      - task --list
+
+  setup:
+    desc: Initial project setup
+    cmds:
+      - pnpm install
+      - pnpm build
+    sources:
+      - package.json
+      - pnpm-lock.yaml
+
+  dev:
+    desc: Start development mode (watch all packages)
+    cmds:
+      - pnpm dev
+
+  build:
+    desc: Build all packages
+    cmds:
+      - pnpm build
+
+  test:
+    desc: Run all tests
+    cmds:
+      - pnpm test
+
+  test:watch:
+    desc: Run tests in watch mode
+    cmds:
+      - pnpm test:watch
+
+  test:coverage:
+    desc: Run tests with coverage report
+    cmds:
+      - pnpm test:coverage
+
+  lint:
+    desc: Run ESLint on all packages
+    cmds:
+      - pnpm lint
+
+  lint:fix:
+    desc: Run ESLint with auto-fix
+    cmds:
+      - pnpm lint:fix
+
+  format:
+    desc: Format code with Prettier
+    cmds:
+      - pnpm format
+
+  format:check:
+    desc: Check code formatting
+    cmds:
+      - pnpm format:check
+
+  typecheck:
+    desc: Run TypeScript type checking
+    cmds:
+      - pnpm typecheck
+
+  check:
+    desc: Run all checks (lint, format, typecheck, test)
+    cmds:
+      - task: lint
+      - task: format:check
+      - task: typecheck
+      - task: test
+
+  size:
+    desc: Check bundle sizes
+    cmds:
+      - pnpm size-limit
+
+  clean:
+    desc: Clean all build artifacts and node_modules
+    cmds:
+      - pnpm clean
+
+  changeset:
+    desc: Create a new changeset
+    cmds:
+      - pnpm changeset
+
+  version:
+    desc: Version packages based on changesets
+    cmds:
+      - pnpm version-packages
+
+  release:
+    desc: Build and publish packages
+    cmds:
+      - pnpm release
+
+  docs:
+    desc: Generate API documentation
+    cmds:
+      - pnpm docs
+
+  docs:serve:
+    desc: Serve documentation locally
+    cmds:
+      - pnpm docs:serve
+
+  bench:
+    desc: Run performance benchmarks
+    cmds:
+      - pnpm bench
