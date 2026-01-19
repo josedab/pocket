@@ -87,7 +87,7 @@ export class PocketServer {
       });
 
       this.wss.on('connection', (socket, request) => {
-        this.handleConnection(socket, request);
+        void this.handleConnection(socket, request);
       });
 
       this.wss.on('listening', () => {
@@ -170,10 +170,21 @@ export class PocketServer {
     });
 
     // Set up message handler
-    socket.on('message', async (data) => {
+    socket.on('message', (data) => {
       try {
-        const message = JSON.parse(data.toString()) as SyncProtocolMessage;
-        await this.handleMessage(client, message);
+        // Handle various RawData types from ws library
+        let dataStr: string;
+        if (Buffer.isBuffer(data)) {
+          dataStr = data.toString('utf8');
+        } else if (data instanceof ArrayBuffer) {
+          dataStr = Buffer.from(data).toString('utf8');
+        } else if (Array.isArray(data)) {
+          dataStr = Buffer.concat(data).toString('utf8');
+        } else {
+          dataStr = data as string;
+        }
+        const message = JSON.parse(dataStr) as SyncProtocolMessage;
+        void this.handleMessage(client, message);
       } catch {
         this.sendError(socket, 'PARSE_ERROR', 'Invalid message format', true);
       }
@@ -200,10 +211,10 @@ export class PocketServer {
 
     switch (message.type) {
       case 'push':
-        await this.handlePush(client, message as PushMessage);
+        await this.handlePush(client, message);
         break;
       case 'pull':
-        await this.handlePull(client, message as PullMessage);
+        await this.handlePull(client, message);
         break;
       default:
         this.sendError(
