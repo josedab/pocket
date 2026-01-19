@@ -1,0 +1,73 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 640" width="1280" height="640">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0f0f23;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#1a1a3e;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="logoGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#6366f1;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#8b5cf6;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="accentGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#6366f1;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#a855f7;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1280" height="640" fill="url(#bgGrad)"/>
+
+  <!-- Decorative grid pattern -->
+  <g opacity="0.05">
+    <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M 40 0 L 0 0 0 40" fill="none" stroke="white" stroke-width="1"/>
+    </pattern>
+    <rect width="1280" height="640" fill="url(#grid)"/>
+  </g>
+
+  <!-- Decorative circles -->
+  <circle cx="100" cy="540" r="200" fill="url(#logoGrad)" opacity="0.1"/>
+  <circle cx="1180" cy="100" r="150" fill="url(#logoGrad)" opacity="0.08"/>
+
+  <!-- Logo (scaled pocket icon) -->
+  <g transform="translate(540, 140) scale(1.6)">
+    <rect x="10" y="20" width="80" height="65" rx="10" fill="url(#logoGrad)"/>
+    <rect x="20" y="10" width="60" height="15" rx="5" fill="url(#logoGrad)"/>
+    <circle cx="35" cy="50" r="8" fill="white" opacity="0.9"/>
+    <circle cx="65" cy="50" r="8" fill="white" opacity="0.9"/>
+    <rect x="30" y="65" width="40" height="8" rx="4" fill="white" opacity="0.9"/>
+  </g>
+
+  <!-- Title -->
+  <text x="640" y="360" font-family="system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="72" font-weight="700" fill="white" text-anchor="middle">Pocket</text>
+
+  <!-- Tagline -->
+  <text x="640" y="420" font-family="system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="28" fill="#a1a1aa" text-anchor="middle">Local-first database for web applications</text>
+
+  <!-- Feature pills -->
+  <g transform="translate(640, 480)">
+    <!-- TypeScript pill -->
+    <g transform="translate(-280, 0)">
+      <rect x="-60" y="-18" width="120" height="36" rx="18" fill="url(#logoGrad)" opacity="0.2"/>
+      <text x="0" y="6" font-family="system-ui, sans-serif" font-size="16" fill="#c4b5fd" text-anchor="middle">TypeScript</text>
+    </g>
+    <!-- Reactive pill -->
+    <g transform="translate(-90, 0)">
+      <rect x="-55" y="-18" width="110" height="36" rx="18" fill="url(#logoGrad)" opacity="0.2"/>
+      <text x="0" y="6" font-family="system-ui, sans-serif" font-size="16" fill="#c4b5fd" text-anchor="middle">Reactive</text>
+    </g>
+    <!-- Offline-first pill -->
+    <g transform="translate(90, 0)">
+      <rect x="-60" y="-18" width="120" height="36" rx="18" fill="url(#logoGrad)" opacity="0.2"/>
+      <text x="0" y="6" font-family="system-ui, sans-serif" font-size="16" fill="#c4b5fd" text-anchor="middle">Offline-first</text>
+    </g>
+    <!-- Sync pill -->
+    <g transform="translate(250, 0)">
+      <rect x="-45" y="-18" width="90" height="36" rx="18" fill="url(#logoGrad)" opacity="0.2"/>
+      <text x="0" y="6" font-family="system-ui, sans-serif" font-size="16" fill="#c4b5fd" text-anchor="middle">Sync</text>
+    </g>
+  </g>
+
+  <!-- Bottom accent line -->
+  <rect x="0" y="630" width="1280" height="10" fill="url(#accentGrad)"/>
+</svg>

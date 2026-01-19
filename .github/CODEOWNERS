@@ -1,0 +1,21 @@
+# Default owners for everything in the repo
+* @pocket-db/maintainers
+
+# Core packages
+/packages/core/ @pocket-db/core-team
+/packages/react/ @pocket-db/core-team
+/packages/sync/ @pocket-db/core-team
+/packages/server/ @pocket-db/core-team
+
+# Storage adapters
+/packages/storage-indexeddb/ @pocket-db/core-team
+/packages/storage-memory/ @pocket-db/core-team
+/packages/storage-opfs/ @pocket-db/core-team
+
+# Documentation
+*.md @pocket-db/maintainers
+/docs/ @pocket-db/maintainers
+
+# CI/CD and tooling
+/.github/ @pocket-db/maintainers
+/.changeset/ @pocket-db/maintainers

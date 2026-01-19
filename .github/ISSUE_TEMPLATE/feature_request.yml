@@ -1,0 +1,76 @@
+name: Feature Request
+description: Suggest a new feature or enhancement
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for suggesting a new feature!
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem Statement
+      description: What problem are you trying to solve? What use case does this enable?
+      placeholder: I'm always frustrated when...
+    validations:
+      required: true
+
+  - type: textarea
+    id: solution
+    attributes:
+      label: Proposed Solution
+      description: Describe the solution you'd like to see.
+      placeholder: It would be great if...
+    validations:
+      required: true
+
+  - type: textarea
+    id: api
+    attributes:
+      label: Suggested API
+      description: If applicable, provide a suggested API design.
+      render: typescript
+      placeholder: |
+        // Example usage:
+        const result = await db.collection('todos').newFeature({
+          option: 'value',
+        });
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives Considered
+      description: Describe any alternative solutions or features you've considered.
+      placeholder: I considered using...
+
+  - type: dropdown
+    id: package
+    attributes:
+      label: Related Package
+      description: Which package(s) would this feature affect?
+      multiple: true
+      options:
+        - pocket
+        - "@pocket/core"
+        - "@pocket/react"
+        - "@pocket/sync"
+        - "@pocket/storage-indexeddb"
+        - "@pocket/storage-opfs"
+        - "@pocket/storage-memory"
+        - "@pocket/server"
+        - New package
+
+  - type: checkboxes
+    id: contribution
+    attributes:
+      label: Contribution
+      description: Would you be willing to help implement this feature?
+      options:
+        - label: I would be willing to submit a PR to implement this feature
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: Additional Context
+      description: Add any other context, screenshots, or examples about the feature request here.
