@@ -153,7 +153,7 @@ export function stripInternalFields<T extends Document>(
   doc: T
 ): Omit<T, '_rev' | '_updatedAt' | '_vclock'> {
   const { _rev, _updatedAt, _vclock, ...rest } = doc;
-  return rest as Omit<T, '_rev' | '_updatedAt' | '_vclock'>;
+  return rest;
 }
 
 /**

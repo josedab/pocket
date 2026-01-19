@@ -23,7 +23,7 @@ export class Database {
   readonly nodeId: string;
 
   private readonly storage: StorageAdapter;
-  private readonly collections = new Map<string, Collection<Document>>();
+  private readonly collections = new Map<string, Collection>();
   private readonly collectionConfigs = new Map<string, CollectionConfig>();
   private isInitialized = false;
   private isClosed = false;
@@ -89,7 +89,7 @@ export class Database {
     const store = this.storage.getStore<T>(name);
     const collection = new Collection<T>(config, store, this.nodeId);
     await collection.initialize(config.indexes);
-    this.collections.set(name, collection as unknown as Collection<Document>);
+    this.collections.set(name, collection as unknown as Collection);
     return collection;
   }
 
@@ -106,7 +106,7 @@ export class Database {
       const config = this.collectionConfigs.get(name) ?? { name };
       const store = this.storage.getStore<T>(name);
       const newCollection = new Collection<T>(config as CollectionConfig<T>, store, this.nodeId);
-      this.collections.set(name, newCollection as unknown as Collection<Document>);
+      this.collections.set(name, newCollection as unknown as Collection);
       return newCollection;
     }
 

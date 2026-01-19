@@ -1,10 +1,7 @@
 /**
  * Vector clock for distributed causality tracking
  */
-export interface VectorClock {
-  /** Map of node ID to logical timestamp */
-  [nodeId: string]: number;
-}
+export type VectorClock = Record<string, number>;
 
 /**
  * Base document interface that all stored documents must extend

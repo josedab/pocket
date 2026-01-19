@@ -54,7 +54,7 @@ export class QueryPlanner<T extends Document> {
 
       for (const index of this.indexes) {
         const firstField = index.fields[0];
-        if (firstField && firstField.field === sortField) {
+        if (firstField?.field === sortField) {
           // Check if direction matches (or we can reverse)
           selectedIndex = index;
           sortUsingIndex = firstField.direction === sortDirection;
@@ -191,14 +191,10 @@ export class QueryPlanner<T extends Document> {
         const lastMatchedIndex = matchedFields;
         const nextIndexField = index.fields[lastMatchedIndex];
 
-        if (nextIndexField && nextIndexField.field === firstSort.field) {
+        if (nextIndexField?.field === firstSort.field) {
           sortMatch = true;
           score += 3;
-        } else if (
-          index.fields[0] &&
-          index.fields[0].field === firstSort.field &&
-          filterFields.size === 0
-        ) {
+        } else if (index.fields[0]?.field === firstSort.field && filterFields.size === 0) {
           sortMatch = true;
           score += 3;
         }

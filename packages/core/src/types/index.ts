@@ -1,3 +1,3 @@
 export * from './document.js';
-export * from './query.js';
-export * from './storage.js';
+export type * from './query.js';
+export type * from './storage.js';

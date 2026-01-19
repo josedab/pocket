@@ -1,4 +1,4 @@
-import { Observable, Subject, takeUntil } from 'rxjs';
+import { type Observable, Subject, takeUntil } from 'rxjs';
 import type { ChangeBatch, ChangeEvent, Document } from '../types/document.js';
 
 /**

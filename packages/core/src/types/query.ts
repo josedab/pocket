@@ -66,10 +66,10 @@ export type SortDirection = 'asc' | 'desc';
 /**
  * Sort specification
  */
-export type SortSpec<T extends Document> = {
+export interface SortSpec<T extends Document> {
   field: keyof T & string;
   direction: SortDirection;
-};
+}
 
 /**
  * Complete query specification
