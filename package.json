@@ -1,0 +1,101 @@
+{
+  "name": "pocket-monorepo",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Local-first database for web applications",
+  "keywords": [
+    "database",
+    "local-first",
+    "offline-first",
+    "sync",
+    "reactive"
+  ],
+  "license": "MIT",
+  "author": "Pocket Contributors",
+  "type": "module",
+  "scripts": {
+    "build": "turbo run build",
+    "dev": "turbo run dev",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "test:integration": "vitest run --project integration",
+    "lint": "eslint packages --ext .ts,.tsx",
+    "lint:fix": "eslint packages --ext .ts,.tsx --fix",
+    "format": "prettier --write \"packages/**/*.{ts,tsx,json}\"",
+    "format:check": "prettier --check \"packages/**/*.{ts,tsx,json}\"",
+    "typecheck": "turbo run typecheck",
+    "clean": "turbo run clean && rm -rf node_modules",
+    "size-limit": "size-limit",
+    "changeset": "changeset",
+    "version-packages": "changeset version",
+    "release": "turbo run build && changeset publish",
+    "docs": "typedoc",
+    "docs:api": "typedoc",
+    "docs:dev": "pnpm --filter @pocket/docs dev",
+    "docs:build": "pnpm --filter @pocket/docs build",
+    "docs:preview": "pnpm --filter @pocket/docs preview",
+    "bench": "pnpm --filter @pocket/benchmarks bench",
+    "prepare": "husky"
+  },
+  "lint-staged": {
+    "*.{ts,tsx}": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "*.{json,yml,yaml}": [
+      "prettier --write"
+    ]
+  },
+  "devDependencies": {
+    "@changesets/cli": "^2.27.0",
+    "@eslint/js": "^9.39.2",
+    "@size-limit/preset-small-lib": "^11.0.0",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@types/node": "^20.10.0",
+    "@vitest/coverage-v8": "^1.1.0",
+    "eslint": "^9.39.2",
+    "eslint-plugin-react": "^7.37.5",
+    "eslint-plugin-react-hooks": "^7.0.1",
+    "fake-indexeddb": "^5.0.0",
+    "husky": "^9.1.7",
+    "jsdom": "^27.4.0",
+    "lint-staged": "^16.2.7",
+    "prettier": "^3.8.0",
+    "prettier-plugin-organize-imports": "^4.3.0",
+    "size-limit": "^11.0.0",
+    "tsup": "^8.0.0",
+    "turbo": "^1.11.0",
+    "typedoc": "^0.28.16",
+    "typedoc-plugin-markdown": "^4.9.0",
+    "typescript": "^5.3.0",
+    "typescript-eslint": "^8.53.0",
+    "vitest": "^1.1.0"
+  },
+  "packageManager": "pnpm@8.12.0",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "size-limit": [
+    {
+      "path": "packages/core/dist/index.js",
+      "limit": "25 KB"
+    },
+    {
+      "path": "packages/react/dist/index.js",
+      "limit": "8 KB"
+    },
+    {
+      "path": "packages/sync/dist/index.js",
+      "limit": "12 KB"
+    },
+    {
+      "path": "packages/storage-indexeddb/dist/index.js",
+      "limit": "5 KB"
+    },
+    {
+      "path": "packages/storage-opfs/dist/index.js",
+      "limit": "8 KB"
+    }
+  ]
+}

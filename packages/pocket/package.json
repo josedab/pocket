@@ -1,0 +1,78 @@
+{
+  "name": "pocket",
+  "version": "0.1.0",
+  "description": "Local-first database for web applications",
+  "keywords": [
+    "database",
+    "local-first",
+    "offline-first",
+    "sync",
+    "reactive",
+    "indexeddb",
+    "opfs"
+  ],
+  "license": "MIT",
+  "author": "Pocket Contributors",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/pocket-db/pocket"
+  },
+  "homepage": "https://pocket-db.dev",
+  "type": "module",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs",
+      "types": "./dist/index.d.ts"
+    },
+    "./react": {
+      "import": "./dist/react.js",
+      "require": "./dist/react.cjs",
+      "types": "./dist/react.d.ts"
+    },
+    "./sync": {
+      "import": "./dist/sync.js",
+      "require": "./dist/sync.cjs",
+      "types": "./dist/sync.d.ts"
+    }
+  },
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint src --ext .ts,.tsx",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "clean": "rm -rf dist"
+  },
+  "dependencies": {
+    "@pocket/core": "workspace:*",
+    "@pocket/react": "workspace:*",
+    "@pocket/storage-indexeddb": "workspace:*",
+    "@pocket/storage-memory": "workspace:*",
+    "@pocket/storage-opfs": "workspace:*",
+    "@pocket/sync": "workspace:*"
+  },
+  "peerDependencies": {
+    "react": ">=18.0.0"
+  },
+  "peerDependenciesMeta": {
+    "react": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.0",
+    "@types/react": "^18.2.0",
+    "react": "^18.2.0",
+    "tsup": "^8.0.0",
+    "typescript": "^5.3.0",
+    "vitest": "^1.1.0"
+  }
+}
