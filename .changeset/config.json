@@ -1,0 +1,22 @@
+{
+  "$schema": "https://unpkg.com/@changesets/config@3.0.0/schema.json",
+  "changelog": "@changesets/cli/changelog",
+  "commit": false,
+  "fixed": [],
+  "linked": [
+    [
+      "@pocket/core",
+      "@pocket/react",
+      "@pocket/sync",
+      "@pocket/server",
+      "@pocket/storage-indexeddb",
+      "@pocket/storage-memory",
+      "@pocket/storage-opfs",
+      "pocket"
+    ]
+  ],
+  "access": "public",
+  "baseBranch": "main",
+  "updateInternalDependencies": "patch",
+  "ignore": []
+}
