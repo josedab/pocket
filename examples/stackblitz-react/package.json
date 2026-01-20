@@ -1,6 +1,6 @@
 {
-  "name": "pocket-react-example",
-  "version": "0.0.1",
+  "name": "@pocket/example-stackblitz-react",
+  "version": "0.1.0",
   "private": true,
   "type": "module",
   "scripts": {
@@ -9,9 +9,9 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@pocket-db/core": "^0.1.0",
-    "@pocket-db/react": "^0.1.0",
-    "@pocket-db/storage-memory": "^0.1.0",
+    "@pocket/core": "workspace:*",
+    "@pocket/react": "workspace:*",
+    "@pocket/storage-memory": "workspace:*",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
   },

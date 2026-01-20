@@ -1,7 +1,7 @@
+import { createDatabase, type Database, type Document } from '@pocket/core';
+import { PocketProvider, useLiveQuery, useMutation } from '@pocket/react';
+import { createMemoryStorage } from '@pocket/storage-memory';
 import React, { useEffect, useState } from 'react';
-import { PocketProvider, useLiveQuery, useMutation } from '@pocket-db/react';
-import { createDatabase, type Database, type Document } from '@pocket-db/core';
-import { createMemoryStorage } from '@pocket-db/storage-memory';
 
 // Define the Todo document type
 interface Todo extends Document {
@@ -41,11 +41,13 @@ function TodoItem({ todo }: { todo: Todo }) {
         onChange={toggleComplete}
         style={styles.checkbox}
       />
-      <span style={{
-        ...styles.todoText,
-        textDecoration: todo.completed ? 'line-through' : 'none',
-        opacity: todo.completed ? 0.6 : 1,
-      }}>
+      <span
+        style={{
+          ...styles.todoText,
+          textDecoration: todo.completed ? 'line-through' : 'none',
+          opacity: todo.completed ? 0.6 : 1,
+        }}
+      >
         {todo.text}
       </span>
       <button onClick={deleteTodo} style={styles.deleteButton}>
@@ -90,16 +92,15 @@ function AddTodo() {
 
 // TodoList component
 function TodoList() {
-  const { data: todos, isLoading } = useLiveQuery<Todo>(
-    'todos',
-    (collection) => collection.find().sort([{ field: 'createdAt', direction: 'desc' }])
+  const { data: todos, isLoading } = useLiveQuery<Todo>('todos', (collection) =>
+    collection.find().sort('createdAt', 'desc')
   );
 
   if (isLoading) {
     return <div style={styles.loading}>Loading todos...</div>;
   }
 
-  const completedCount = todos.filter(t => t.completed).length;
+  const completedCount = todos.filter((t) => t.completed).length;
 
   return (
     <div>
@@ -155,14 +156,10 @@ export function App() {
       <div style={styles.container}>
         <div style={styles.card}>
           <h1 style={styles.title}>Pocket Todo</h1>
-          <p style={styles.subtitle}>
-            A local-first todo app powered by Pocket database
-          </p>
+          <p style={styles.subtitle}>A local-first todo app powered by Pocket database</p>
           <AddTodo />
           <TodoList />
-          <div style={styles.footer}>
-            Data persists in memory. Refresh to reset.
-          </div>
+          <div style={styles.footer}>Data persists in memory. Refresh to reset.</div>
         </div>
       </div>
     </PocketProvider>
