@@ -1,0 +1,21 @@
+{
+  "name": "@pocket/benchmarks",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Benchmark suite for Pocket database",
+  "type": "module",
+  "scripts": {
+    "bench": "tsx src/run.ts",
+    "bench:core": "tsx src/core.bench.ts",
+    "bench:storage": "tsx src/storage.bench.ts",
+    "bench:query": "tsx src/query.bench.ts"
+  },
+  "dependencies": {
+    "@pocket/core": "workspace:*",
+    "@pocket/storage-memory": "workspace:*"
+  },
+  "devDependencies": {
+    "tinybench": "^2.6.0",
+    "tsx": "^4.7.0"
+  }
+}
