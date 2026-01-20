@@ -1,0 +1,79 @@
+<svg width="1200" height="630" viewBox="0 0 1200 630" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#1a1a2e;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#16213e;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="accentGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#00d9ff;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#6366f1;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="logoGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#00d9ff;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#6366f1;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#a855f7;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1200" height="630" fill="url(#bgGradient)"/>
+
+  <!-- Decorative elements -->
+  <circle cx="1100" cy="100" r="150" fill="#6366f1" fill-opacity="0.1"/>
+  <circle cx="100" cy="530" r="200" fill="#00d9ff" fill-opacity="0.08"/>
+
+  <!-- Grid pattern -->
+  <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+    <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#ffffff" stroke-width="0.5" stroke-opacity="0.05"/>
+  </pattern>
+  <rect width="1200" height="630" fill="url(#grid)"/>
+
+  <!-- Logo icon (database with sync arrows) -->
+  <g transform="translate(540, 140)">
+    <!-- Database cylinder -->
+    <ellipse cx="60" cy="30" rx="50" ry="20" fill="none" stroke="url(#logoGradient)" stroke-width="4"/>
+    <path d="M 10 30 L 10 90" stroke="url(#logoGradient)" stroke-width="4"/>
+    <path d="M 110 30 L 110 90" stroke="url(#logoGradient)" stroke-width="4"/>
+    <ellipse cx="60" cy="90" rx="50" ry="20" fill="none" stroke="url(#logoGradient)" stroke-width="4"/>
+
+    <!-- Sync arrows -->
+    <g transform="translate(85, 50)">
+      <path d="M 25 0 A 25 25 0 1 1 0 25" fill="none" stroke="#00d9ff" stroke-width="3" stroke-linecap="round"/>
+      <polygon points="25,-8 25,8 35,0" fill="#00d9ff"/>
+    </g>
+  </g>
+
+  <!-- Title -->
+  <text x="600" y="320" font-family="system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif"
+        font-size="72" font-weight="700" fill="#ffffff" text-anchor="middle">
+    Pocket
+  </text>
+
+  <!-- Subtitle -->
+  <text x="600" y="390" font-family="system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif"
+        font-size="28" font-weight="400" fill="#94a3b8" text-anchor="middle">
+    Local-first database for web applications
+  </text>
+
+  <!-- Feature badges -->
+  <g transform="translate(300, 450)">
+    <!-- TypeScript badge -->
+    <rect x="0" y="0" width="140" height="36" rx="18" fill="#3178c6" fill-opacity="0.2" stroke="#3178c6" stroke-width="1"/>
+    <text x="70" y="24" font-family="system-ui, sans-serif" font-size="14" font-weight="500" fill="#3178c6" text-anchor="middle">TypeScript</text>
+
+    <!-- React badge -->
+    <rect x="160" y="0" width="100" height="36" rx="18" fill="#61dafb" fill-opacity="0.2" stroke="#61dafb" stroke-width="1"/>
+    <text x="210" y="24" font-family="system-ui, sans-serif" font-size="14" font-weight="500" fill="#61dafb" text-anchor="middle">React</text>
+
+    <!-- Offline badge -->
+    <rect x="280" y="0" width="120" height="36" rx="18" fill="#10b981" fill-opacity="0.2" stroke="#10b981" stroke-width="1"/>
+    <text x="340" y="24" font-family="system-ui, sans-serif" font-size="14" font-weight="500" fill="#10b981" text-anchor="middle">Offline-first</text>
+
+    <!-- Sync badge -->
+    <rect x="420" y="0" width="100" height="36" rx="18" fill="#a855f7" fill-opacity="0.2" stroke="#a855f7" stroke-width="1"/>
+    <text x="470" y="24" font-family="system-ui, sans-serif" font-size="14" font-weight="500" fill="#a855f7" text-anchor="middle">Sync</text>
+  </g>
+
+  <!-- Accent line at bottom -->
+  <rect x="0" y="620" width="1200" height="10" fill="url(#accentGradient)"/>
+</svg>
