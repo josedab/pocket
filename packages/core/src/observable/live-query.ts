@@ -162,7 +162,7 @@ export class LiveQuery<T extends Document> {
    */
   observable(): Observable<T[]> {
     // Auto-start when subscribed
-    this.start().catch((error) => {
+    this.start().catch((error: unknown) => {
       this.state$.next({
         ...this.state,
         isLoading: false,
@@ -252,7 +252,7 @@ export class LiveQuery<T extends Document> {
 
     // For multiple changes, it's often more efficient to re-execute
     if (changes.length > 5) {
-      this.execute();
+      void this.execute();
       return;
     }
 
@@ -267,7 +267,7 @@ export class LiveQuery<T extends Document> {
    */
   private applyChange(event: ChangeEvent<T>): void {
     if (!this.options.useEventReduce) {
-      this.execute();
+      void this.execute();
       return;
     }
 
@@ -275,7 +275,7 @@ export class LiveQuery<T extends Document> {
     const action = reduceEvent(event, currentData, this.spec);
 
     if (action.type === 're-execute') {
-      this.execute();
+      void this.execute();
       return;
     }
 
@@ -283,7 +283,7 @@ export class LiveQuery<T extends Document> {
 
     if (newData === null) {
       // Action requires re-execution
-      this.execute();
+      void this.execute();
       return;
     }
 

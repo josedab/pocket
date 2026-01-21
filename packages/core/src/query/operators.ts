@@ -112,7 +112,7 @@ export function matchesCondition<T>(value: T, condition: QueryCondition<T>): boo
       if (ops.$regex instanceof RegExp) {
         regex = ops.$regex;
       } else {
-        regex = createSafeRegex(ops.$regex as string);
+        regex = createSafeRegex(ops.$regex!);
         if (regex === null) {
           // Invalid or potentially dangerous regex pattern - treat as no match
           return false;
@@ -123,17 +123,17 @@ export function matchesCondition<T>(value: T, condition: QueryCondition<T>): boo
 
     // $startsWith
     if ('$startsWith' in ops) {
-      if (!value.startsWith(ops.$startsWith as string)) return false;
+      if (!value.startsWith(ops.$startsWith!)) return false;
     }
 
     // $endsWith
     if ('$endsWith' in ops) {
-      if (!value.endsWith(ops.$endsWith as string)) return false;
+      if (!value.endsWith(ops.$endsWith!)) return false;
     }
 
     // $contains
     if ('$contains' in ops) {
-      if (!value.includes(ops.$contains as string)) return false;
+      if (!value.includes(ops.$contains!)) return false;
     }
   }
 
@@ -186,7 +186,7 @@ export function matchesFilter<T extends Document>(doc: T, filter: QueryFilter<T>
     if (key.startsWith('$')) continue;
 
     const value = getNestedValue(doc, key);
-    if (!matchesCondition(value, condition as QueryCondition<unknown>)) {
+    if (!matchesCondition(value, condition)) {
       return false;
     }
   }

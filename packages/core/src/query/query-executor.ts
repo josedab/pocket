@@ -107,7 +107,7 @@ export class QueryExecutor<T extends Document> {
 
       for (const [key, exclude] of entries) {
         if (exclude === 0) {
-          delete (result as Record<string, unknown>)[key];
+          Reflect.deleteProperty(result as Record<string, unknown>, key);
         }
       }
 

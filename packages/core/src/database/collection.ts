@@ -283,7 +283,7 @@ export class Collection<T extends Document = Document> {
     const initial$ = new BehaviorSubject<T | null>(null);
 
     // Load initial value
-    this.get(id).then((doc) => initial$.next(doc));
+    void this.get(id).then((doc) => initial$.next(doc));
 
     // Merge with changes
     return new Observable<T | null>((subscriber) => {

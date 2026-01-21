@@ -1,6 +1,6 @@
 import {
   BehaviorSubject,
-  Observable,
+  type Observable,
   Subject,
   type Subscription,
   distinctUntilChanged,
@@ -237,8 +237,8 @@ export function throttle<T>(fn: (value: T) => void, delay: number): (value: T) =
     if (now - lastTime >= delay) {
       lastTime = now;
       fn(value);
-    } else if (!timeoutId) {
-      timeoutId = setTimeout(
+    } else {
+      timeoutId ??= setTimeout(
         () => {
           lastTime = Date.now();
           if (lastValue !== undefined) {

@@ -3,6 +3,7 @@ import type { VectorClock } from '../types/document.js';
 /**
  * Vector clock utility class
  */
+// eslint-disable-next-line @typescript-eslint/no-extraneous-class
 export class VectorClockUtil {
   /**
    * Create a new vector clock for a node
