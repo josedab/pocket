@@ -97,7 +97,7 @@ async function putDocument(collection: string, doc: Document): Promise<Document>
   // Use sync access handle for better performance if available
   const hasSyncAccess = 'createSyncAccessHandle' in fileHandle;
   if (hasSyncAccess) {
-    const accessHandle = await (fileHandle as FileSystemFileHandle).createSyncAccessHandle();
+    const accessHandle = await fileHandle.createSyncAccessHandle();
     const encoder = new TextEncoder();
     const data = encoder.encode(JSON.stringify(doc));
     accessHandle.truncate(0);

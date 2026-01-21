@@ -86,9 +86,7 @@ export class WriteAheadLog {
     }
 
     // Write entry
-    if (!this.writer) {
-      this.writer = await this.handle.createWritable({ keepExistingData: true });
-    }
+    this.writer ??= await this.handle.createWritable({ keepExistingData: true });
 
     await this.writer.write({
       type: 'write',

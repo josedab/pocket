@@ -12,7 +12,7 @@ import {
   type StorageQuery,
   type StorageStats,
 } from '@pocket/core';
-import { Observable, Subject } from 'rxjs';
+import { Subject, type Observable } from 'rxjs';
 import { createKeyRange, deserializeDocument, serializeDocument } from './serialization.js';
 import {
   collectCursor,
@@ -208,7 +208,7 @@ class IndexedDBDocumentStore<T extends Document> implements DocumentStore<T> {
   }
 
   async count(query?: StorageQuery<T>): Promise<number> {
-    if (!query || !query.spec.filter) {
+    if (!query?.spec.filter) {
       const tx = this.db.transaction(this.name, 'readonly');
       const store = tx.objectStore(this.name);
       return promisifyRequest(store.count());
@@ -397,7 +397,7 @@ export class IndexedDBAdapter implements StorageAdapter {
         }
 
         // We need to trigger a version upgrade
-        this.triggerUpgrade();
+        void this.triggerUpgrade();
       }
 
       store = new IndexedDBDocumentStore(name, this.db);
