@@ -57,7 +57,7 @@ export class WebSocketTransport implements SyncTransport {
 
       this.socket.onerror = (_event) => {
         const error = new Error('WebSocket error');
-        if (!this.socket || this.socket.readyState !== WebSocket.OPEN) {
+        if (this.socket?.readyState !== WebSocket.OPEN) {
           reject(error);
         }
         this.errorHandler?.(error);
@@ -185,18 +185,19 @@ export class WebSocketTransport implements SyncTransport {
     const delay = this.config.reconnectDelay * Math.pow(2, this.reconnectAttempts - 1);
 
     setTimeout(
-      async () => {
-        try {
-          await this.connect();
-          this.reconnectHandler?.();
-        } catch {
-          if (this.reconnectAttempts < this.config.maxReconnectAttempts) {
-            this.attemptReconnect();
-          } else {
-            this.isReconnecting = false;
-            this.errorHandler?.(new Error('Max reconnection attempts reached'));
-          }
-        }
+      () => {
+        this.connect()
+          .then(() => {
+            this.reconnectHandler?.();
+          })
+          .catch(() => {
+            if (this.reconnectAttempts < this.config.maxReconnectAttempts) {
+              this.attemptReconnect();
+            } else {
+              this.isReconnecting = false;
+              this.errorHandler?.(new Error('Max reconnection attempts reached'));
+            }
+          });
       },
       Math.min(delay, 30000)
     );
