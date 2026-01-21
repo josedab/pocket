@@ -69,7 +69,7 @@ export function useLiveQuery<T extends Document>(
           setError(null);
         }
       })
-      .catch((err) => {
+      .catch((err: unknown) => {
         if (mountedRef.current) {
           setError(err instanceof Error ? err : new Error(String(err)));
           setIsLoading(false);

@@ -37,7 +37,7 @@ export function PocketProvider({
   children,
   loading,
   errorComponent,
-}: PocketProviderProps): JSX.Element {
+}: PocketProviderProps): React.JSX.Element {
   const [database, setDatabase] = useState<Database | null>(
     databaseOrPromise instanceof Promise ? null : databaseOrPromise
   );
@@ -51,7 +51,7 @@ export function PocketProvider({
           setDatabase(db);
           setIsReady(true);
         })
-        .catch((err) => {
+        .catch((err: unknown) => {
           setError(err instanceof Error ? err : new Error(String(err)));
           setIsReady(false);
         });

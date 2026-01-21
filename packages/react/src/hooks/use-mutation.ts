@@ -235,7 +235,8 @@ export function useOptimisticMutation<T extends Document>(
       applyOptimistic({ type: 'delete', id });
 
       try {
-        return await baseMutation.remove(id);
+        await baseMutation.remove(id);
+        return;
       } catch (err) {
         rollback();
         throw err;

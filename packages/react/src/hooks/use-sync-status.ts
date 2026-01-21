@@ -142,7 +142,7 @@ export function useSyncStatus(
 
     // Auto-start if enabled
     if (autoStart) {
-      syncEngine.start().catch((err) => {
+      syncEngine.start().catch((err: unknown) => {
         if (mountedRef.current) {
           setError(err instanceof Error ? err : new Error(String(err)));
           setStatus('error');
