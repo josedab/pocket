@@ -18,3 +18,6 @@ export * from './change-tracking/index.js';
 
 // Migrations
 export * from './migrations/index.js';
+
+// Plugins
+export * from './plugins/index.js';
