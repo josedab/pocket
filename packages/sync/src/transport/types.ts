@@ -2,7 +2,7 @@ import type { ChangeEvent, Document } from '@pocket/core';
 import type { Checkpoint } from '../checkpoint.js';
 
 /**
- * Sync message types
+ * Types of messages in the sync protocol.
  */
 export type SyncMessageType =
   | 'push'
@@ -14,74 +14,93 @@ export type SyncMessageType =
   | 'ack';
 
 /**
- * Base sync message
+ * Base interface for all sync protocol messages.
  */
 export interface SyncMessage {
+  /** Message type discriminator */
   type: SyncMessageType;
+  /** Unique message identifier for correlation */
   id: string;
+  /** Unix timestamp when message was created */
   timestamp: number;
 }
 
 /**
- * Push message - client sending changes to server
+ * Message sent from client to server to push local changes.
  */
 export interface PushMessage extends SyncMessage {
   type: 'push';
+  /** Collection containing the changes */
   collection: string;
+  /** List of change events to sync */
   changes: ChangeEvent<Document>[];
+  /** Client's current checkpoint for conflict detection */
   checkpoint: Checkpoint;
 }
 
 /**
- * Pull message - client requesting changes from server
+ * Message sent from client to server to request remote changes.
  */
 export interface PullMessage extends SyncMessage {
   type: 'pull';
+  /** Collections to pull changes from */
   collections: string[];
+  /** Client's checkpoint to get changes since */
   checkpoint: Checkpoint;
+  /** Maximum number of changes to return */
   limit?: number;
 }
 
 /**
- * Push response from server
+ * Server response to a push message.
  */
 export interface PushResponseMessage extends SyncMessage {
   type: 'push-response';
+  /** Whether all changes were accepted */
   success: boolean;
+  /** Conflicts detected during push (if any) */
   conflicts?: { documentId: string; serverDocument: Document }[];
+  /** Updated server checkpoint */
   checkpoint: Checkpoint;
 }
 
 /**
- * Pull response from server
+ * Server response to a pull message.
  */
 export interface PullResponseMessage extends SyncMessage {
   type: 'pull-response';
+  /** Changes by collection name */
   changes: Record<string, ChangeEvent<Document>[]>;
+  /** Updated server checkpoint */
   checkpoint: Checkpoint;
+  /** Whether more changes are available (pagination) */
   hasMore: boolean;
 }
 
 /**
- * Error message
+ * Error message from server.
  */
 export interface ErrorMessage extends SyncMessage {
   type: 'error';
+  /** Error code for programmatic handling */
   code: string;
+  /** Human-readable error message */
   message: string;
+  /** Whether the operation can be retried */
   retryable: boolean;
 }
 
 /**
- * Acknowledgement message
+ * Acknowledgement message for confirming receipt.
  */
 export interface AckMessage extends SyncMessage {
   type: 'ack';
+  /** ID of the message being acknowledged */
   originalId: string;
 }
 
 /**
- * Union of all sync messages
+ * Union type of all sync protocol messages.
  */
 export type SyncProtocolMessage =
   | PushMessage
@@ -92,54 +111,97 @@ export type SyncProtocolMessage =
   | AckMessage;
 
 /**
- * Transport interface for sync communication
+ * Transport layer interface for sync communication.
+ *
+ * Implementations handle the actual network communication
+ * (WebSocket, HTTP, etc.) while providing a consistent API.
+ *
+ * @see {@link createWebSocketTransport}
+ * @see {@link createHttpTransport}
  */
 export interface SyncTransport {
-  /** Connect to the server */
+  /**
+   * Establish connection to the sync server.
+   * @throws Error if connection fails
+   */
   connect(): Promise<void>;
 
-  /** Disconnect from the server */
+  /**
+   * Close the connection to the server.
+   */
   disconnect(): Promise<void>;
 
-  /** Check if connected */
+  /**
+   * Check if currently connected to the server.
+   */
   isConnected(): boolean;
 
-  /** Send a message and wait for response */
+  /**
+   * Send a message and wait for the response.
+   * @typeParam T - Expected response message type
+   * @param message - Message to send
+   * @returns Promise resolving to the response
+   */
   send<T extends SyncProtocolMessage>(message: SyncProtocolMessage): Promise<T>;
 
-  /** Set up message handler */
+  /**
+   * Register handler for incoming messages.
+   * @param handler - Function called for each received message
+   */
   onMessage(handler: (message: SyncProtocolMessage) => void): void;
 
-  /** Set up error handler */
+  /**
+   * Register handler for connection errors.
+   * @param handler - Function called when an error occurs
+   */
   onError(handler: (error: Error) => void): void;
 
-  /** Set up disconnect handler */
+  /**
+   * Register handler for disconnection events.
+   * @param handler - Function called when disconnected
+   */
   onDisconnect(handler: () => void): void;
 
-  /** Set up reconnect handler */
+  /**
+   * Register handler for reconnection events.
+   * @param handler - Function called after reconnecting
+   */
   onReconnect(handler: () => void): void;
 }
 
 /**
- * Transport configuration
+ * Configuration for sync transports.
  */
 export interface TransportConfig {
-  /** Server URL */
+  /** Sync server URL (wss:// or https://) */
   serverUrl: string;
-  /** Authentication token */
+  /** Authentication token for requests */
   authToken?: string;
-  /** Request timeout in ms */
+  /** Request timeout in milliseconds. @default 30000 */
   timeout?: number;
-  /** Auto reconnect */
+  /** Automatically reconnect on disconnect. @default true */
   autoReconnect?: boolean;
-  /** Reconnect delay in ms */
+  /** Delay between reconnection attempts in ms. @default 1000 */
   reconnectDelay?: number;
-  /** Max reconnect attempts */
+  /** Maximum reconnection attempts. @default 10 */
   maxReconnectAttempts?: number;
 }
 
 /**
- * Generate a unique message ID
+ * Generate a unique message ID for sync protocol messages.
+ *
+ * @returns A unique identifier string
+ *
+ * @example
+ * ```typescript
+ * const message: PushMessage = {
+ *   type: 'push',
+ *   id: generateMessageId(),
+ *   timestamp: Date.now(),
+ *   collection: 'todos',
+ *   changes: [...]
+ * };
+ * ```
  */
 export function generateMessageId(): string {
   const timestamp = Date.now().toString(36);
