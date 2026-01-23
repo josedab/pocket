@@ -15,3 +15,6 @@ export * from './observable/index.js';
 
 // Change Tracking
 export * from './change-tracking/index.js';
+
+// Migrations
+export * from './migrations/index.js';
