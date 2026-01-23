@@ -21,3 +21,6 @@ export * from './migrations/index.js';
 
 // Plugins
 export * from './plugins/index.js';
+
+// Search
+export * from './search/index.js';
