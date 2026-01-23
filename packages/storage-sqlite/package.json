@@ -1,0 +1,60 @@
+{
+  "name": "@pocket/storage-sqlite",
+  "version": "0.1.0",
+  "description": "SQLite storage adapter for Pocket database",
+  "keywords": [
+    "pocket",
+    "storage",
+    "sqlite",
+    "database",
+    "electron"
+  ],
+  "license": "MIT",
+  "author": "Pocket Contributors",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint src --ext .ts,.tsx",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "clean": "rm -rf dist"
+  },
+  "dependencies": {
+    "@pocket/core": "workspace:*",
+    "rxjs": "^7.8.0"
+  },
+  "peerDependencies": {
+    "better-sqlite3": ">=9.0.0",
+    "sql.js": ">=1.8.0"
+  },
+  "peerDependenciesMeta": {
+    "better-sqlite3": {
+      "optional": true
+    },
+    "sql.js": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@types/better-sqlite3": "^7.6.8",
+    "@types/node": "^20.10.0",
+    "tsup": "^8.0.0",
+    "typescript": "^5.3.0",
+    "vitest": "^1.1.0"
+  }
+}
