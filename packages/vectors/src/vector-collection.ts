@@ -10,37 +10,133 @@ import type {
 import { createVectorStore, type VectorStore } from './vector-store.js';
 
 /**
- * Vector collection configuration
+ * Configuration for creating a VectorCollection.
+ *
+ * @example Basic configuration
+ * ```typescript
+ * const config: VectorCollectionConfig = {
+ *   embeddingFunction: createOpenAIEmbedding({ apiKey }),
+ *   textFields: ['title', 'content'],
+ *   autoIndex: true,
+ * };
+ * ```
+ *
+ * @example With custom text extractor
+ * ```typescript
+ * const config: VectorCollectionConfig = {
+ *   embeddingFunction: createOllamaEmbedding(),
+ *   textFields: [],  // Not used when textExtractor is provided
+ *   textExtractor: (doc) => `${doc.title}: ${doc.description}`,
+ * };
+ * ```
  */
 export interface VectorCollectionConfig {
-  /** Embedding function for auto-embedding */
+  /** Embedding function for converting text to vectors */
   embeddingFunction: EmbeddingFunction;
-  /** Fields to embed (will be concatenated) */
+
+  /**
+   * Document fields to extract and concatenate for embedding.
+   * Order matters - fields are joined with spaces.
+   */
   textFields: string[];
-  /** Custom text extractor function */
+
+  /**
+   * Custom function to extract text from documents.
+   * Overrides textFields if provided.
+   */
   textExtractor?: (doc: Document) => string;
-  /** Auto-index new documents */
+
+  /**
+   * Automatically index documents when they're inserted/updated.
+   * @default true
+   */
   autoIndex?: boolean;
-  /** Index type */
+
+  /**
+   * Index type for nearest neighbor search.
+   * - 'flat': Exact search (better for <10K documents)
+   * - 'hnsw': Approximate search (better for >10K documents)
+   * @default 'flat'
+   */
   indexType?: 'flat' | 'hnsw';
 }
 
 /**
- * Vector indexing state
+ * Current state of the vector index.
+ *
+ * @example
+ * ```typescript
+ * vectorCollection.state().subscribe((state) => {
+ *   if (state.isIndexing) {
+ *     console.log('Indexing in progress...');
+ *   } else {
+ *     console.log(`${state.indexedCount} documents indexed`);
+ *   }
+ * });
+ * ```
  */
 export interface VectorIndexState {
-  /** Total indexed documents */
+  /** Number of documents currently indexed */
   indexedCount: number;
-  /** Pending documents */
+
+  /** Number of documents waiting to be indexed */
   pendingCount: number;
-  /** Last index update time */
+
+  /** Unix timestamp of last index update, or null if never updated */
   lastUpdateAt: number | null;
-  /** Is currently indexing */
+
+  /** Whether a bulk indexing operation is in progress */
   isIndexing: boolean;
 }
 
 /**
- * Wraps a Pocket collection with vector search capabilities
+ * Adds vector search capabilities to a Pocket Collection.
+ *
+ * VectorCollection wraps a standard Collection and maintains a parallel
+ * vector index for semantic search. Documents are automatically embedded
+ * when inserted/updated (if autoIndex is enabled).
+ *
+ * @typeParam T - The document type
+ *
+ * @example Basic setup
+ * ```typescript
+ * const notes = db.collection<Note>('notes');
+ *
+ * const vectorNotes = createVectorCollection(notes, {
+ *   embeddingFunction: createOpenAIEmbedding({ apiKey }),
+ *   textFields: ['title', 'content'],
+ * });
+ *
+ * // Index existing documents
+ * await vectorNotes.indexAll();
+ *
+ * // Search by meaning
+ * const results = await vectorNotes.search('machine learning concepts');
+ * for (const result of results) {
+ *   console.log(`${result.document?.title}: ${result.score}`);
+ * }
+ * ```
+ *
+ * @example Finding similar documents
+ * ```typescript
+ * // Find notes similar to a specific one
+ * const similar = await vectorNotes.findSimilar('note-123', {
+ *   limit: 5,
+ *   minScore: 0.7,
+ * });
+ * ```
+ *
+ * @example With local embeddings (Ollama)
+ * ```typescript
+ * const vectorNotes = createVectorCollection(notes, {
+ *   embeddingFunction: createOllamaEmbedding({ model: 'nomic-embed-text' }),
+ *   textFields: ['content'],
+ *   indexType: 'hnsw',  // Use HNSW for large collections
+ * });
+ * ```
+ *
+ * @see {@link createVectorCollection} for factory function
+ * @see {@link VectorCollectionConfig} for configuration options
  */
 export class VectorCollection<T extends Document = Document> {
   private readonly collection: Collection<T>;
@@ -140,7 +236,18 @@ export class VectorCollection<T extends Document = Document> {
   }
 
   /**
-   * Index a single document
+   * Index a single document for vector search.
+   *
+   * Extracts text from the document, generates an embedding,
+   * and adds it to the vector index.
+   *
+   * @param doc - The document to index
+   *
+   * @example
+   * ```typescript
+   * const note = await notes.insert({ title: 'AI', content: '...' });
+   * await vectorNotes.indexDocument(note);
+   * ```
    */
   async indexDocument(doc: T): Promise<void> {
     const text = this.extractText(doc);
@@ -158,7 +265,12 @@ export class VectorCollection<T extends Document = Document> {
   }
 
   /**
-   * Remove a document from the vector index
+   * Remove a document from the vector index.
+   *
+   * Call this when a document is deleted to keep the index in sync.
+   * If autoIndex is enabled, this happens automatically.
+   *
+   * @param id - The document ID to remove
    */
   removeDocument(id: string): void {
     this.vectorStore.delete(id);
@@ -167,7 +279,20 @@ export class VectorCollection<T extends Document = Document> {
   }
 
   /**
-   * Index all existing documents
+   * Index all existing documents in the collection.
+   *
+   * This is typically called once when setting up vector search
+   * on an existing collection. New documents are indexed automatically
+   * if autoIndex is enabled.
+   *
+   * @returns Object with counts of indexed and failed documents
+   *
+   * @example
+   * ```typescript
+   * console.log('Indexing all documents...');
+   * const result = await vectorNotes.indexAll();
+   * console.log(`Indexed: ${result.indexed}, Failed: ${result.failed}`);
+   * ```
    */
   async indexAll(): Promise<{ indexed: number; failed: number }> {
     this.updateState({ isIndexing: true });
@@ -221,7 +346,18 @@ export class VectorCollection<T extends Document = Document> {
   }
 
   /**
-   * Reindex all documents (clear and rebuild)
+   * Reindex all documents by clearing and rebuilding the index.
+   *
+   * Use this after changing the embedding function or textFields.
+   *
+   * @returns Object with counts of indexed and failed documents
+   *
+   * @example
+   * ```typescript
+   * // After updating embedding config
+   * const result = await vectorNotes.reindexAll();
+   * console.log(`Reindexed ${result.indexed} documents`);
+   * ```
    */
   async reindexAll(): Promise<{ indexed: number; failed: number }> {
     this.vectorStore.clear();
@@ -230,7 +366,31 @@ export class VectorCollection<T extends Document = Document> {
   }
 
   /**
-   * Semantic search
+   * Perform semantic search to find documents by meaning.
+   *
+   * Embeds the query text and finds the most similar documents
+   * in the vector index, then retrieves the full documents.
+   *
+   * @param query - Natural language search query
+   * @param options - Search options (limit, minScore, filter, etc.)
+   * @returns Array of search results with associated documents
+   *
+   * @example Basic search
+   * ```typescript
+   * const results = await vectorNotes.search('machine learning');
+   *
+   * for (const result of results) {
+   *   console.log(`${result.document?.title} (${result.score.toFixed(3)})`);
+   * }
+   * ```
+   *
+   * @example With options
+   * ```typescript
+   * const results = await vectorNotes.search('project deadlines', {
+   *   limit: 5,
+   *   minScore: 0.7,
+   * });
+   * ```
    */
   async search(
     query: string,
@@ -256,7 +416,31 @@ export class VectorCollection<T extends Document = Document> {
   }
 
   /**
-   * Find documents similar to a given document
+   * Find documents similar to a given document.
+   *
+   * Useful for "related items" or "more like this" features.
+   *
+   * @param docOrId - Document or document ID to find similar items for
+   * @param options - Search options (limit, minScore, filter, etc.)
+   * @returns Array of similar documents (excluding the source document)
+   *
+   * @example Find similar by ID
+   * ```typescript
+   * const similar = await vectorNotes.findSimilar('note-123', {
+   *   limit: 5,
+   * });
+   *
+   * console.log('Related notes:');
+   * for (const result of similar) {
+   *   console.log(`- ${result.document?.title}`);
+   * }
+   * ```
+   *
+   * @example Find similar to a new document
+   * ```typescript
+   * const newNote = { _id: 'temp', title: 'AI Research', content: '...' };
+   * const similar = await vectorNotes.findSimilar(newNote);
+   * ```
    */
   async findSimilar(
     docOrId: T | string,
@@ -292,7 +476,21 @@ export class VectorCollection<T extends Document = Document> {
   }
 
   /**
-   * Search by vector directly
+   * Search using a pre-computed vector embedding.
+   *
+   * Use this when you have already generated an embedding
+   * and want to avoid re-embedding the same text.
+   *
+   * @param vector - Pre-computed query vector
+   * @param options - Search options
+   * @returns Array of search results with documents
+   *
+   * @example
+   * ```typescript
+   * // Reuse a previously computed embedding
+   * const queryVector = await vectorNotes.embed('machine learning');
+   * const results = await vectorNotes.searchByVector(queryVector);
+   * ```
    */
   async searchByVector(
     vector: Vector,
@@ -318,49 +516,81 @@ export class VectorCollection<T extends Document = Document> {
   }
 
   /**
-   * Get the embedding for a text
+   * Generate an embedding vector for text.
+   *
+   * Useful for caching embeddings or debugging.
+   *
+   * @param text - Text to embed
+   * @returns The embedding vector
+   *
+   * @example
+   * ```typescript
+   * const vector = await vectorNotes.embed('Hello world');
+   * console.log(`Dimensions: ${vector.length}`);
+   * ```
    */
   async embed(text: string): Promise<Vector> {
     return this.config.embeddingFunction.embed(text);
   }
 
   /**
-   * Get the underlying vector store
+   * Get the underlying VectorStore for advanced operations.
+   *
+   * @returns The VectorStore instance
    */
   getVectorStore(): VectorStore {
     return this.vectorStore;
   }
 
   /**
-   * Get the underlying collection
+   * Get the underlying Pocket Collection.
+   *
+   * @returns The wrapped Collection instance
    */
   getCollection(): Collection<T> {
     return this.collection;
   }
 
   /**
-   * Get index state observable
+   * Subscribe to index state changes.
+   *
+   * @returns Observable of index state updates
+   *
+   * @example
+   * ```typescript
+   * vectorNotes.state().subscribe((state) => {
+   *   updateUI({
+   *     indexed: state.indexedCount,
+   *     isIndexing: state.isIndexing,
+   *   });
+   * });
+   * ```
    */
   state(): Observable<VectorIndexState> {
     return this.state$.asObservable();
   }
 
   /**
-   * Get current state
+   * Get current index state snapshot.
+   *
+   * @returns Current VectorIndexState
    */
   getState(): VectorIndexState {
     return this.state$.getValue();
   }
 
   /**
-   * Check if a document is indexed
+   * Check if a document has been indexed.
+   *
+   * @param id - Document ID to check
+   * @returns `true` if the document is in the index
    */
   isIndexed(id: string): boolean {
     return this.indexedIds.has(id);
   }
 
   /**
-   * Get indexed document count
+   * Get the number of indexed documents.
    */
   get indexedCount(): number {
     return this.indexedIds.size;
@@ -379,7 +609,16 @@ export class VectorCollection<T extends Document = Document> {
   }
 
   /**
-   * Dispose resources
+   * Release resources and stop auto-indexing.
+   *
+   * Call this when you're done with the VectorCollection
+   * to prevent memory leaks.
+   *
+   * @example
+   * ```typescript
+   * // When unmounting or closing
+   * vectorNotes.dispose();
+   * ```
    */
   dispose(): void {
     this.isDisposed = true;
@@ -395,7 +634,28 @@ export class VectorCollection<T extends Document = Document> {
 }
 
 /**
- * Create a vector-enabled collection wrapper
+ * Create a VectorCollection wrapper for semantic search.
+ *
+ * @typeParam T - The document type
+ * @param collection - Pocket Collection to wrap
+ * @param config - Vector collection configuration
+ * @returns A new VectorCollection instance
+ *
+ * @example
+ * ```typescript
+ * const vectorNotes = createVectorCollection(
+ *   db.collection<Note>('notes'),
+ *   {
+ *     embeddingFunction: createOpenAIEmbedding({ apiKey }),
+ *     textFields: ['title', 'content'],
+ *   }
+ * );
+ *
+ * await vectorNotes.indexAll();
+ * ```
+ *
+ * @see {@link VectorCollection}
+ * @see {@link VectorCollectionConfig}
  */
 export function createVectorCollection<T extends Document>(
   collection: Collection<T>,
@@ -405,7 +665,24 @@ export function createVectorCollection<T extends Document>(
 }
 
 /**
- * Helper to create a document with pre-computed embedding
+ * Helper to create a document with a pre-computed embedding.
+ *
+ * @typeParam T - The document type
+ * @param doc - Document without vector field
+ * @param vector - Pre-computed embedding vector
+ * @returns Document with _vector field attached
+ *
+ * @example
+ * ```typescript
+ * const vector = await embeddingFn.embed('Note content...');
+ * const note = withVector({
+ *   _id: 'note-1',
+ *   title: 'My Note',
+ *   content: 'Note content...',
+ * }, vector);
+ *
+ * await collection.insert(note);
+ * ```
  */
 export function withVector<T extends Document>(
   doc: Omit<T, '_vector'>,
