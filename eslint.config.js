@@ -107,6 +107,7 @@ export default tseslint.config(
       'examples/**',
       'docs/**',
       'benchmarks/**',
+      'website/**',
       '**/*.test.ts',
       '**/*.test.tsx',
       '**/*.integration.test.ts',
