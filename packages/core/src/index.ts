@@ -1,6 +1,9 @@
 // Types
 export * from './types/index.js';
 
+// Errors
+export * from './errors/index.js';
+
 // Schema
 export * from './schema/index.js';
 
@@ -24,3 +27,12 @@ export * from './plugins/index.js';
 
 // Search
 export * from './search/index.js';
+
+// Relations
+export * from './relations/index.js';
+
+// TTL
+export * from './ttl/index.js';
+
+// Seed
+export * from './seed/index.js';
