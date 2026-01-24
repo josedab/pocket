@@ -263,7 +263,7 @@ export class EncryptedCollection<T extends Document = Document> {
     const docs = await this.collection.getAll();
     for (const doc of docs) {
       if (this.encryptor.isEncrypted(doc as unknown as Document)) {
-        const reencrypted = await this.encryptor.reencrypt<T>(
+        const reencrypted = await this.encryptor.reencrypt(
           doc as unknown as EncryptedDocument,
           newKey.keyId,
           oldKeyId ?? undefined

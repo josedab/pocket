@@ -88,6 +88,7 @@ export function createUsePermissionHook(React: ReactHooks) {
 
     React.useEffect(() => {
       check();
+      return undefined;
     }, [check]);
 
     // Subscribe to config changes to recheck

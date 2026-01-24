@@ -82,6 +82,7 @@ export function createUseQueryHook(React: ReactHooks) {
       } finally {
         setLoading(false);
       }
+      return undefined;
     }, [manager, JSON.stringify(query), JSON.stringify(options)]);
 
     const refresh = React.useCallback(() => {
