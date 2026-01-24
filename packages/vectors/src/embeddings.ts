@@ -1,16 +1,58 @@
 import type { EmbeddingFunction, Vector } from './types.js';
 
 /**
- * OpenAI embedding function configuration
+ * Configuration for OpenAI embedding function.
+ *
+ * @example
+ * ```typescript
+ * const config: OpenAIEmbeddingConfig = {
+ *   apiKey: process.env.OPENAI_API_KEY!,
+ *   model: 'text-embedding-3-small',
+ * };
+ * ```
  */
 export interface OpenAIEmbeddingConfig {
+  /** OpenAI API key */
   apiKey: string;
+
+  /**
+   * Embedding model to use.
+   * @default 'text-embedding-3-small'
+   */
   model?: string;
+
+  /**
+   * Custom API base URL (for proxies or Azure OpenAI).
+   * @default 'https://api.openai.com/v1'
+   */
   baseUrl?: string;
 }
 
 /**
- * Create an OpenAI embedding function
+ * Create an OpenAI embedding function.
+ *
+ * Supports all OpenAI embedding models including:
+ * - text-embedding-3-small (1536 dimensions, fastest)
+ * - text-embedding-3-large (3072 dimensions, best quality)
+ * - text-embedding-ada-002 (1536 dimensions, legacy)
+ *
+ * @param config - OpenAI configuration
+ * @returns EmbeddingFunction for use with VectorStore/VectorCollection
+ *
+ * @example
+ * ```typescript
+ * const embedding = createOpenAIEmbedding({
+ *   apiKey: process.env.OPENAI_API_KEY!,
+ *   model: 'text-embedding-3-small',
+ * });
+ *
+ * const vectorCollection = createVectorCollection(collection, {
+ *   embeddingFunction: embedding,
+ *   textFields: ['content'],
+ * });
+ * ```
+ *
+ * @see {@link EmbeddingFunction}
  */
 export function createOpenAIEmbedding(config: OpenAIEmbeddingConfig): EmbeddingFunction {
   const model = config.model ?? 'text-embedding-3-small';
@@ -86,15 +128,38 @@ export function createOpenAIEmbedding(config: OpenAIEmbeddingConfig): EmbeddingF
 }
 
 /**
- * Cohere embedding function configuration
+ * Configuration for Cohere embedding function.
  */
 export interface CohereEmbeddingConfig {
+  /** Cohere API key */
   apiKey: string;
+
+  /**
+   * Embedding model to use.
+   * @default 'embed-english-v3.0'
+   */
   model?: string;
 }
 
 /**
- * Create a Cohere embedding function
+ * Create a Cohere embedding function.
+ *
+ * Supports Cohere embedding models:
+ * - embed-english-v3.0 (1024 dimensions)
+ * - embed-multilingual-v3.0 (1024 dimensions)
+ * - embed-english-light-v3.0 (384 dimensions, faster)
+ * - embed-multilingual-light-v3.0 (384 dimensions, faster)
+ *
+ * @param config - Cohere configuration
+ * @returns EmbeddingFunction for use with VectorStore/VectorCollection
+ *
+ * @example
+ * ```typescript
+ * const embedding = createCohereEmbedding({
+ *   apiKey: process.env.COHERE_API_KEY!,
+ *   model: 'embed-english-v3.0',
+ * });
+ * ```
  */
 export function createCohereEmbedding(config: CohereEmbeddingConfig): EmbeddingFunction {
   const model = config.model ?? 'embed-english-v3.0';
@@ -169,16 +234,68 @@ export function createCohereEmbedding(config: CohereEmbeddingConfig): EmbeddingF
 }
 
 /**
- * Ollama embedding function configuration
+ * Configuration for Ollama embedding function.
+ *
+ * Ollama provides local embedding generation without API calls,
+ * keeping data completely private.
  */
 export interface OllamaEmbeddingConfig {
+  /**
+   * Ollama model name.
+   * @default 'nomic-embed-text'
+   */
   model?: string;
+
+  /**
+   * Ollama server URL.
+   * @default 'http://localhost:11434'
+   */
   baseUrl?: string;
+
+  /**
+   * Embedding dimensions (varies by model).
+   * @default 768
+   */
   dimensions?: number;
 }
 
 /**
- * Create an Ollama embedding function (for local embeddings)
+ * Create an Ollama embedding function for local embeddings.
+ *
+ * Runs embeddings locally using Ollama, keeping all data private.
+ * Requires Ollama to be installed and running.
+ *
+ * Popular embedding models:
+ * - nomic-embed-text (768 dimensions, good general purpose)
+ * - mxbai-embed-large (1024 dimensions, higher quality)
+ * - all-minilm (384 dimensions, very fast)
+ *
+ * @param config - Ollama configuration
+ * @returns EmbeddingFunction for use with VectorStore/VectorCollection
+ *
+ * @example
+ * ```typescript
+ * // First, install the model: ollama pull nomic-embed-text
+ *
+ * const embedding = createOllamaEmbedding({
+ *   model: 'nomic-embed-text',
+ * });
+ *
+ * // All embeddings generated locally
+ * const vectorCollection = createVectorCollection(collection, {
+ *   embeddingFunction: embedding,
+ *   textFields: ['content'],
+ * });
+ * ```
+ *
+ * @example Custom Ollama server
+ * ```typescript
+ * const embedding = createOllamaEmbedding({
+ *   model: 'mxbai-embed-large',
+ *   baseUrl: 'http://192.168.1.100:11434',
+ *   dimensions: 1024,
+ * });
+ * ```
  */
 export function createOllamaEmbedding(config: OllamaEmbeddingConfig = {}): EmbeddingFunction {
   const model = config.model ?? 'nomic-embed-text';
@@ -223,13 +340,42 @@ export function createOllamaEmbedding(config: OllamaEmbeddingConfig = {}): Embed
 }
 
 /**
- * Custom embedding function type
+ * Function signature for single-text embedding.
  */
 export type CustomEmbedFn = (text: string) => Promise<Vector>;
+
+/**
+ * Function signature for batch text embedding.
+ */
 export type CustomBatchEmbedFn = (texts: string[]) => Promise<Vector[]>;
 
 /**
- * Create a custom embedding function
+ * Create a custom embedding function from your own implementation.
+ *
+ * Use this to integrate with any embedding provider or local model
+ * not covered by the built-in functions.
+ *
+ * @param embedFn - Function to embed single text
+ * @param dimensions - Vector dimensionality
+ * @param modelName - Model identifier
+ * @param batchEmbedFn - Optional batch embedding function
+ * @returns EmbeddingFunction for use with VectorStore/VectorCollection
+ *
+ * @example
+ * ```typescript
+ * const embedding = createCustomEmbedding(
+ *   async (text) => {
+ *     const response = await myEmbeddingAPI.embed(text);
+ *     return response.vector;
+ *   },
+ *   384,
+ *   'my-model',
+ *   async (texts) => {
+ *     const response = await myEmbeddingAPI.embedBatch(texts);
+ *     return response.vectors;
+ *   }
+ * );
+ * ```
  */
 export function createCustomEmbedding(
   embedFn: CustomEmbedFn,
@@ -246,8 +392,33 @@ export function createCustomEmbedding(
 }
 
 /**
- * Simple hash-based embedding for testing (NOT for production use)
- * Creates deterministic vectors from text for testing purposes
+ * Create a test embedding function for development and testing.
+ *
+ * **WARNING: NOT for production use!**
+ *
+ * Generates deterministic pseudo-random vectors from text using hashing.
+ * The same text always produces the same vector, making tests reproducible.
+ * Does not capture semantic meaning.
+ *
+ * @param dimensions - Vector dimensionality (default: 384)
+ * @returns EmbeddingFunction for testing
+ *
+ * @example
+ * ```typescript
+ * // In tests
+ * const testEmbedding = createTestEmbedding(384);
+ *
+ * const store = createVectorStore({
+ *   name: 'test-store',
+ *   dimensions: 384,
+ *   embeddingFunction: testEmbedding,
+ * });
+ *
+ * // Deterministic: same text = same vector
+ * const v1 = await testEmbedding.embed('hello');
+ * const v2 = await testEmbedding.embed('hello');
+ * // v1 === v2 (same values)
+ * ```
  */
 export function createTestEmbedding(dimensions = 384): EmbeddingFunction {
   function hashCode(str: string): number {

@@ -16,7 +16,43 @@ import type {
 } from './types.js';
 
 /**
- * In-memory vector store with semantic search capabilities
+ * In-memory vector store with semantic search capabilities.
+ *
+ * VectorStore provides efficient storage and retrieval of vector embeddings
+ * using various index types (flat, HNSW) and distance metrics.
+ *
+ * For most use cases, prefer using {@link VectorCollection} which provides
+ * automatic document-to-vector integration.
+ *
+ * @example Basic usage
+ * ```typescript
+ * const store = createVectorStore({
+ *   name: 'embeddings',
+ *   dimensions: 1536,
+ *   embeddingFunction: createOpenAIEmbedding({ apiKey }),
+ * });
+ *
+ * // Add vectors (auto-embed text)
+ * await store.upsert('doc-1', 'Hello world');
+ * await store.upsert('doc-2', 'Machine learning concepts');
+ *
+ * // Search
+ * const results = await store.search({ text: 'AI and ML' });
+ * ```
+ *
+ * @example With pre-computed vectors
+ * ```typescript
+ * const store = createVectorStore({
+ *   name: 'precomputed',
+ *   dimensions: 384,
+ *   metric: 'cosine',
+ * });
+ *
+ * await store.upsert('vec-1', [0.1, 0.2, ...], { category: 'tech' });
+ * ```
+ *
+ * @see {@link VectorCollection} for document integration
+ * @see {@link createVectorStore} for factory function
  */
 export class VectorStore {
   readonly name: string;
@@ -56,7 +92,25 @@ export class VectorStore {
   }
 
   /**
-   * Add or update a vector
+   * Add or update a vector entry.
+   *
+   * Accepts either a vector array or text (which will be auto-embedded
+   * if an embedding function is configured).
+   *
+   * @param id - Unique identifier for the entry
+   * @param vectorOrText - Vector array or text to embed
+   * @param metadata - Optional metadata to associate with the entry
+   * @throws Error if dimensions don't match or embedding fails
+   *
+   * @example With text (auto-embed)
+   * ```typescript
+   * await store.upsert('doc-1', 'Machine learning basics');
+   * ```
+   *
+   * @example With vector
+   * ```typescript
+   * await store.upsert('doc-2', [0.1, 0.2, ...], { source: 'manual' });
+   * ```
    */
   async upsert(
     id: string,
@@ -105,7 +159,24 @@ export class VectorStore {
   }
 
   /**
-   * Batch upsert vectors
+   * Add or update multiple vector entries in batch.
+   *
+   * More efficient than calling upsert() multiple times as it
+   * batches embedding API calls.
+   *
+   * @param items - Array of items to upsert
+   * @returns Result with succeeded and failed IDs
+   *
+   * @example
+   * ```typescript
+   * const result = await store.upsertBatch([
+   *   { id: 'doc-1', text: 'First document' },
+   *   { id: 'doc-2', text: 'Second document' },
+   *   { id: 'doc-3', vector: [...], metadata: { type: 'manual' } },
+   * ]);
+   *
+   * console.log(`Succeeded: ${result.succeeded.length}`);
+   * ```
    */
   async upsertBatch(
     items: {
@@ -215,21 +286,30 @@ export class VectorStore {
   }
 
   /**
-   * Get a vector entry by ID
+   * Get a vector entry by ID.
+   *
+   * @param id - Entry ID
+   * @returns The entry or undefined if not found
    */
   get(id: string): VectorEntry | undefined {
     return this.entries.get(id);
   }
 
   /**
-   * Get multiple entries
+   * Get multiple entries by ID.
+   *
+   * @param ids - Array of entry IDs
+   * @returns Array of entries (undefined for missing IDs)
    */
   getMany(ids: string[]): (VectorEntry | undefined)[] {
     return ids.map((id) => this.entries.get(id));
   }
 
   /**
-   * Delete a vector
+   * Delete a vector entry.
+   *
+   * @param id - Entry ID to delete
+   * @returns `true` if entry existed and was deleted
    */
   delete(id: string): boolean {
     const existed = this.entries.has(id);
@@ -243,7 +323,10 @@ export class VectorStore {
   }
 
   /**
-   * Delete multiple vectors
+   * Delete multiple vector entries.
+   *
+   * @param ids - Array of entry IDs to delete
+   * @returns Number of entries deleted
    */
   deleteBatch(ids: string[]): number {
     let deleted = 0;
@@ -262,7 +345,29 @@ export class VectorStore {
   }
 
   /**
-   * Semantic search
+   * Perform semantic similarity search.
+   *
+   * @param options - Search options (text, vector, limit, filter, etc.)
+   * @returns Array of search results sorted by similarity
+   * @throws Error if neither text nor vector is provided
+   *
+   * @example Text search
+   * ```typescript
+   * const results = await store.search({
+   *   text: 'machine learning',
+   *   limit: 10,
+   *   minScore: 0.7,
+   * });
+   * ```
+   *
+   * @example Vector search with filter
+   * ```typescript
+   * const results = await store.search({
+   *   vector: queryVector,
+   *   filter: { category: 'tech' },
+   *   includeMetadata: true,
+   * });
+   * ```
    */
   async search(options: VectorSearchOptions): Promise<VectorSearchResult[]> {
     let queryVector: Vector;
@@ -349,7 +454,17 @@ export class VectorStore {
   }
 
   /**
-   * Find similar vectors to a given ID
+   * Find vectors similar to an existing entry.
+   *
+   * @param id - ID of the entry to find similar vectors to
+   * @param options - Search options
+   * @returns Array of similar entries (excluding the source)
+   * @throws Error if the ID doesn't exist
+   *
+   * @example
+   * ```typescript
+   * const similar = await store.findSimilar('doc-123', { limit: 5 });
+   * ```
    */
   async findSimilar(
     id: string,
@@ -415,7 +530,9 @@ export class VectorStore {
   }
 
   /**
-   * Clear embedding cache
+   * Clear the embedding cache.
+   *
+   * Call this if you want to force re-embedding of text.
    */
   clearCache(): void {
     this.textCache.clear();
@@ -424,7 +541,9 @@ export class VectorStore {
   }
 
   /**
-   * Get all entries
+   * Get all vector entries.
+   *
+   * @returns Array of all entries
    */
   getAll(): VectorEntry[] {
     return Array.from(this.entries.values());
@@ -445,7 +564,7 @@ export class VectorStore {
   }
 
   /**
-   * Clear all vectors
+   * Clear all vectors from the store.
    */
   clear(): void {
     const ids = Array.from(this.entries.keys());
@@ -461,35 +580,58 @@ export class VectorStore {
   }
 
   /**
-   * Subscribe to changes
+   * Subscribe to vector change events.
+   *
+   * @returns Observable of change events
+   *
+   * @example
+   * ```typescript
+   * store.changes().subscribe((event) => {
+   *   console.log(`${event.operation}: ${event.id}`);
+   * });
+   * ```
    */
   changes(): Observable<VectorChangeEvent> {
     return this.changes$.asObservable();
   }
 
   /**
-   * Get stats observable
+   * Subscribe to store statistics updates.
+   *
+   * @returns Observable of stats updates
    */
   stats(): Observable<VectorStoreStats> {
     return this.stats$.asObservable();
   }
 
   /**
-   * Get current stats
+   * Get current store statistics.
+   *
+   * @returns Current stats snapshot
    */
   getStats(): VectorStoreStats {
     return this.computeStats();
   }
 
   /**
-   * Rebuild the index
+   * Rebuild the vector index.
+   *
+   * Useful after many updates to optimize search performance.
    */
   rebuild(): void {
     this.index.rebuild();
   }
 
   /**
-   * Export all data
+   * Export all store data for persistence or transfer.
+   *
+   * @returns Object containing store config and all entries
+   *
+   * @example
+   * ```typescript
+   * const data = store.export();
+   * localStorage.setItem('vectors', JSON.stringify(data));
+   * ```
    */
   export(): {
     name: string;
@@ -506,7 +648,16 @@ export class VectorStore {
   }
 
   /**
-   * Import data
+   * Import vector entries from exported data.
+   *
+   * @param entries - Array of entries to import
+   * @returns Result with succeeded and failed IDs
+   *
+   * @example
+   * ```typescript
+   * const data = JSON.parse(localStorage.getItem('vectors') || '{}');
+   * const result = store.import(data.entries || []);
+   * ```
    */
   import(entries: VectorEntry[]): UpsertResult {
     const succeeded: string[] = [];
@@ -579,7 +730,9 @@ export class VectorStore {
   }
 
   /**
-   * Dispose resources
+   * Release resources and complete observables.
+   *
+   * Call when done with the store to prevent memory leaks.
    */
   dispose(): void {
     this.changes$.complete();
@@ -590,7 +743,23 @@ export class VectorStore {
 }
 
 /**
- * Create a vector store
+ * Create a VectorStore instance.
+ *
+ * @param config - Store configuration
+ * @returns A new VectorStore instance
+ *
+ * @example
+ * ```typescript
+ * const store = createVectorStore({
+ *   name: 'my-vectors',
+ *   dimensions: 1536,
+ *   embeddingFunction: createOpenAIEmbedding({ apiKey }),
+ *   indexType: 'hnsw',
+ * });
+ * ```
+ *
+ * @see {@link VectorStoreConfig}
+ * @see {@link VectorStore}
  */
 export function createVectorStore(config: VectorStoreConfig): VectorStore {
   return new VectorStore(config);
