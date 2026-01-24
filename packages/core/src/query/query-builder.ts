@@ -4,7 +4,71 @@ import type { Document } from '../types/document.js';
 import type { QueryFilter, QuerySpec, SortDirection, SortSpec } from '../types/query.js';
 
 /**
- * Type-safe query builder using fluent interface
+ * Fluent query builder for constructing type-safe database queries.
+ *
+ * QueryBuilder provides a chainable API for building complex queries with
+ * filtering, sorting, pagination, and projection. Queries can be executed
+ * once with {@link exec} or subscribed to reactively with {@link live}.
+ *
+ * @typeParam T - The document type being queried
+ *
+ * @example Basic query
+ * ```typescript
+ * const users = await db.collection<User>('users')
+ *   .find()
+ *   .where('age').greaterThan(18)
+ *   .sort('name', 'asc')
+ *   .exec();
+ * ```
+ *
+ * @example Complex filtering
+ * ```typescript
+ * const results = await collection
+ *   .find()
+ *   .where('status').in(['active', 'pending'])
+ *   .where('createdAt').greaterThan(lastWeek)
+ *   .or(
+ *     { priority: 'high' },
+ *     { assignee: currentUser }
+ *   )
+ *   .sort('priority', 'desc')
+ *   .limit(20)
+ *   .exec();
+ * ```
+ *
+ * @example Pagination
+ * ```typescript
+ * const page2 = await collection
+ *   .find()
+ *   .sort('createdAt', 'desc')
+ *   .skip(20)
+ *   .limit(10)
+ *   .exec();
+ * ```
+ *
+ * @example Projection
+ * ```typescript
+ * const names = await collection
+ *   .find()
+ *   .include('_id', 'name')
+ *   .exec();
+ * ```
+ *
+ * @example Live query (reactive)
+ * ```typescript
+ * const todos$ = collection
+ *   .find()
+ *   .where('completed').equals(false)
+ *   .sort('priority', 'desc')
+ *   .live();
+ *
+ * todos$.subscribe(items => {
+ *   console.log('Todo count:', items.length);
+ * });
+ * ```
+ *
+ * @see {@link Collection.find} for creating queries
+ * @see {@link FieldQuery} for field-level operators
  */
 export class QueryBuilder<T extends Document> {
   private spec: QuerySpec<T> = {};
@@ -23,14 +87,43 @@ export class QueryBuilder<T extends Document> {
   }
 
   /**
-   * Add a field condition
+   * Start building a condition for a specific field.
+   *
+   * Returns a {@link FieldQuery} with type-safe comparison operators
+   * for the specified field.
+   *
+   * @typeParam K - The field name type
+   * @param field - The field to filter on
+   * @returns A FieldQuery for building the condition
+   *
+   * @example
+   * ```typescript
+   * query
+   *   .where('age').greaterThan(18)
+   *   .where('status').in(['active', 'pending'])
+   *   .where('email').contains('@company.com')
+   * ```
    */
   where<K extends keyof T & string>(field: K): FieldQuery<T, T[K]> {
     return new FieldQuery<T, T[K]>(this, field);
   }
 
   /**
-   * Add a raw filter
+   * Add a raw filter object to the query.
+   *
+   * For advanced filtering scenarios not covered by {@link where}.
+   * The filter is merged with any existing filters.
+   *
+   * @param filter - Raw filter object
+   * @returns This query builder for chaining
+   *
+   * @example
+   * ```typescript
+   * query.filter({
+   *   status: 'active',
+   *   count: { $gte: 10, $lte: 100 }
+   * });
+   * ```
    */
   filter(filter: QueryFilter<T>): this {
     this.spec.filter = {
@@ -41,7 +134,21 @@ export class QueryBuilder<T extends Document> {
   }
 
   /**
-   * Add logical AND conditions
+   * Add logical AND conditions to the query.
+   *
+   * All provided conditions must match for a document to be included.
+   *
+   * @param filters - Filter objects that must all match
+   * @returns This query builder for chaining
+   *
+   * @example
+   * ```typescript
+   * query.and(
+   *   { status: 'active' },
+   *   { verified: true },
+   *   { age: { $gte: 18 } }
+   * );
+   * ```
    */
   and(...filters: QueryFilter<T>[]): this {
     const existing = this.spec.filter?.$and ?? [];
@@ -53,7 +160,22 @@ export class QueryBuilder<T extends Document> {
   }
 
   /**
-   * Add logical OR conditions
+   * Add logical OR conditions to the query.
+   *
+   * At least one of the provided conditions must match for a document
+   * to be included.
+   *
+   * @param filters - Filter objects where at least one must match
+   * @returns This query builder for chaining
+   *
+   * @example
+   * ```typescript
+   * query.or(
+   *   { role: 'admin' },
+   *   { role: 'moderator' },
+   *   { permissions: { $contains: 'manage_users' } }
+   * );
+   * ```
    */
   or(...filters: QueryFilter<T>[]): this {
     const existing = this.spec.filter?.$or ?? [];
@@ -65,7 +187,22 @@ export class QueryBuilder<T extends Document> {
   }
 
   /**
-   * Add a sort specification
+   * Sort results by a field.
+   *
+   * Can be called multiple times to sort by multiple fields.
+   * Earlier sorts take precedence.
+   *
+   * @param field - The field to sort by
+   * @param direction - Sort direction: 'asc' (default) or 'desc'
+   * @returns This query builder for chaining
+   *
+   * @example
+   * ```typescript
+   * // Sort by priority descending, then by createdAt ascending
+   * query
+   *   .sort('priority', 'desc')
+   *   .sort('createdAt', 'asc');
+   * ```
    */
   sort(field: keyof T & string, direction: SortDirection = 'asc'): this {
     const sorts = this.spec.sort ?? [];
@@ -74,7 +211,18 @@ export class QueryBuilder<T extends Document> {
   }
 
   /**
-   * Sort by multiple fields
+   * Sort by multiple fields at once.
+   *
+   * @param sorts - Array of sort specifications
+   * @returns This query builder for chaining
+   *
+   * @example
+   * ```typescript
+   * query.sortBy([
+   *   { field: 'priority', direction: 'desc' },
+   *   { field: 'name', direction: 'asc' }
+   * ]);
+   * ```
    */
   sortBy(sorts: SortSpec<T>[]): this {
     this.spec.sort = [...(this.spec.sort ?? []), ...sorts];
@@ -82,7 +230,16 @@ export class QueryBuilder<T extends Document> {
   }
 
   /**
-   * Skip documents
+   * Skip a number of documents (for pagination).
+   *
+   * @param count - Number of documents to skip
+   * @returns This query builder for chaining
+   *
+   * @example
+   * ```typescript
+   * // Page 3 with 10 items per page
+   * query.skip(20).limit(10);
+   * ```
    */
   skip(count: number): this {
     this.spec.skip = count;
@@ -90,7 +247,16 @@ export class QueryBuilder<T extends Document> {
   }
 
   /**
-   * Limit number of documents
+   * Limit the number of results returned.
+   *
+   * @param count - Maximum number of documents to return
+   * @returns This query builder for chaining
+   *
+   * @example
+   * ```typescript
+   * // Get top 5 users
+   * query.sort('score', 'desc').limit(5);
+   * ```
    */
   limit(count: number): this {
     this.spec.limit = count;
@@ -98,7 +264,19 @@ export class QueryBuilder<T extends Document> {
   }
 
   /**
-   * Set projection (fields to include/exclude)
+   * Set field projection using include/exclude syntax.
+   *
+   * @param projection - Object mapping field names to 1 (include) or 0 (exclude)
+   * @returns This query builder for chaining
+   *
+   * @example
+   * ```typescript
+   * // Include only specific fields
+   * query.select({ name: 1, email: 1 });
+   *
+   * // Exclude large fields
+   * query.select({ content: 0, attachments: 0 });
+   * ```
    */
   select(projection: Partial<Record<keyof T, 0 | 1>>): this {
     this.spec.projection = projection;
@@ -106,7 +284,18 @@ export class QueryBuilder<T extends Document> {
   }
 
   /**
-   * Include only specified fields
+   * Include only the specified fields in results.
+   *
+   * The `_id` field is always included unless explicitly excluded.
+   *
+   * @param fields - Field names to include
+   * @returns This query builder for chaining
+   *
+   * @example
+   * ```typescript
+   * // Return only name and email
+   * const summary = await query.include('name', 'email').exec();
+   * ```
    */
   include(...fields: (keyof T & string)[]): this {
     const projection: Partial<Record<keyof T, 0 | 1>> = {};
@@ -118,7 +307,18 @@ export class QueryBuilder<T extends Document> {
   }
 
   /**
-   * Exclude specified fields
+   * Exclude the specified fields from results.
+   *
+   * Useful for omitting large fields when not needed.
+   *
+   * @param fields - Field names to exclude
+   * @returns This query builder for chaining
+   *
+   * @example
+   * ```typescript
+   * // Exclude large content field
+   * const list = await query.exclude('content', 'metadata').exec();
+   * ```
    */
   exclude(...fields: (keyof T & string)[]): this {
     const projection: Partial<Record<keyof T, 0 | 1>> = {};
@@ -130,21 +330,46 @@ export class QueryBuilder<T extends Document> {
   }
 
   /**
-   * Get the query specification
+   * Get the underlying query specification.
+   *
+   * Useful for debugging or passing to other APIs.
+   *
+   * @returns A copy of the query specification
    */
   getSpec(): QuerySpec<T> {
     return { ...this.spec };
   }
 
   /**
-   * Execute the query and return results
+   * Execute the query and return matching documents.
+   *
+   * This is a one-time query. For reactive updates, use {@link live}.
+   *
+   * @returns Promise resolving to array of matching documents
+   *
+   * @example
+   * ```typescript
+   * const users = await db.collection('users')
+   *   .find()
+   *   .where('active').equals(true)
+   *   .exec();
+   * ```
    */
   async exec(): Promise<T[]> {
     return this.executor(this.spec);
   }
 
   /**
-   * Execute and return first result
+   * Execute the query and return the first matching document.
+   *
+   * Equivalent to `.limit(1).exec()[0]`.
+   *
+   * @returns Promise resolving to the first match, or `null` if none
+   *
+   * @example
+   * ```typescript
+   * const admin = await query.where('role').equals('admin').first();
+   * ```
    */
   async first(): Promise<T | null> {
     const results = await this.limit(1).exec();
@@ -152,7 +377,40 @@ export class QueryBuilder<T extends Document> {
   }
 
   /**
-   * Create a live query observable
+   * Create a live query that updates automatically.
+   *
+   * Returns an RxJS Observable that emits the current results whenever
+   * the underlying data changes. Uses EventReduce optimization by default
+   * to minimize re-queries.
+   *
+   * @param options - Live query options (debounce, EventReduce settings)
+   * @returns Observable that emits arrays of matching documents
+   *
+   * @example React integration
+   * ```typescript
+   * function UserList() {
+   *   const [users, setUsers] = useState<User[]>([]);
+   *
+   *   useEffect(() => {
+   *     const sub = db.collection<User>('users')
+   *       .find()
+   *       .where('active').equals(true)
+   *       .sort('name')
+   *       .live()
+   *       .subscribe(setUsers);
+   *
+   *     return () => sub.unsubscribe();
+   *   }, []);
+   *
+   *   return <ul>{users.map(u => <li key={u._id}>{u.name}</li>)}</ul>;
+   * }
+   * ```
+   *
+   * @example With debouncing
+   * ```typescript
+   * // Debounce rapid changes (e.g., during typing)
+   * query.live({ debounceMs: 100 });
+   * ```
    */
   live(options?: LiveQueryOptions): Observable<T[]> {
     const factory = this.liveQueryFactory();
@@ -173,7 +431,33 @@ export class QueryBuilder<T extends Document> {
 }
 
 /**
- * Field-specific query builder for type-safe conditions
+ * Field-specific query builder with type-safe comparison operators.
+ *
+ * Created by {@link QueryBuilder.where}, provides operators appropriate
+ * for the field's type (comparisons, string matching, array operations).
+ *
+ * @typeParam T - The document type
+ * @typeParam V - The field value type
+ *
+ * @example Comparison operators
+ * ```typescript
+ * query.where('age').greaterThan(18)
+ * query.where('price').between(10, 100)
+ * query.where('status').in(['active', 'pending'])
+ * ```
+ *
+ * @example String operators
+ * ```typescript
+ * query.where('email').contains('@company.com')
+ * query.where('name').startsWith('Dr.')
+ * query.where('code').matches(/^[A-Z]{3}-\d{4}$/)
+ * ```
+ *
+ * @example Array operators
+ * ```typescript
+ * query.where('tags').all(['javascript', 'react'])
+ * query.where('items').size(3)
+ * ```
  */
 export class FieldQuery<T extends Document, V> {
   private readonly builder: QueryBuilder<T>;
@@ -185,172 +469,319 @@ export class FieldQuery<T extends Document, V> {
   }
 
   /**
-   * Equal to
+   * Match documents where the field equals the value.
+   *
+   * @param value - The value to match
+   * @returns The query builder for chaining
+   *
+   * @example
+   * ```typescript
+   * query.where('status').equals('active')
+   * ```
    */
   equals(value: V): QueryBuilder<T> {
     return this.builder._addCondition(this.field, value);
   }
 
   /**
-   * Equal to (alias)
+   * Alias for {@link equals}.
    */
   eq(value: V): QueryBuilder<T> {
     return this.equals(value);
   }
 
   /**
-   * Not equal to
+   * Match documents where the field does not equal the value.
+   *
+   * @param value - The value to not match
+   * @returns The query builder for chaining
+   *
+   * @example
+   * ```typescript
+   * query.where('status').notEquals('deleted')
+   * ```
    */
   notEquals(value: V): QueryBuilder<T> {
     return this.builder._addCondition(this.field, { $ne: value });
   }
 
   /**
-   * Not equal to (alias)
+   * Alias for {@link notEquals}.
    */
   ne(value: V): QueryBuilder<T> {
     return this.notEquals(value);
   }
 
   /**
-   * Greater than
+   * Match documents where the field is greater than the value.
+   *
+   * @param value - The minimum value (exclusive)
+   * @returns The query builder for chaining
+   *
+   * @example
+   * ```typescript
+   * query.where('age').greaterThan(18)
+   * query.where('createdAt').greaterThan(lastWeek)
+   * ```
    */
   greaterThan(value: V): QueryBuilder<T> {
     return this.builder._addCondition(this.field, { $gt: value });
   }
 
   /**
-   * Greater than (alias)
+   * Alias for {@link greaterThan}.
    */
   gt(value: V): QueryBuilder<T> {
     return this.greaterThan(value);
   }
 
   /**
-   * Greater than or equal
+   * Match documents where the field is greater than or equal to the value.
+   *
+   * @param value - The minimum value (inclusive)
+   * @returns The query builder for chaining
+   *
+   * @example
+   * ```typescript
+   * query.where('quantity').greaterThanOrEqual(1)
+   * ```
    */
   greaterThanOrEqual(value: V): QueryBuilder<T> {
     return this.builder._addCondition(this.field, { $gte: value });
   }
 
   /**
-   * Greater than or equal (alias)
+   * Alias for {@link greaterThanOrEqual}.
    */
   gte(value: V): QueryBuilder<T> {
     return this.greaterThanOrEqual(value);
   }
 
   /**
-   * Less than
+   * Match documents where the field is less than the value.
+   *
+   * @param value - The maximum value (exclusive)
+   * @returns The query builder for chaining
+   *
+   * @example
+   * ```typescript
+   * query.where('price').lessThan(100)
+   * ```
    */
   lessThan(value: V): QueryBuilder<T> {
     return this.builder._addCondition(this.field, { $lt: value });
   }
 
   /**
-   * Less than (alias)
+   * Alias for {@link lessThan}.
    */
   lt(value: V): QueryBuilder<T> {
     return this.lessThan(value);
   }
 
   /**
-   * Less than or equal
+   * Match documents where the field is less than or equal to the value.
+   *
+   * @param value - The maximum value (inclusive)
+   * @returns The query builder for chaining
+   *
+   * @example
+   * ```typescript
+   * query.where('rating').lessThanOrEqual(5)
+   * ```
    */
   lessThanOrEqual(value: V): QueryBuilder<T> {
     return this.builder._addCondition(this.field, { $lte: value });
   }
 
   /**
-   * Less than or equal (alias)
+   * Alias for {@link lessThanOrEqual}.
    */
   lte(value: V): QueryBuilder<T> {
     return this.lessThanOrEqual(value);
   }
 
   /**
-   * In array
+   * Match documents where the field value is in the provided array.
+   *
+   * @param values - Array of allowed values
+   * @returns The query builder for chaining
+   *
+   * @example
+   * ```typescript
+   * query.where('status').in(['active', 'pending', 'review'])
+   * query.where('category').in(allowedCategories)
+   * ```
    */
   in(values: V[]): QueryBuilder<T> {
     return this.builder._addCondition(this.field, { $in: values });
   }
 
   /**
-   * Not in array
+   * Match documents where the field value is not in the provided array.
+   *
+   * @param values - Array of disallowed values
+   * @returns The query builder for chaining
+   *
+   * @example
+   * ```typescript
+   * query.where('status').notIn(['deleted', 'archived'])
+   * ```
    */
   notIn(values: V[]): QueryBuilder<T> {
     return this.builder._addCondition(this.field, { $nin: values });
   }
 
   /**
-   * Between two values (inclusive)
+   * Match documents where the field is between two values (inclusive).
+   *
+   * @param min - Minimum value (inclusive)
+   * @param max - Maximum value (inclusive)
+   * @returns The query builder for chaining
+   *
+   * @example
+   * ```typescript
+   * query.where('price').between(10, 100)
+   * query.where('date').between(startOfMonth, endOfMonth)
+   * ```
    */
   between(min: V, max: V): QueryBuilder<T> {
     return this.builder._addCondition(this.field, { $gte: min, $lte: max });
   }
 
   /**
-   * Exists (is not null/undefined)
+   * Match documents where the field exists and is not null.
+   *
+   * @returns The query builder for chaining
+   *
+   * @example
+   * ```typescript
+   * query.where('email').exists()
+   * ```
    */
   exists(): QueryBuilder<T> {
     return this.builder._addCondition(this.field, { $ne: null });
   }
 
   /**
-   * Does not exist (is null/undefined)
+   * Match documents where the field is null or undefined.
+   *
+   * @returns The query builder for chaining
+   *
+   * @example
+   * ```typescript
+   * query.where('deletedAt').notExists()
+   * ```
    */
   notExists(): QueryBuilder<T> {
     return this.builder._addCondition(this.field, null);
   }
 
-  // String-specific methods (type-safe when V extends string)
+  // String-specific methods
 
   /**
-   * Matches regex pattern
+   * Match documents where the string field matches a regex pattern.
+   *
+   * @param pattern - Regular expression or pattern string
+   * @returns The query builder for chaining
+   *
+   * @example
+   * ```typescript
+   * query.where('phone').matches(/^\d{3}-\d{4}$/)
+   * query.where('code').matches('^[A-Z]{3}')
+   * ```
    */
   matches(pattern: RegExp | string): QueryBuilder<T> {
     return this.builder._addCondition(this.field, { $regex: pattern });
   }
 
   /**
-   * Starts with
+   * Match documents where the string field starts with a prefix.
+   *
+   * @param prefix - The prefix to match
+   * @returns The query builder for chaining
+   *
+   * @example
+   * ```typescript
+   * query.where('name').startsWith('Dr.')
+   * ```
    */
   startsWith(prefix: string): QueryBuilder<T> {
     return this.builder._addCondition(this.field, { $startsWith: prefix });
   }
 
   /**
-   * Ends with
+   * Match documents where the string field ends with a suffix.
+   *
+   * @param suffix - The suffix to match
+   * @returns The query builder for chaining
+   *
+   * @example
+   * ```typescript
+   * query.where('email').endsWith('@company.com')
+   * ```
    */
   endsWith(suffix: string): QueryBuilder<T> {
     return this.builder._addCondition(this.field, { $endsWith: suffix });
   }
 
   /**
-   * Contains substring
+   * Match documents where the string field contains a substring.
+   *
+   * @param substring - The substring to find
+   * @returns The query builder for chaining
+   *
+   * @example
+   * ```typescript
+   * query.where('description').contains('important')
+   * ```
    */
   contains(substring: string): QueryBuilder<T> {
     return this.builder._addCondition(this.field, { $contains: substring });
   }
 
-  // Array-specific methods (type-safe when V extends array)
+  // Array-specific methods
 
   /**
-   * Array contains all values
+   * Match documents where the array field contains all specified values.
+   *
+   * @param values - Values that must all be present
+   * @returns The query builder for chaining
+   *
+   * @example
+   * ```typescript
+   * query.where('tags').all(['javascript', 'typescript', 'react'])
+   * ```
    */
   all(values: unknown[]): QueryBuilder<T> {
     return this.builder._addCondition(this.field, { $all: values });
   }
 
   /**
-   * Array has size
+   * Match documents where the array field has the specified length.
+   *
+   * @param length - Required array length
+   * @returns The query builder for chaining
+   *
+   * @example
+   * ```typescript
+   * query.where('items').size(3)
+   * ```
    */
   size(length: number): QueryBuilder<T> {
     return this.builder._addCondition(this.field, { $size: length });
   }
 
   /**
-   * Array element matches condition
+   * Match documents where at least one array element matches the condition.
+   *
+   * @param condition - Condition that at least one element must match
+   * @returns The query builder for chaining
+   *
+   * @example
+   * ```typescript
+   * query.where('items').elemMatch({ price: { $gt: 100 }, inStock: true })
+   * ```
    */
   elemMatch(condition: Record<string, unknown>): QueryBuilder<T> {
     return this.builder._addCondition(this.field, { $elemMatch: condition });
@@ -358,7 +789,16 @@ export class FieldQuery<T extends Document, V> {
 }
 
 /**
- * Create a new query builder
+ * Create a new query builder instance.
+ *
+ * This is an internal factory function. Users should access query builders
+ * through {@link Collection.find}.
+ *
+ * @param executor - Function to execute queries
+ * @param liveQueryFactory - Factory for creating live queries
+ * @returns A new QueryBuilder instance
+ *
+ * @internal
  */
 export function createQueryBuilder<T extends Document>(
   executor: (spec: QuerySpec<T>) => Promise<T[]>,

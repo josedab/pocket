@@ -2,7 +2,9 @@ import type { Document } from '../types/document.js';
 import type { IndexDefinition } from '../types/storage.js';
 
 /**
- * Field types supported by schema
+ * Supported field types for schema validation.
+ *
+ * @see {@link FieldDefinition}
  */
 export type FieldType =
   | 'string'
@@ -15,77 +17,212 @@ export type FieldType =
   | 'any';
 
 /**
- * Field definition in schema
+ * Definition for a single field in a schema.
+ *
+ * Supports type validation, constraints, defaults, and nested schemas.
+ *
+ * @example String field with constraints
+ * ```typescript
+ * const emailField: FieldDefinition = {
+ *   type: 'string',
+ *   required: true,
+ *   pattern: '^[^@]+@[^@]+\\.[^@]+$'
+ * };
+ * ```
+ *
+ * @example Number with range
+ * ```typescript
+ * const ageField: FieldDefinition = {
+ *   type: 'number',
+ *   min: 0,
+ *   max: 150
+ * };
+ * ```
+ *
+ * @example Field with default value
+ * ```typescript
+ * const roleField: FieldDefinition = {
+ *   type: 'string',
+ *   default: 'user',
+ *   enum: ['user', 'admin', 'moderator']
+ * };
+ * ```
+ *
+ * @example Nested object
+ * ```typescript
+ * const addressField: FieldDefinition = {
+ *   type: 'object',
+ *   properties: {
+ *     street: { type: 'string', required: true },
+ *     city: { type: 'string', required: true },
+ *     zip: { type: 'string', pattern: '^\\d{5}$' }
+ *   }
+ * };
+ * ```
  */
 export interface FieldDefinition {
-  /** Field type */
+  /**
+   * The field type(s). Can be a single type or array for union types.
+   * @example 'string'
+   * @example ['string', 'null']
+   */
   type: FieldType | FieldType[];
-  /** Whether field is required */
+
+  /** Whether the field must be present (not undefined) */
   required?: boolean;
-  /** Default value */
+
+  /**
+   * Default value applied when field is missing.
+   * Can be a value or a function that returns a value.
+   */
   default?: unknown;
-  /** Minimum value (for numbers) or length (for strings/arrays) */
+
+  /** Minimum value (numbers) or length (strings/arrays) */
   min?: number;
-  /** Maximum value (for numbers) or length (for strings/arrays) */
+
+  /** Maximum value (numbers) or length (strings/arrays) */
   max?: number;
-  /** Pattern for string validation */
+
+  /** Regex pattern for string validation */
   pattern?: string | RegExp;
-  /** Enum values */
+
+  /** Allowed values (for enums) */
   enum?: unknown[];
-  /** Nested schema for objects */
+
+  /** Nested schema for object fields */
   properties?: SchemaDefinition['properties'];
-  /** Array item schema */
+
+  /** Schema for array elements */
   items?: FieldDefinition;
 }
 
 /**
- * Schema definition for a collection
+ * Complete schema definition for a collection.
+ *
+ * @example
+ * ```typescript
+ * const userSchema: SchemaDefinition = {
+ *   version: 1,
+ *   properties: {
+ *     name: { type: 'string', required: true, min: 1 },
+ *     email: { type: 'string', required: true, pattern: '^[^@]+@[^@]+$' },
+ *     age: { type: 'number', min: 0 },
+ *     role: { type: 'string', default: 'user', enum: ['user', 'admin'] },
+ *     tags: { type: 'array', items: { type: 'string' } }
+ *   },
+ *   additionalProperties: false
+ * };
+ * ```
  */
 export interface SchemaDefinition {
   /** Schema version for migrations */
   version?: number;
-  /** Field definitions */
+
+  /** Field definitions mapping field name to definition */
   properties: Record<string, FieldDefinition>;
-  /** Whether to allow additional properties not in schema */
+
+  /** Whether to allow fields not defined in properties. @default true */
   additionalProperties?: boolean;
-  /** Required field names */
+
+  /** List of required field names (alternative to setting required in each field) */
   required?: string[];
 }
 
 /**
- * Collection configuration
+ * Configuration options for a collection.
+ *
+ * @typeParam T - The document type for this collection
+ *
+ * @example
+ * ```typescript
+ * const usersConfig: CollectionConfig<User> = {
+ *   name: 'users',
+ *   schema: userSchema,
+ *   indexes: [
+ *     { name: 'email-idx', fields: ['email'], unique: true }
+ *   ],
+ *   sync: true,
+ *   conflictStrategy: 'last-write-wins'
+ * };
+ * ```
  */
 export interface CollectionConfig<T extends Document = Document> {
-  /** Collection name */
+  /** Collection name (must be unique within database) */
   name: string;
-  /** Schema definition */
+
+  /** Schema for validation and defaults */
   schema?: SchemaDefinition;
-  /** Index definitions */
+
+  /** Index definitions for query optimization */
   indexes?: IndexDefinition[];
-  /** Default sort field */
+
+  /** Default sort field for queries */
   defaultSort?: keyof T & string;
-  /** Time-to-live in ms (for auto-expiry) */
+
+  /** Time-to-live in milliseconds for auto-expiring documents */
   ttl?: number;
-  /** Whether collection syncs with server */
+
+  /** Enable sync for this collection */
   sync?: boolean;
-  /** Conflict resolution strategy */
+
+  /**
+   * Strategy for resolving conflicts during sync.
+   * - 'server-wins': Server version always takes precedence
+   * - 'client-wins': Client version always takes precedence
+   * - 'last-write-wins': Most recent update wins (by timestamp)
+   * - 'merge': Deep merge conflicting changes
+   */
   conflictStrategy?: 'server-wins' | 'client-wins' | 'last-write-wins' | 'merge';
 }
 
 /**
- * Database configuration
+ * Database-level configuration.
+ *
+ * @see {@link DatabaseOptions}
  */
 export interface DatabaseConfig {
-  /** Database name */
+  /** Database name (used for storage isolation) */
   name: string;
-  /** Database version */
+
+  /** Database schema version for migrations */
   version?: number;
-  /** Collection configurations */
+
+  /** Pre-configured collection definitions */
   collections?: CollectionConfig[];
 }
 
 /**
- * Schema class for runtime type validation and defaults
+ * Runtime schema validator for type checking and default value application.
+ *
+ * Schema provides:
+ * - Runtime type validation for documents
+ * - Default value application for missing fields
+ * - Detailed validation error messages
+ *
+ * @typeParam T - The document type this schema validates
+ *
+ * @example
+ * ```typescript
+ * const schema = new Schema<User>({
+ *   properties: {
+ *     name: { type: 'string', required: true },
+ *     role: { type: 'string', default: 'user' }
+ *   }
+ * });
+ *
+ * // Apply defaults
+ * const withDefaults = schema.applyDefaults({ name: 'Alice' });
+ * // { name: 'Alice', role: 'user' }
+ *
+ * // Validate
+ * const result = schema.validate({ name: '' });
+ * if (!result.valid) {
+ *   console.log(result.errors);
+ * }
+ * ```
+ *
+ * @see {@link SchemaDefinition}
+ * @see {@link ValidationResult}
  */
 export class Schema<T extends Document = Document> {
   readonly definition: SchemaDefinition;
@@ -106,7 +243,23 @@ export class Schema<T extends Document = Document> {
   }
 
   /**
-   * Validate a document against the schema
+   * Validate a document against the schema.
+   *
+   * Checks type constraints, required fields, value ranges, patterns,
+   * and nested objects. Does not modify the document.
+   *
+   * @param doc - The document to validate
+   * @returns Validation result with errors array
+   *
+   * @example
+   * ```typescript
+   * const result = schema.validate(document);
+   * if (!result.valid) {
+   *   for (const error of result.errors) {
+   *     console.log(`${error.path}: ${error.message}`);
+   *   }
+   * }
+   * ```
    */
   validate(doc: unknown): ValidationResult {
     const errors: FieldValidationError[] = [];
@@ -158,7 +311,27 @@ export class Schema<T extends Document = Document> {
   }
 
   /**
-   * Apply default values to a document
+   * Apply default values to a partial document.
+   *
+   * For each field with a default value defined in the schema,
+   * if the field is missing from the document, the default is applied.
+   *
+   * @param doc - Partial document to apply defaults to
+   * @returns New document with defaults applied (original is unchanged)
+   *
+   * @example
+   * ```typescript
+   * const schema = new Schema({
+   *   properties: {
+   *     name: { type: 'string', required: true },
+   *     role: { type: 'string', default: 'user' },
+   *     createdAt: { type: 'date', default: () => new Date() }
+   *   }
+   * });
+   *
+   * const doc = schema.applyDefaults({ name: 'Alice' });
+   * // { name: 'Alice', role: 'user', createdAt: Date }
+   * ```
    */
   applyDefaults(doc: Partial<T>): Partial<T> {
     const result = { ...doc };
@@ -301,17 +474,47 @@ export class Schema<T extends Document = Document> {
 }
 
 /**
- * Field validation error
+ * Details about a single field validation error.
+ *
+ * @see {@link ValidationResult}
  */
 export interface FieldValidationError {
+  /**
+   * The field path where the error occurred.
+   * For nested fields, uses dot notation (e.g., 'address.city').
+   * For array items, uses bracket notation (e.g., 'items[0].name').
+   */
   path: string;
+
+  /** Human-readable description of the validation failure */
   message: string;
 }
 
 /**
- * Validation result
+ * Result of validating a document against a schema.
+ *
+ * @example
+ * ```typescript
+ * const result = schema.validate(document);
+ *
+ * if (result.valid) {
+ *   await collection.insert(document);
+ * } else {
+ *   // Show errors to user
+ *   const errorMessages = result.errors
+ *     .map(e => `${e.path}: ${e.message}`)
+ *     .join('\n');
+ *   showValidationErrors(errorMessages);
+ * }
+ * ```
+ *
+ * @see {@link Schema.validate}
+ * @see {@link ValidationError}
  */
 export interface ValidationResult {
+  /** Whether the document passed all validation rules */
   valid: boolean;
+
+  /** List of validation errors (empty if valid is true) */
   errors: FieldValidationError[];
 }
