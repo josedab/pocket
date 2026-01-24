@@ -81,6 +81,11 @@ const config: Config = {
           label: 'Docs',
         },
         {
+          to: '/docs/playground',
+          label: 'Playground',
+          position: 'left',
+        },
+        {
           to: '/docs/api/database',
           label: 'API',
           position: 'left',
