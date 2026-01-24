@@ -17,53 +17,169 @@ import { generateMessageId } from './transport/types.js';
 import { createWebSocketTransport } from './transport/websocket.js';
 
 /**
- * Sync status
+ * Current status of the sync engine.
+ *
+ * - `'idle'`: Connected and waiting for changes
+ * - `'syncing'`: Currently pushing or pulling changes
+ * - `'error'`: An error occurred (check stats.lastError)
+ * - `'offline'`: Disconnected from server
+ *
+ * @see {@link SyncEngine.getStatus}
  */
 export type SyncStatus = 'idle' | 'syncing' | 'error' | 'offline';
 
 /**
- * Sync statistics
+ * Statistics about sync operations.
+ *
+ * @see {@link SyncEngine.getStats}
  */
 export interface SyncStats {
+  /** Total number of changes pushed to server */
   pushCount: number;
+  /** Total number of changes pulled from server */
   pullCount: number;
+  /** Total number of conflicts resolved */
   conflictCount: number;
+  /** Timestamp of last successful sync, or null if never synced */
   lastSyncAt: number | null;
+  /** Last error encountered, or null if no recent errors */
   lastError: Error | null;
 }
 
 /**
- * Sync configuration
+ * Configuration options for the sync engine.
+ *
+ * @example Basic WebSocket sync
+ * ```typescript
+ * const config: SyncConfig = {
+ *   serverUrl: 'wss://sync.myapp.com',
+ *   authToken: 'user-jwt-token',
+ *   collections: ['todos', 'notes'],
+ *   conflictStrategy: 'last-write-wins'
+ * };
+ * ```
+ *
+ * @example HTTP polling sync
+ * ```typescript
+ * const config: SyncConfig = {
+ *   serverUrl: 'https://api.myapp.com/sync',
+ *   useWebSocket: false,
+ *   pullInterval: 5000, // Poll every 5 seconds
+ *   direction: 'both'
+ * };
+ * ```
+ *
+ * @example Push-only sync (backup)
+ * ```typescript
+ * const config: SyncConfig = {
+ *   serverUrl: 'wss://backup.myapp.com',
+ *   direction: 'push',
+ *   collections: ['important-data']
+ * };
+ * ```
+ *
+ * @see {@link SyncEngine}
+ * @see {@link ConflictStrategy}
  */
 export interface SyncConfig {
-  /** Server URL */
+  /** Sync server URL (wss:// for WebSocket, https:// for HTTP) */
   serverUrl: string;
-  /** Authentication token */
+
+  /** JWT or API key for authentication */
   authToken?: string;
-  /** Collections to sync (empty = all) */
+
+  /** Collections to sync. Empty array syncs all collections with changes. */
   collections?: string[];
-  /** Sync direction */
+
+  /**
+   * Sync direction:
+   * - `'push'`: Only send local changes to server
+   * - `'pull'`: Only receive changes from server
+   * - `'both'`: Bidirectional sync (default)
+   */
   direction?: 'push' | 'pull' | 'both';
-  /** Conflict resolution strategy */
+
+  /**
+   * Strategy for resolving conflicts when same document modified locally and remotely.
+   * @default 'last-write-wins'
+   */
   conflictStrategy?: ConflictStrategy;
-  /** Auto retry on failure */
+
+  /** Automatically retry failed sync operations. @default true */
   autoRetry?: boolean;
-  /** Retry delay in ms */
+
+  /** Delay between retry attempts in milliseconds. @default 1000 */
   retryDelay?: number;
-  /** Max retry attempts */
+
+  /** Maximum number of retry attempts before giving up. @default 5 */
   maxRetryAttempts?: number;
-  /** Use WebSocket (true) or HTTP (false) */
+
+  /** Use WebSocket (true) or HTTP polling (false). @default true */
   useWebSocket?: boolean;
-  /** Poll interval for pull (ms, 0 to disable) */
+
+  /** Interval for pulling changes in ms. Set to 0 to disable. @default 30000 */
   pullInterval?: number;
-  /** Batch size for push/pull */
+
+  /** Maximum changes per push/pull request. @default 100 */
   batchSize?: number;
-  /** Logger options for structured logging */
+
+  /**
+   * Logger configuration. Pass `false` to disable logging,
+   * a Logger instance for custom logging, or LoggerOptions to configure.
+   */
   logger?: LoggerOptions | Logger | false;
 }
 
 /**
- * Main sync engine
+ * Sync engine for synchronizing local database with a remote server.
+ *
+ * The SyncEngine handles:
+ * - Pushing local changes to the server
+ * - Pulling remote changes from the server
+ * - Conflict detection and resolution
+ * - Optimistic updates and rollback
+ * - Automatic reconnection and retry
+ *
+ * @example Basic usage
+ * ```typescript
+ * import { Database } from '@pocket/core';
+ * import { SyncEngine } from '@pocket/sync';
+ *
+ * const db = await Database.create({ ... });
+ *
+ * const sync = new SyncEngine(db, {
+ *   serverUrl: 'wss://sync.myapp.com',
+ *   authToken: userToken,
+ *   collections: ['todos', 'notes']
+ * });
+ *
+ * // Start syncing
+ * await sync.start();
+ *
+ * // Monitor sync status
+ * sync.getStatus().subscribe(status => {
+ *   console.log('Sync status:', status);
+ * });
+ *
+ * // Force immediate sync
+ * await sync.forceSync();
+ *
+ * // Stop syncing
+ * await sync.stop();
+ * ```
+ *
+ * @example Handling sync events
+ * ```typescript
+ * sync.getStats().subscribe(stats => {
+ *   console.log(`Pushed: ${stats.pushCount}, Pulled: ${stats.pullCount}`);
+ *   if (stats.lastError) {
+ *     console.error('Sync error:', stats.lastError);
+ *   }
+ * });
+ * ```
+ *
+ * @see {@link SyncConfig} for configuration options
+ * @see {@link ConflictStrategy} for conflict resolution
  */
 export class SyncEngine {
   private readonly database: Database;
@@ -145,7 +261,25 @@ export class SyncEngine {
   }
 
   /**
-   * Start syncing
+   * Start the sync engine and connect to the server.
+   *
+   * This method:
+   * 1. Connects to the sync server via WebSocket or HTTP
+   * 2. Subscribes to local collection changes (for push)
+   * 3. Starts the pull interval (if configured)
+   * 4. Performs an initial sync
+   *
+   * @throws Error if connection to server fails
+   *
+   * @example
+   * ```typescript
+   * try {
+   *   await sync.start();
+   *   console.log('Sync started successfully');
+   * } catch (error) {
+   *   console.error('Failed to start sync:', error);
+   * }
+   * ```
    */
   async start(): Promise<void> {
     if (this.isRunning) {
@@ -187,7 +321,17 @@ export class SyncEngine {
   }
 
   /**
-   * Stop syncing
+   * Stop the sync engine and disconnect from the server.
+   *
+   * Stops all background sync operations, unsubscribes from change
+   * listeners, and disconnects the transport. Can be restarted with
+   * {@link start}.
+   *
+   * @example
+   * ```typescript
+   * // Stop sync when user logs out
+   * await sync.stop();
+   * ```
    */
   async stop(): Promise<void> {
     this.logger.info('Stopping sync engine');
@@ -214,7 +358,21 @@ export class SyncEngine {
   }
 
   /**
-   * Force immediate sync
+   * Force an immediate sync operation.
+   *
+   * Pushes all pending local changes and pulls all remote changes.
+   * Useful after reconnecting or when immediate consistency is needed.
+   *
+   * @throws Error if sync fails
+   *
+   * @example
+   * ```typescript
+   * // Force sync when user requests refresh
+   * document.getElementById('refresh').onclick = async () => {
+   *   await sync.forceSync();
+   *   console.log('Sync complete');
+   * };
+   * ```
    */
   async forceSync(): Promise<void> {
     if (this.status$.getValue() === 'syncing') {
@@ -253,7 +411,16 @@ export class SyncEngine {
   }
 
   /**
-   * Push local changes to server
+   * Push all pending local changes to the server.
+   *
+   * Changes are batched by collection and sent according to
+   * the configured batch size.
+   *
+   * @example
+   * ```typescript
+   * // Manually push changes (usually handled automatically)
+   * await sync.push();
+   * ```
    */
   async push(): Promise<void> {
     const collections = this.getCollectionsToSync();
@@ -264,7 +431,16 @@ export class SyncEngine {
   }
 
   /**
-   * Pull remote changes from server
+   * Pull remote changes from the server.
+   *
+   * Fetches all changes since the last checkpoint and applies them
+   * locally. Handles pagination automatically for large changesets.
+   *
+   * @example
+   * ```typescript
+   * // Manually pull changes (usually handled automatically)
+   * await sync.pull();
+   * ```
    */
   async pull(): Promise<void> {
     const collections = this.getCollectionsToSync();
@@ -291,21 +467,69 @@ export class SyncEngine {
   }
 
   /**
-   * Get sync status observable
+   * Get an observable of sync status changes.
+   *
+   * Use this to show sync state in your UI.
+   *
+   * @returns Observable that emits current sync status
+   *
+   * @example
+   * ```typescript
+   * sync.getStatus().subscribe(status => {
+   *   switch (status) {
+   *     case 'idle':
+   *       showSyncedIcon();
+   *       break;
+   *     case 'syncing':
+   *       showSyncingSpinner();
+   *       break;
+   *     case 'error':
+   *       showErrorIcon();
+   *       break;
+   *     case 'offline':
+   *       showOfflineIcon();
+   *       break;
+   *   }
+   * });
+   * ```
    */
   getStatus(): Observable<SyncStatus> {
     return this.status$.asObservable().pipe(takeUntil(this.destroy$));
   }
 
   /**
-   * Get sync stats observable
+   * Get an observable of sync statistics.
+   *
+   * Use this to display sync progress and error information.
+   *
+   * @returns Observable that emits sync statistics
+   *
+   * @example
+   * ```typescript
+   * sync.getStats().subscribe(stats => {
+   *   console.log(`Changes: ${stats.pushCount} pushed, ${stats.pullCount} pulled`);
+   *   console.log(`Conflicts resolved: ${stats.conflictCount}`);
+   *   if (stats.lastSyncAt) {
+   *     console.log(`Last sync: ${new Date(stats.lastSyncAt).toLocaleString()}`);
+   *   }
+   * });
+   * ```
    */
   getStats(): Observable<SyncStats> {
     return this.stats$.asObservable().pipe(takeUntil(this.destroy$));
   }
 
   /**
-   * Destroy the sync engine
+   * Permanently destroy the sync engine and release all resources.
+   *
+   * After calling destroy(), the sync engine cannot be restarted.
+   * Create a new SyncEngine instance if you need to sync again.
+   *
+   * @example
+   * ```typescript
+   * // Cleanup on app shutdown
+   * sync.destroy();
+   * ```
    */
   destroy(): void {
     void this.stop();
@@ -565,7 +789,23 @@ export class SyncEngine {
 }
 
 /**
- * Create a sync engine
+ * Factory function to create a sync engine.
+ *
+ * @param database - The database to sync
+ * @param config - Sync configuration options
+ * @returns A new SyncEngine instance
+ *
+ * @example
+ * ```typescript
+ * const sync = createSyncEngine(db, {
+ *   serverUrl: 'wss://sync.example.com',
+ *   authToken: userToken
+ * });
+ *
+ * await sync.start();
+ * ```
+ *
+ * @see {@link SyncEngine}
  */
 export function createSyncEngine(database: Database, config: SyncConfig): SyncEngine {
   return new SyncEngine(database, config);

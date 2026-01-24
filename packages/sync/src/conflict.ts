@@ -2,29 +2,98 @@ import type { Document, DocumentConflict } from '@pocket/core';
 import { VectorClockUtil } from '@pocket/core';
 
 /**
- * Conflict resolution strategies
+ * Available strategies for resolving sync conflicts.
+ *
+ * When the same document is modified both locally and remotely,
+ * a conflict occurs. The strategy determines how to resolve it:
+ *
+ * - `'server-wins'`: Always use the server's version
+ * - `'client-wins'`: Always use the client's version
+ * - `'last-write-wins'`: Use whichever version was modified most recently
+ * - `'merge'`: Attempt to merge changes field-by-field
+ *
+ * @see {@link ConflictResolver}
+ * @see {@link SyncConfig.conflictStrategy}
  */
 export type ConflictStrategy = 'server-wins' | 'client-wins' | 'last-write-wins' | 'merge';
 
 /**
- * Conflict resolution result
+ * Result of resolving a conflict between document versions.
+ *
+ * @typeParam T - The document type
  */
 export interface ConflictResolution<T extends Document> {
-  /** Resolved document */
+  /** The resolved document to be saved */
   document: T;
-  /** Winner of the conflict */
+
+  /** Which version was chosen as the winner */
   winner: 'local' | 'remote' | 'merged';
-  /** Whether manual resolution is needed */
+
+  /** Whether the conflict requires user intervention to resolve */
   needsManualResolution: boolean;
 }
 
 /**
- * Custom merge function type
+ * Custom function type for merging conflicting documents.
+ *
+ * @typeParam T - The document type
+ * @param local - The local version of the document
+ * @param remote - The remote version of the document
+ * @param base - The common ancestor (if known)
+ * @returns The merged document
+ *
+ * @example
+ * ```typescript
+ * const customMerge: MergeFunction<Todo> = (local, remote, base) => {
+ *   // Custom logic: prefer local title, remote completion status
+ *   return {
+ *     ...remote,
+ *     title: local.title,
+ *     completed: remote.completed,
+ *     _updatedAt: Date.now()
+ *   };
+ * };
+ * ```
  */
 export type MergeFunction<T extends Document> = (local: T, remote: T, base?: T) => T;
 
 /**
- * Conflict resolver class
+ * Resolves conflicts between local and remote document versions.
+ *
+ * The ConflictResolver applies the configured strategy to determine
+ * which version of a document should be kept when both have been modified.
+ *
+ * @typeParam T - The document type
+ *
+ * @example Using built-in strategies
+ * ```typescript
+ * const resolver = new ConflictResolver<Todo>('last-write-wins');
+ *
+ * const result = resolver.resolve({
+ *   documentId: 'todo-123',
+ *   localDocument: localTodo,
+ *   remoteDocument: remoteTodo,
+ *   timestamp: Date.now()
+ * });
+ *
+ * if (result.winner === 'local') {
+ *   console.log('Local changes preserved');
+ * }
+ * ```
+ *
+ * @example Using custom merge function
+ * ```typescript
+ * const customMerge: MergeFunction<User> = (local, remote) => ({
+ *   ...remote,
+ *   preferences: local.preferences, // Prefer local preferences
+ *   profile: remote.profile          // Prefer remote profile
+ * });
+ *
+ * const resolver = new ConflictResolver<User>('merge', customMerge);
+ * ```
+ *
+ * @see {@link ConflictStrategy}
+ * @see {@link ConflictResolution}
  */
 export class ConflictResolver<T extends Document> {
   private readonly strategy: ConflictStrategy;
@@ -36,7 +105,28 @@ export class ConflictResolver<T extends Document> {
   }
 
   /**
-   * Resolve a conflict between local and remote documents
+   * Resolve a conflict between local and remote document versions.
+   *
+   * @param conflict - The conflict details including both versions
+   * @returns Resolution result with the winning document
+   *
+   * @example
+   * ```typescript
+   * const result = resolver.resolve({
+   *   documentId: 'doc-123',
+   *   localDocument: localDoc,
+   *   remoteDocument: remoteDoc,
+   *   baseDocument: ancestorDoc, // Optional
+   *   timestamp: Date.now()
+   * });
+   *
+   * console.log(`Winner: ${result.winner}`);
+   * await collection.applyRemoteChange({
+   *   operation: 'update',
+   *   document: result.document,
+   *   ...
+   * });
+   * ```
    */
   resolve(conflict: DocumentConflict<T>): ConflictResolution<T> {
     const { localDocument, remoteDocument, baseDocument } = conflict;
@@ -242,7 +332,33 @@ function parseRevision(rev: string | undefined): { sequence: number; hash: strin
 }
 
 /**
- * Detect if two documents have a conflict
+ * Detect if two document versions are in conflict.
+ *
+ * Conflicts occur when both versions have been modified independently
+ * (concurrent edits). This function uses:
+ * 1. Revision strings to detect same-base divergence
+ * 2. Vector clocks (if present) for precise causality tracking
+ *
+ * @typeParam T - The document type
+ * @param local - The local version of the document
+ * @param remote - The remote version of the document
+ * @returns `true` if the documents are in conflict, `false` otherwise
+ *
+ * @example
+ * ```typescript
+ * const localDoc = await collection.get('doc-123');
+ * const remoteDoc = changeFromServer.document;
+ *
+ * if (detectConflict(localDoc, remoteDoc)) {
+ *   const resolution = conflictResolver.resolve({
+ *     documentId: 'doc-123',
+ *     localDocument: localDoc,
+ *     remoteDocument: remoteDoc,
+ *     timestamp: Date.now()
+ *   });
+ *   // Apply resolution...
+ * }
+ * ```
  */
 export function detectConflict<T extends Document>(local: T, remote: T): boolean {
   // Same revision - no conflict
