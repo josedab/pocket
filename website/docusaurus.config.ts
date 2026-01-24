@@ -1,5 +1,5 @@
 import type * as Preset from '@docusaurus/preset-classic';
-import type { Config } from '@docusaurus/types';
+import type { Config, Plugin } from '@docusaurus/types';
 import { themes as prismThemes } from 'prism-react-renderer';
 
 const config: Config = {
@@ -58,6 +58,26 @@ const config: Config = {
         },
       } satisfies Preset.Options,
     ],
+  ],
+
+  plugins: [
+    function webpackFallbackPlugin(): Plugin {
+      return {
+        name: 'webpack-fallback-plugin',
+        configureWebpack() {
+          return {
+            resolve: {
+              fallback: {
+                'vscode-languageserver-types': false,
+                'vscode-jsonrpc/lib/common/cancellation.js': false,
+                'vscode-jsonrpc/lib/common/events.js': false,
+                '@chevrotain/regexp-to-ast': false,
+              },
+            },
+          };
+        },
+      };
+    },
   ],
 
   themeConfig: {
