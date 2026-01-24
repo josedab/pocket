@@ -72,6 +72,23 @@ export interface SortSpec<T extends Document> {
 }
 
 /**
+ * Cursor direction for pagination
+ */
+export type CursorDirection = 'after' | 'before';
+
+/**
+ * Cursor-based pagination specification
+ */
+export interface CursorSpec {
+  /** The cursor value (typically a document ID or field value) */
+  value: string;
+  /** Direction: 'after' to get items after cursor, 'before' to get items before */
+  direction: CursorDirection;
+  /** The field to use for cursor comparison (defaults to '_id') */
+  field?: string;
+}
+
+/**
  * Complete query specification
  */
 export interface QuerySpec<T extends Document> {
@@ -85,6 +102,8 @@ export interface QuerySpec<T extends Document> {
   limit?: number;
   /** Fields to include/exclude */
   projection?: Partial<Record<keyof T, 0 | 1>>;
+  /** Cursor-based pagination */
+  cursor?: CursorSpec;
 }
 
 /**
@@ -124,6 +143,42 @@ export interface QueryResult<T extends Document> {
   executionTimeMs: number;
   /** Query plan used */
   plan?: QueryPlan;
+  /** Next cursor for pagination (if applicable) */
+  nextCursor?: string;
+  /** Previous cursor for pagination (if applicable) */
+  prevCursor?: string;
+  /** Whether there are more results */
+  hasMore?: boolean;
+}
+
+/**
+ * Query execution statistics
+ */
+export interface QueryExecutionStats {
+  /** Total execution time in milliseconds */
+  totalTimeMs: number;
+  /** Number of documents scanned */
+  documentsScanned: number;
+  /** Number of index hits (if index was used) */
+  indexHits: number;
+  /** Number of documents returned */
+  documentsReturned: number;
+  /** Whether query used an index */
+  usedIndex: boolean;
+  /** Index name if used */
+  indexName?: string;
+}
+
+/**
+ * Full query explanation result
+ */
+export interface QueryExplainResult {
+  /** The query plan that will be/was used */
+  plan: QueryPlan;
+  /** Execution statistics (only present after execution) */
+  execution?: QueryExecutionStats;
+  /** Suggestions for improving query performance */
+  suggestions?: string[];
 }
 
 /**
