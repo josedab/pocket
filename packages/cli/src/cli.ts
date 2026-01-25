@@ -6,6 +6,8 @@
  * @module @pocket/cli
  */
 
+import { backup } from './commands/backup.js';
+import { doctor } from './commands/doctor.js';
 import { exportData } from './commands/export.js';
 import { generateTypes } from './commands/generate/types.js';
 import { importData } from './commands/import.js';
@@ -14,6 +16,7 @@ import { create as migrateCreate } from './commands/migrate/create.js';
 import { down as migrateDown } from './commands/migrate/down.js';
 import { status as migrateStatus } from './commands/migrate/status.js';
 import { up as migrateUp } from './commands/migrate/up.js';
+import { restore } from './commands/restore.js';
 import { studio } from './commands/studio.js';
 
 /**
@@ -81,11 +84,14 @@ Usage: pocket <command> [options]
 
 Commands:
   init                    Initialize a new Pocket project
+  doctor                  Check project health and configuration
   migrate create <name>   Create a new migration
   migrate up              Run pending migrations
   migrate down [n]        Rollback n migrations (default: 1)
   migrate status          Show migration status
   studio                  Launch data inspection UI
+  backup                  Create a backup of your data
+  restore <file>          Restore data from a backup
   export [collection]     Export data to JSON/NDJSON
   import <file>           Import data from JSON/NDJSON
   generate types          Generate TypeScript types from schema
@@ -96,10 +102,14 @@ Options:
 
 Examples:
   pocket init                           Create pocket.config.ts
+  pocket doctor                         Check project health
   pocket migrate create add-users       Create a new migration
   pocket migrate up                     Run pending migrations
   pocket migrate down 2                 Rollback last 2 migrations
-  pocket studio                         Open data browser
+  pocket studio                         Open data browser (with schema view)
+  pocket backup                         Backup all collections to JSON
+  pocket backup --format ndjson         Backup in NDJSON format
+  pocket restore ./backup.json          Restore from backup
   pocket export users                   Export users collection
   pocket import ./backup.json           Import from file
   pocket generate types                 Generate TypeScript types
@@ -141,6 +151,37 @@ async function main(): Promise<void> {
           name: args.positional[0] ?? (args.flags.name as string),
           force: args.flags.force === true,
           skipMigrations: args.flags['skip-migrations'] === true,
+        });
+        break;
+
+      case 'doctor':
+        await doctor({
+          quiet: args.flags.quiet === true,
+        });
+        break;
+
+      case 'backup':
+        await backup({
+          output: (args.flags.output as string) ?? (args.flags.o as string),
+          format: args.flags.format as 'json' | 'ndjson' | 'sqlite' | undefined,
+          collections: args.positional.length > 0 ? args.positional : undefined,
+          pretty: args.flags.pretty !== false,
+          dryRun: args.flags['dry-run'] === true,
+        });
+        break;
+
+      case 'restore':
+        if (!args.positional[0]) {
+          console.error('Error: Backup file path is required');
+          console.error('Usage: pocket restore <file>');
+          process.exit(1);
+        }
+        await restore({
+          file: args.positional[0],
+          collections: args.positional.slice(1).length > 0 ? args.positional.slice(1) : undefined,
+          clear: args.flags.clear === true,
+          force: args.flags.force === true,
+          dryRun: args.flags['dry-run'] === true,
         });
         break;
 
