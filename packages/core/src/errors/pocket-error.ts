@@ -10,6 +10,84 @@ import {
 } from './error-codes.js';
 
 /**
+ * Code examples for common error scenarios.
+ * These help developers quickly understand how to fix issues.
+ */
+const ERROR_CODE_EXAMPLES: Partial<Record<ErrorCode, string>> = {
+  POCKET_V100: `// Ensure your document matches the schema:
+const user = await db.collection('users').insert({
+  name: 'John',  // required field
+  email: 'john@example.com',  // must match pattern
+});`,
+
+  POCKET_V101: `// Add all required fields to your document:
+await db.collection('users').insert({
+  _id: 'user-1',
+  name: 'Required field',  // Don't forget required fields!
+});`,
+
+  POCKET_D401: `// Check if the document exists before accessing:
+const doc = await db.collection('users').get('user-123');
+if (!doc) {
+  console.log('Document not found');
+}`,
+
+  POCKET_D403: `// Use upsert to handle duplicate IDs:
+await db.collection('users').upsert({
+  _id: 'existing-id',
+  name: 'Updated name',
+});`,
+
+  POCKET_Q200: `// Ensure collection exists and query is valid:
+const results = await db.collection('users')
+  .find()
+  .where('age').gte(18)
+  .exec();`,
+
+  POCKET_Q203: `// Add an index to speed up queries:
+// In pocket.config.ts:
+collections: {
+  users: {
+    indexes: [{ fields: ['email'], unique: true }]
+  }
+}`,
+
+  POCKET_S301: `// Check storage adapter availability:
+import { createIndexedDBStorage } from '@pocket/storage-indexeddb';
+
+const storage = createIndexedDBStorage();
+if (!storage.isAvailable()) {
+  // Fall back to memory storage
+}`,
+
+  POCKET_C501: `// Configure sync with retry logic:
+const sync = createSyncEngine(db, {
+  serverUrl: 'wss://your-server.com',
+  reconnect: true,
+  reconnectDelay: 1000,
+});`,
+
+  POCKET_I603: `// Handle unique constraint violations:
+try {
+  await db.collection('users').insert({ email: 'exists@example.com' });
+} catch (e) {
+  if (PocketError.isCode(e, 'POCKET_I603')) {
+    console.log('Email already exists');
+  }
+}`,
+
+  POCKET_M700: `// Check migration file syntax:
+// migrations/001_add_users.ts
+export async function up(ctx) {
+  await ctx.createCollection('users');
+}
+
+export async function down(ctx) {
+  await ctx.dropCollection('users');
+}`,
+};
+
+/**
  * Options for creating a PocketError
  */
 export interface PocketErrorOptions {
@@ -145,7 +223,7 @@ export class PocketError extends Error {
   }
 
   /**
-   * Format the error for display
+   * Format the error for display (basic format)
    */
   format(): string {
     const lines = [`[${this.code}] ${this.message}`];
@@ -163,6 +241,57 @@ export class PocketError extends Error {
     }
 
     return lines.join('\n');
+  }
+
+  /**
+   * Format the error for terminal display with colors and clickable links.
+   * Uses ANSI escape codes for styling.
+   */
+  formatTerminal(): string {
+    const red = '\x1b[31m';
+    const yellow = '\x1b[33m';
+    const cyan = '\x1b[36m';
+    const dim = '\x1b[2m';
+    const bold = '\x1b[1m';
+    const reset = '\x1b[0m';
+    const underline = '\x1b[4m';
+
+    const lines: string[] = [];
+
+    // Error header with code
+    lines.push(`${red}${bold}Error [${this.code}]${reset} ${this.message}`);
+    lines.push('');
+
+    // Context (if any)
+    if (Object.keys(this.context).length > 0) {
+      lines.push(`${dim}Context:${reset}`);
+      for (const [key, value] of Object.entries(this.context)) {
+        const displayValue = typeof value === 'string' ? value : JSON.stringify(value, null, 2);
+        lines.push(`  ${cyan}${key}${reset}: ${displayValue}`);
+      }
+      lines.push('');
+    }
+
+    // Suggestion
+    if (this.suggestion) {
+      lines.push(`${yellow}${bold}Suggestion:${reset} ${this.suggestion}`);
+    }
+
+    // Clickable documentation link (OSC 8 hyperlink escape sequence)
+    // Format: \x1b]8;;URL\x07LINK_TEXT\x1b]8;;\x07
+    if (this.docsUrl) {
+      const clickableLink = `\x1b]8;;${this.docsUrl}\x07${underline}${cyan}${this.docsUrl}${reset}\x1b]8;;\x07`;
+      lines.push(`${dim}Learn more:${reset} ${clickableLink}`);
+    }
+
+    return lines.join('\n');
+  }
+
+  /**
+   * Get a helpful code example for this error type (if available)
+   */
+  getCodeExample(): string | null {
+    return ERROR_CODE_EXAMPLES[this.code] ?? null;
   }
 
   /**
