@@ -241,6 +241,115 @@ Firebase:                    Pocket:
 
 ---
 
+## Desktop Apps: Electron vs Tauri
+
+When building desktop applications with Pocket, you have two main options.
+
+### Electron
+
+[Electron](https://www.electronjs.org/) wraps your web app with Chromium and Node.js.
+
+| Pros | Cons |
+|------|------|
+| Mature ecosystem | Large bundle (~150MB) |
+| Full Node.js access | Higher memory usage |
+| Extensive documentation | Slower startup |
+| Easy debugging | Security requires care |
+
+**Pocket with Electron:**
+```typescript
+import { Database } from '@pocket/core';
+import { createElectronStorage } from '@pocket/electron';
+
+const db = await Database.create({
+  name: 'my-app',
+  storage: createElectronStorage({
+    path: path.join(app.getPath('userData'), 'pocket.db'),
+  }),
+});
+```
+
+See: [Electron Integration Guide](/docs/guides/electron-integration)
+
+### Tauri
+
+[Tauri](https://tauri.app/) uses native webviews with a Rust backend.
+
+| Pros | Cons |
+|------|------|
+| Tiny bundle (~5MB) | Rust knowledge helpful |
+| Low memory usage | Smaller ecosystem |
+| Fast startup | Webview differences |
+| Better security | Fewer built-in features |
+
+**Pocket with Tauri:**
+```typescript
+import { Database } from '@pocket/core';
+import { createTauriStorage } from '@pocket/tauri';
+
+const db = await Database.create({
+  name: 'my-app',
+  storage: createTauriStorage({ path: 'pocket.db' }),
+});
+```
+
+See: [Tauri Integration Guide](/docs/guides/tauri-integration)
+
+### When to Choose Each
+
+**Choose Electron if:**
+- You need full Node.js APIs
+- Team is more comfortable with JavaScript
+- You need a mature ecosystem
+- Bundle size isn't critical
+
+**Choose Tauri if:**
+- Bundle size matters
+- You want better performance
+- Security is a priority
+- You're comfortable with some Rust
+
+---
+
+## Mobile Apps: React Native vs Expo
+
+For mobile applications with Pocket.
+
+### React Native (Bare)
+
+Direct React Native with native modules.
+
+| Pros | Cons |
+|------|------|
+| Full native access | Complex setup |
+| Any native library | Native build tools needed |
+| Performance control | Steeper learning curve |
+
+### Expo
+
+Managed workflow with pre-built native modules.
+
+| Pros | Cons |
+|------|------|
+| Easy setup | Limited native modules |
+| OTA updates | Larger app size |
+| Expo Go for dev | Some features need eject |
+
+**Pocket with Expo:**
+```typescript
+import { Database } from '@pocket/core';
+import { createExpoStorage } from '@pocket/expo';
+
+const db = await Database.create({
+  name: 'my-app',
+  storage: createExpoStorage(),
+});
+```
+
+See: [Expo Integration Guide](/docs/guides/expo-integration) | [React Native Guide](/docs/guides/react-native)
+
+---
+
 ## Summary: When to Use Pocket
 
 **Choose Pocket if you:**
