@@ -10,7 +10,7 @@ importers:
     devDependencies:
       '@changesets/cli':
         specifier: ^2.27.0
-        version: 2.29.8(@types/node@20.19.30)
+        version: 2.29.8(@types/node@25.0.10)
       '@eslint/js':
         specifier: ^9.39.2
         version: 9.39.2
@@ -21,8 +21,8 @@ importers:
         specifier: ^6.9.1
         version: 6.9.1
       '@types/node':
-        specifier: ^20.10.0
-        version: 20.19.30
+        specifier: ^25.0.10
+        version: 25.0.10
       '@vitest/coverage-v8':
         specifier: ^1.1.0
         version: 1.6.1(vitest@1.6.1)
@@ -76,7 +76,7 @@ importers:
         version: 8.53.0(eslint@9.39.2)(typescript@5.9.3)
       vitest:
         specifier: ^1.1.0
-        version: 1.6.1(@types/node@20.19.30)(happy-dom@12.10.3)(jsdom@27.4.0)
+        version: 1.6.1(@types/node@25.0.10)(happy-dom@12.10.3)(jsdom@27.4.0)
 
   benchmarks:
     dependencies:
@@ -98,7 +98,7 @@ importers:
     devDependencies:
       vitepress:
         specifier: ^1.0.0
-        version: 1.6.4(@algolia/client-search@5.46.3)(@types/node@20.19.30)(search-insights@2.17.3)(typescript@5.9.3)
+        version: 1.6.4(@algolia/client-search@5.47.0)(@types/node@25.0.10)(search-insights@2.17.3)(typescript@5.9.3)
 
   examples/notes-app:
     dependencies:
@@ -144,7 +144,7 @@ importers:
         version: 5.9.3
       vite:
         specifier: ^5.0.10
-        version: 5.4.21(@types/node@20.19.30)
+        version: 5.4.21(@types/node@25.0.10)
 
   examples/stackblitz-react:
     dependencies:
@@ -178,7 +178,7 @@ importers:
         version: 5.9.3
       vite:
         specifier: ^5.0.10
-        version: 5.4.21(@types/node@20.19.30)
+        version: 5.4.21(@types/node@25.0.10)
 
   examples/todo-app:
     dependencies:
@@ -215,7 +215,7 @@ importers:
         version: 5.9.3
       vite:
         specifier: ^5.0.10
-        version: 5.4.21(@types/node@20.19.30)
+        version: 5.4.21(@types/node@25.0.10)
 
   packages/ai:
     dependencies:
@@ -233,8 +233,8 @@ importers:
         specifier: ^0.27.0
         version: 0.27.3
       '@types/node':
-        specifier: ^20.10.0
-        version: 20.19.30
+        specifier: ^25.0.10
+        version: 25.0.10
       openai:
         specifier: ^4.20.0
         version: 4.104.0(zod@4.3.5)
@@ -246,7 +246,7 @@ importers:
         version: 5.9.3
       vitest:
         specifier: ^1.1.0
-        version: 1.6.1(@types/node@20.19.30)(happy-dom@12.10.3)(jsdom@27.4.0)
+        version: 1.6.1(@types/node@25.0.10)(happy-dom@12.10.3)(jsdom@27.4.0)
 
   packages/analytics:
     dependencies:
@@ -258,8 +258,8 @@ importers:
         version: 7.8.2
     devDependencies:
       '@types/node':
-        specifier: ^20.10.0
-        version: 20.19.30
+        specifier: ^25.0.10
+        version: 25.0.10
       tsup:
         specifier: ^8.0.0
         version: 8.5.1(typescript@5.9.3)
@@ -268,7 +268,7 @@ importers:
         version: 5.9.3
       vitest:
         specifier: ^1.1.0
-        version: 1.6.1(@types/node@20.19.30)(happy-dom@12.10.3)(jsdom@27.4.0)
+        version: 1.6.1(@types/node@25.0.10)(happy-dom@12.10.3)(jsdom@27.4.0)
 
   packages/angular:
     dependencies:
@@ -292,8 +292,8 @@ importers:
         specifier: workspace:*
         version: link:../storage-opfs
       '@types/node':
-        specifier: ^20.10.0
-        version: 20.19.30
+        specifier: ^25.0.10
+        version: 25.0.10
       tsup:
         specifier: ^8.0.0
         version: 8.5.1(typescript@5.9.3)
@@ -302,7 +302,7 @@ importers:
         version: 5.9.3
       vitest:
         specifier: ^1.1.0
-        version: 1.6.1(@types/node@20.19.30)(happy-dom@12.10.3)(jsdom@27.4.0)
+        version: 1.6.1(@types/node@25.0.10)(happy-dom@12.10.3)(jsdom@27.4.0)
 
   packages/cli:
     dependencies:
@@ -311,8 +311,8 @@ importers:
         version: link:../core
     devDependencies:
       '@types/node':
-        specifier: ^20.10.0
-        version: 20.19.30
+        specifier: ^25.0.10
+        version: 25.0.10
       tsup:
         specifier: ^8.0.0
         version: 8.5.1(typescript@5.9.3)
@@ -321,7 +321,7 @@ importers:
         version: 5.9.3
       vitest:
         specifier: ^1.1.0
-        version: 1.6.1(@types/node@20.19.30)(happy-dom@12.10.3)(jsdom@27.4.0)
+        version: 1.6.1(@types/node@25.0.10)(happy-dom@12.10.3)(jsdom@27.4.0)
 
   packages/conflict-resolution:
     dependencies:
@@ -336,8 +336,8 @@ importers:
         version: 7.8.2
     devDependencies:
       '@types/node':
-        specifier: ^20.10.0
-        version: 20.19.30
+        specifier: ^25.0.10
+        version: 25.0.10
       tsup:
         specifier: ^8.0.0
         version: 8.5.1(typescript@5.9.3)
@@ -346,7 +346,7 @@ importers:
         version: 5.9.3
       vitest:
         specifier: ^1.1.0
-        version: 1.6.1(@types/node@20.19.30)(happy-dom@12.10.3)(jsdom@27.4.0)
+        version: 1.6.1(@types/node@25.0.10)(happy-dom@12.10.3)(jsdom@27.4.0)
 
   packages/core:
     dependencies:
@@ -355,8 +355,8 @@ importers:
         version: 7.8.2
     devDependencies:
       '@types/node':
-        specifier: ^20.10.0
-        version: 20.19.30
+        specifier: ^25.0.10
+        version: 25.0.10
       tsup:
         specifier: ^8.0.0
         version: 8.5.1(typescript@5.9.3)
@@ -365,7 +365,7 @@ importers:
         version: 5.9.3
       vitest:
         specifier: ^1.1.0
-        version: 1.6.1(@types/node@20.19.30)(happy-dom@12.10.3)(jsdom@27.4.0)
+        version: 1.6.1(@types/node@25.0.10)(happy-dom@12.10.3)(jsdom@27.4.0)
 
   packages/crdt:
     dependencies:
@@ -377,8 +377,8 @@ importers:
         version: 7.8.2
     devDependencies:
       '@types/node':
-        specifier: ^20.10.0
-        version: 20.19.30
+        specifier: ^25.0.10
+        version: 25.0.10
       tsup:
         specifier: ^8.0.0
         version: 8.5.1(typescript@5.9.3)
@@ -387,13 +387,13 @@ importers:
         version: 5.9.3
       vitest:
         specifier: ^1.1.0
-        version: 1.6.1(@types/node@20.19.30)(happy-dom@12.10.3)(jsdom@27.4.0)
+        version: 1.6.1(@types/node@25.0.10)(happy-dom@12.10.3)(jsdom@27.4.0)
 
   packages/create-pocket-app:
     devDependencies:
       '@types/node':
-        specifier: ^20.10.0
-        version: 20.19.30
+        specifier: ^25.0.10
+        version: 25.0.10
       tsup:
         specifier: ^8.0.0
         version: 8.5.1(typescript@5.9.3)
@@ -402,7 +402,7 @@ importers:
         version: 5.9.3
       vitest:
         specifier: ^1.1.0
-        version: 1.6.1(@types/node@20.19.30)(happy-dom@12.10.3)(jsdom@27.4.0)
+        version: 1.6.1(@types/node@25.0.10)(happy-dom@12.10.3)(jsdom@27.4.0)
 
   packages/cross-tab:
     dependencies:
@@ -414,8 +414,8 @@ importers:
         version: 7.8.2
     devDependencies:
       '@types/node':
-        specifier: ^20.10.0
-        version: 20.19.30
+        specifier: ^25.0.10
+        version: 25.0.10
       tsup:
         specifier: ^8.0.0
         version: 8.5.1(typescript@5.9.3)
@@ -424,7 +424,7 @@ importers:
         version: 5.9.3
       vitest:
         specifier: ^1.1.0
-        version: 1.6.1(@types/node@20.19.30)(happy-dom@12.10.3)(jsdom@27.4.0)
+        version: 1.6.1(@types/node@25.0.10)(happy-dom@12.10.3)(jsdom@27.4.0)
 
   packages/devtools:
     dependencies:
@@ -436,8 +436,8 @@ importers:
         version: 7.8.2
     devDependencies:
       '@types/node':
-        specifier: ^20.10.0
-        version: 20.19.30
+        specifier: ^25.0.10
+        version: 25.0.10
       tsup:
         specifier: ^8.0.0
         version: 8.5.1(typescript@5.9.3)
@@ -446,7 +446,7 @@ importers:
         version: 5.9.3
       vitest:
         specifier: ^1.1.0
-        version: 1.6.1(@types/node@20.19.30)(happy-dom@12.10.3)(jsdom@27.4.0)
+        version: 1.6.1(@types/node@25.0.10)(happy-dom@12.10.3)(jsdom@27.4.0)
 
   packages/electron:
     dependencies:
@@ -461,8 +461,8 @@ importers:
         version: 7.8.2
     devDependencies:
       '@types/node':
-        specifier: ^20.10.0
-        version: 20.19.30
+        specifier: ^25.0.10
+        version: 25.0.10
       electron:
         specifier: ^28.0.0
         version: 28.3.3
@@ -474,7 +474,7 @@ importers:
         version: 5.9.3
       vitest:
         specifier: ^1.1.0
-        version: 1.6.1(@types/node@20.19.30)(happy-dom@12.10.3)(jsdom@27.4.0)
+        version: 1.6.1(@types/node@25.0.10)(happy-dom@12.10.3)(jsdom@27.4.0)
 
   packages/encryption:
     dependencies:
@@ -486,8 +486,8 @@ importers:
         version: 7.8.2
     devDependencies:
       '@types/node':
-        specifier: ^20.10.0
-        version: 20.19.30
+        specifier: ^25.0.10
+        version: 25.0.10
       tsup:
         specifier: ^8.0.0
         version: 8.5.1(typescript@5.9.3)
@@ -496,7 +496,7 @@ importers:
         version: 5.9.3
       vitest:
         specifier: ^1.1.0
-        version: 1.6.1(@types/node@20.19.30)(happy-dom@12.10.3)(jsdom@27.4.0)
+        version: 1.6.1(@types/node@25.0.10)(happy-dom@12.10.3)(jsdom@27.4.0)
 
   packages/expo:
     dependencies:
@@ -523,8 +523,8 @@ importers:
         version: 7.8.2
     devDependencies:
       '@types/node':
-        specifier: ^20.10.0
-        version: 20.19.30
+        specifier: ^25.0.10
+        version: 25.0.10
       '@types/react':
         specifier: ^18.2.0
         version: 18.3.27
@@ -536,7 +536,7 @@ importers:
         version: 5.9.3
       vitest:
         specifier: ^1.1.0
-        version: 1.6.1(@types/node@20.19.30)(happy-dom@12.10.3)(jsdom@27.4.0)
+        version: 1.6.1(@types/node@25.0.10)(happy-dom@12.10.3)(jsdom@27.4.0)
 
   packages/forms:
     dependencies:
@@ -551,8 +551,8 @@ importers:
         version: 3.25.76
     devDependencies:
       '@types/node':
-        specifier: ^20.10.0
-        version: 20.19.30
+        specifier: ^25.0.10
+        version: 25.0.10
       tsup:
         specifier: ^8.0.0
         version: 8.5.1(typescript@5.9.3)
@@ -561,7 +561,7 @@ importers:
         version: 5.9.3
       vitest:
         specifier: ^1.1.0
-        version: 1.6.1(@types/node@20.19.30)(happy-dom@12.10.3)(jsdom@27.4.0)
+        version: 1.6.1(@types/node@25.0.10)(happy-dom@12.10.3)(jsdom@27.4.0)
 
   packages/opentelemetry:
     dependencies:
@@ -573,8 +573,8 @@ importers:
         specifier: ^1.7.0
         version: 1.9.0
       '@types/node':
-        specifier: ^20.10.0
-        version: 20.19.30
+        specifier: ^25.0.10
+        version: 25.0.10
       tsup:
         specifier: ^8.0.0
         version: 8.5.1(typescript@5.9.3)
@@ -583,7 +583,7 @@ importers:
         version: 5.9.3
       vitest:
         specifier: ^1.1.0
-        version: 1.6.1(@types/node@20.19.30)(happy-dom@12.10.3)(jsdom@27.4.0)
+        version: 1.6.1(@types/node@25.0.10)(happy-dom@12.10.3)(jsdom@27.4.0)
 
   packages/permissions:
     dependencies:
@@ -595,8 +595,8 @@ importers:
         version: 7.8.2
     devDependencies:
       '@types/node':
-        specifier: ^20.10.0
-        version: 20.19.30
+        specifier: ^25.0.10
+        version: 25.0.10
       tsup:
         specifier: ^8.0.0
         version: 8.5.1(typescript@5.9.3)
@@ -605,7 +605,7 @@ importers:
         version: 5.9.3
       vitest:
         specifier: ^1.1.0
-        version: 1.6.1(@types/node@20.19.30)(happy-dom@12.10.3)(jsdom@27.4.0)
+        version: 1.6.1(@types/node@25.0.10)(happy-dom@12.10.3)(jsdom@27.4.0)
 
   packages/pocket:
     dependencies:
@@ -629,8 +629,8 @@ importers:
         version: link:../sync
     devDependencies:
       '@types/node':
-        specifier: ^20.10.0
-        version: 20.19.30
+        specifier: ^25.0.10
+        version: 25.0.10
       '@types/react':
         specifier: ^18.2.0
         version: 18.3.27
@@ -645,7 +645,7 @@ importers:
         version: 5.9.3
       vitest:
         specifier: ^1.1.0
-        version: 1.6.1(@types/node@20.19.30)(happy-dom@12.10.3)(jsdom@27.4.0)
+        version: 1.6.1(@types/node@25.0.10)(happy-dom@12.10.3)(jsdom@27.4.0)
 
   packages/presence:
     dependencies:
@@ -657,8 +657,8 @@ importers:
         version: 7.8.2
     devDependencies:
       '@types/node':
-        specifier: ^20.10.0
-        version: 20.19.30
+        specifier: ^25.0.10
+        version: 25.0.10
       tsup:
         specifier: ^8.0.0
         version: 8.5.1(typescript@5.9.3)
@@ -667,7 +667,7 @@ importers:
         version: 5.9.3
       vitest:
         specifier: ^1.1.0
-        version: 1.6.1(@types/node@20.19.30)(happy-dom@12.10.3)(jsdom@27.4.0)
+        version: 1.6.1(@types/node@25.0.10)(happy-dom@12.10.3)(jsdom@27.4.0)
 
   packages/query:
     dependencies:
@@ -679,8 +679,8 @@ importers:
         version: 7.8.2
     devDependencies:
       '@types/node':
-        specifier: ^20.10.0
-        version: 20.19.30
+        specifier: ^25.0.10
+        version: 25.0.10
       tsup:
         specifier: ^8.0.0
         version: 8.5.1(typescript@5.9.3)
@@ -689,7 +689,7 @@ importers:
         version: 5.9.3
       vitest:
         specifier: ^1.1.0
-        version: 1.6.1(@types/node@20.19.30)(happy-dom@12.10.3)(jsdom@27.4.0)
+        version: 1.6.1(@types/node@25.0.10)(happy-dom@12.10.3)(jsdom@27.4.0)
 
   packages/react:
     dependencies:
@@ -704,8 +704,8 @@ importers:
         specifier: ^14.1.0
         version: 14.3.1(@types/react@18.3.27)(react-dom@18.3.1)(react@18.3.1)
       '@types/node':
-        specifier: ^20.10.0
-        version: 20.19.30
+        specifier: ^25.0.10
+        version: 25.0.10
       '@types/react':
         specifier: ^18.2.0
         version: 18.3.27
@@ -726,7 +726,7 @@ importers:
         version: 5.9.3
       vitest:
         specifier: ^1.1.0
-        version: 1.6.1(@types/node@20.19.30)(happy-dom@12.10.3)(jsdom@27.4.0)
+        version: 1.6.1(@types/node@25.0.10)(happy-dom@12.10.3)(jsdom@27.4.0)
 
   packages/react-native:
     dependencies:
@@ -741,8 +741,8 @@ importers:
         version: 7.8.2
     devDependencies:
       '@types/node':
-        specifier: ^20.10.0
-        version: 20.19.30
+        specifier: ^25.0.10
+        version: 25.0.10
       '@types/react':
         specifier: ^18.2.0
         version: 18.3.27
@@ -757,7 +757,7 @@ importers:
         version: 5.9.3
       vitest:
         specifier: ^1.1.0
-        version: 1.6.1(@types/node@20.19.30)(happy-dom@12.10.3)(jsdom@27.4.0)
+        version: 1.6.1(@types/node@25.0.10)(happy-dom@12.10.3)(jsdom@27.4.0)
 
   packages/server:
     dependencies:
@@ -772,8 +772,8 @@ importers:
         version: 8.19.0
     devDependencies:
       '@types/node':
-        specifier: ^20.10.0
-        version: 20.19.30
+        specifier: ^25.0.10
+        version: 25.0.10
       '@types/ws':
         specifier: ^8.5.0
         version: 8.18.1
@@ -785,7 +785,7 @@ importers:
         version: 5.9.3
       vitest:
         specifier: ^1.1.0
-        version: 1.6.1(@types/node@20.19.30)(happy-dom@12.10.3)(jsdom@27.4.0)
+        version: 1.6.1(@types/node@25.0.10)(happy-dom@12.10.3)(jsdom@27.4.0)
 
   packages/solid:
     dependencies:
@@ -800,8 +800,8 @@ importers:
         specifier: ^0.8.0
         version: 0.8.10(solid-js@1.9.11)
       '@types/node':
-        specifier: ^20.10.0
-        version: 20.19.30
+        specifier: ^25.0.10
+        version: 25.0.10
       esbuild:
         specifier: ^0.24.0
         version: 0.24.2
@@ -819,7 +819,7 @@ importers:
         version: 5.9.3
       vitest:
         specifier: ^1.1.0
-        version: 1.6.1(@types/node@20.19.30)(happy-dom@12.10.3)(jsdom@27.4.0)
+        version: 1.6.1(@types/node@25.0.10)(happy-dom@12.10.3)(jsdom@27.4.0)
 
   packages/storage-edge:
     dependencies:
@@ -834,8 +834,8 @@ importers:
         specifier: ^4.20231218.0
         version: 4.20260124.0
       '@types/node':
-        specifier: ^20.10.0
-        version: 20.19.30
+        specifier: ^25.0.10
+        version: 25.0.10
       tsup:
         specifier: ^8.0.0
         version: 8.5.1(typescript@5.9.3)
@@ -844,7 +844,7 @@ importers:
         version: 5.9.3
       vitest:
         specifier: ^1.1.0
-        version: 1.6.1(@types/node@20.19.30)(happy-dom@12.10.3)(jsdom@27.4.0)
+        version: 1.6.1(@types/node@25.0.10)(happy-dom@12.10.3)(jsdom@27.4.0)
 
   packages/storage-indexeddb:
     dependencies:
@@ -856,8 +856,8 @@ importers:
         version: 7.8.2
     devDependencies:
       '@types/node':
-        specifier: ^20.10.0
-        version: 20.19.30
+        specifier: ^25.0.10
+        version: 25.0.10
       fake-indexeddb:
         specifier: ^5.0.0
         version: 5.0.2
@@ -869,7 +869,7 @@ importers:
         version: 5.9.3
       vitest:
         specifier: ^1.1.0
-        version: 1.6.1(@types/node@20.19.30)(happy-dom@12.10.3)(jsdom@27.4.0)
+        version: 1.6.1(@types/node@25.0.10)(happy-dom@12.10.3)(jsdom@27.4.0)
 
   packages/storage-memory:
     dependencies:
@@ -881,8 +881,8 @@ importers:
         version: 7.8.2
     devDependencies:
       '@types/node':
-        specifier: ^20.10.0
-        version: 20.19.30
+        specifier: ^25.0.10
+        version: 25.0.10
       tsup:
         specifier: ^8.0.0
         version: 8.5.1(typescript@5.9.3)
@@ -891,7 +891,7 @@ importers:
         version: 5.9.3
       vitest:
         specifier: ^1.1.0
-        version: 1.6.1(@types/node@20.19.30)(happy-dom@12.10.3)(jsdom@27.4.0)
+        version: 1.6.1(@types/node@25.0.10)(happy-dom@12.10.3)(jsdom@27.4.0)
 
   packages/storage-opfs:
     dependencies:
@@ -903,8 +903,8 @@ importers:
         version: 7.8.2
     devDependencies:
       '@types/node':
-        specifier: ^20.10.0
-        version: 20.19.30
+        specifier: ^25.0.10
+        version: 25.0.10
       tsup:
         specifier: ^8.0.0
         version: 8.5.1(typescript@5.9.3)
@@ -913,7 +913,7 @@ importers:
         version: 5.9.3
       vitest:
         specifier: ^1.1.0
-        version: 1.6.1(@types/node@20.19.30)(happy-dom@12.10.3)(jsdom@27.4.0)
+        version: 1.6.1(@types/node@25.0.10)(happy-dom@12.10.3)(jsdom@27.4.0)
 
   packages/storage-sqlite:
     dependencies:
@@ -934,8 +934,8 @@ importers:
         specifier: ^7.6.8
         version: 7.6.13
       '@types/node':
-        specifier: ^20.10.0
-        version: 20.19.30
+        specifier: ^25.0.10
+        version: 25.0.10
       tsup:
         specifier: ^8.0.0
         version: 8.5.1(typescript@5.9.3)
@@ -944,7 +944,7 @@ importers:
         version: 5.9.3
       vitest:
         specifier: ^1.1.0
-        version: 1.6.1(@types/node@20.19.30)(happy-dom@12.10.3)(jsdom@27.4.0)
+        version: 1.6.1(@types/node@25.0.10)(happy-dom@12.10.3)(jsdom@27.4.0)
 
   packages/svelte:
     dependencies:
@@ -959,8 +959,8 @@ importers:
         specifier: ^3.0.0
         version: 3.1.2(svelte@4.2.20)(vite@5.4.21)
       '@types/node':
-        specifier: ^20.10.0
-        version: 20.19.30
+        specifier: ^25.0.10
+        version: 25.0.10
       svelte:
         specifier: ^4.2.0
         version: 4.2.20
@@ -972,7 +972,7 @@ importers:
         version: 5.9.3
       vitest:
         specifier: ^1.1.0
-        version: 1.6.1(@types/node@20.19.30)(happy-dom@12.10.3)(jsdom@27.4.0)
+        version: 1.6.1(@types/node@25.0.10)(happy-dom@12.10.3)(jsdom@27.4.0)
 
   packages/sync:
     dependencies:
@@ -984,8 +984,8 @@ importers:
         version: 7.8.2
     devDependencies:
       '@types/node':
-        specifier: ^20.10.0
-        version: 20.19.30
+        specifier: ^25.0.10
+        version: 25.0.10
       tsup:
         specifier: ^8.0.0
         version: 8.5.1(typescript@5.9.3)
@@ -994,7 +994,7 @@ importers:
         version: 5.9.3
       vitest:
         specifier: ^1.1.0
-        version: 1.6.1(@types/node@20.19.30)(happy-dom@12.10.3)(jsdom@27.4.0)
+        version: 1.6.1(@types/node@25.0.10)(happy-dom@12.10.3)(jsdom@27.4.0)
 
   packages/sync-server:
     dependencies:
@@ -1006,8 +1006,8 @@ importers:
         version: 8.19.0
     devDependencies:
       '@types/node':
-        specifier: ^20.10.0
-        version: 20.19.30
+        specifier: ^25.0.10
+        version: 25.0.10
       '@types/ws':
         specifier: ^8.5.10
         version: 8.18.1
@@ -1019,7 +1019,7 @@ importers:
         version: 5.9.3
       vitest:
         specifier: ^1.1.0
-        version: 1.6.1(@types/node@20.19.30)(happy-dom@12.10.3)(jsdom@27.4.0)
+        version: 1.6.1(@types/node@25.0.10)(happy-dom@12.10.3)(jsdom@27.4.0)
 
   packages/tauri:
     dependencies:
@@ -1037,8 +1037,8 @@ importers:
         version: 7.8.2
     devDependencies:
       '@types/node':
-        specifier: ^20.10.0
-        version: 20.19.30
+        specifier: ^25.0.10
+        version: 25.0.10
       tsup:
         specifier: ^8.0.0
         version: 8.5.1(typescript@5.9.3)
@@ -1047,7 +1047,7 @@ importers:
         version: 5.9.3
       vitest:
         specifier: ^1.1.0
-        version: 1.6.1(@types/node@20.19.30)(happy-dom@12.10.3)(jsdom@27.4.0)
+        version: 1.6.1(@types/node@25.0.10)(happy-dom@12.10.3)(jsdom@27.4.0)
 
   packages/time-travel:
     dependencies:
@@ -1059,8 +1059,8 @@ importers:
         version: 7.8.2
     devDependencies:
       '@types/node':
-        specifier: ^20.10.0
-        version: 20.19.30
+        specifier: ^25.0.10
+        version: 25.0.10
       tsup:
         specifier: ^8.0.0
         version: 8.5.1(typescript@5.9.3)
@@ -1069,7 +1069,7 @@ importers:
         version: 5.9.3
       vitest:
         specifier: ^1.1.0
-        version: 1.6.1(@types/node@20.19.30)(happy-dom@12.10.3)(jsdom@27.4.0)
+        version: 1.6.1(@types/node@25.0.10)(happy-dom@12.10.3)(jsdom@27.4.0)
 
   packages/vectors:
     dependencies:
@@ -1081,8 +1081,8 @@ importers:
         version: 7.8.2
     devDependencies:
       '@types/node':
-        specifier: ^20.10.0
-        version: 20.19.30
+        specifier: ^25.0.10
+        version: 25.0.10
       tsup:
         specifier: ^8.0.0
         version: 8.5.1(typescript@5.9.3)
@@ -1091,7 +1091,7 @@ importers:
         version: 5.9.3
       vitest:
         specifier: ^1.1.0
-        version: 1.6.1(@types/node@20.19.30)(happy-dom@12.10.3)(jsdom@27.4.0)
+        version: 1.6.1(@types/node@25.0.10)(happy-dom@12.10.3)(jsdom@27.4.0)
 
   packages/vue:
     dependencies:
@@ -1103,8 +1103,8 @@ importers:
         version: 7.8.2
     devDependencies:
       '@types/node':
-        specifier: ^20.10.0
-        version: 20.19.30
+        specifier: ^25.0.10
+        version: 25.0.10
       '@vue/test-utils':
         specifier: ^2.4.0
         version: 2.4.6
@@ -1119,7 +1119,7 @@ importers:
         version: 5.9.3
       vitest:
         specifier: ^1.1.0
-        version: 1.6.1(@types/node@20.19.30)(happy-dom@12.10.3)(jsdom@27.4.0)
+        version: 1.6.1(@types/node@25.0.10)(happy-dom@12.10.3)(jsdom@27.4.0)
       vue:
         specifier: ^3.4.0
         version: 3.5.26(typescript@5.9.3)
@@ -1131,8 +1131,8 @@ importers:
         version: link:../core
     devDependencies:
       '@types/node':
-        specifier: ^20.10.0
-        version: 20.19.30
+        specifier: ^25.0.10
+        version: 25.0.10
       tsup:
         specifier: ^8.0.0
         version: 8.5.1(typescript@5.9.3)
@@ -1141,7 +1141,7 @@ importers:
         version: 5.9.3
       vitest:
         specifier: ^1.1.0
-        version: 1.6.1(@types/node@20.19.30)(happy-dom@12.10.3)(jsdom@27.4.0)
+        version: 1.6.1(@types/node@25.0.10)(happy-dom@12.10.3)(jsdom@27.4.0)
       zod:
         specifier: ^3.22.0
         version: 3.25.76
@@ -1220,47 +1220,47 @@ packages:
       '@algolia/requester-fetch': 5.46.3
       '@algolia/requester-node-http': 5.46.3
 
-  /@algolia/autocomplete-core@1.17.7(@algolia/client-search@5.46.3)(algoliasearch@5.46.3)(search-insights@2.17.3):
+  /@algolia/autocomplete-core@1.17.7(@algolia/client-search@5.47.0)(algoliasearch@5.46.3)(search-insights@2.17.3):
     resolution: {integrity: sha512-BjiPOW6ks90UKl7TwMv7oNQMnzU+t/wk9mgIDi6b1tXpUek7MW0lbNOUHpvam9pe3lVCf4xPFT+lK7s+e+fs7Q==}
     dependencies:
-      '@algolia/autocomplete-plugin-algolia-insights': 1.17.7(@algolia/client-search@5.46.3)(algoliasearch@5.46.3)(search-insights@2.17.3)
-      '@algolia/autocomplete-shared': 1.17.7(@algolia/client-search@5.46.3)(algoliasearch@5.46.3)
+      '@algolia/autocomplete-plugin-algolia-insights': 1.17.7(@algolia/client-search@5.47.0)(algoliasearch@5.46.3)(search-insights@2.17.3)
+      '@algolia/autocomplete-shared': 1.17.7(@algolia/client-search@5.47.0)(algoliasearch@5.46.3)
     transitivePeerDependencies:
       - '@algolia/client-search'
       - algoliasearch
       - search-insights
     dev: true
 
-  /@algolia/autocomplete-plugin-algolia-insights@1.17.7(@algolia/client-search@5.46.3)(algoliasearch@5.46.3)(search-insights@2.17.3):
+  /@algolia/autocomplete-plugin-algolia-insights@1.17.7(@algolia/client-search@5.47.0)(algoliasearch@5.46.3)(search-insights@2.17.3):
     resolution: {integrity: sha512-Jca5Ude6yUOuyzjnz57og7Et3aXjbwCSDf/8onLHSQgw1qW3ALl9mrMWaXb5FmPVkV3EtkD2F/+NkT6VHyPu9A==}
     peerDependencies:
       search-insights: '>= 1 < 3'
     dependencies:
-      '@algolia/autocomplete-shared': 1.17.7(@algolia/client-search@5.46.3)(algoliasearch@5.46.3)
+      '@algolia/autocomplete-shared': 1.17.7(@algolia/client-search@5.47.0)(algoliasearch@5.46.3)
       search-insights: 2.17.3
     transitivePeerDependencies:
       - '@algolia/client-search'
       - algoliasearch
     dev: true
 
-  /@algolia/autocomplete-preset-algolia@1.17.7(@algolia/client-search@5.46.3)(algoliasearch@5.46.3):
+  /@algolia/autocomplete-preset-algolia@1.17.7(@algolia/client-search@5.47.0)(algoliasearch@5.46.3):
     resolution: {integrity: sha512-ggOQ950+nwbWROq2MOCIL71RE0DdQZsceqrg32UqnhDz8FlO9rL8ONHNsI2R1MH0tkgVIDKI/D0sMiUchsFdWA==}
     peerDependencies:
       '@algolia/client-search': '>= 4.9.1 < 6'
       algoliasearch: '>= 4.9.1 < 6'
     dependencies:
-      '@algolia/autocomplete-shared': 1.17.7(@algolia/client-search@5.46.3)(algoliasearch@5.46.3)
-      '@algolia/client-search': 5.46.3
+      '@algolia/autocomplete-shared': 1.17.7(@algolia/client-search@5.47.0)(algoliasearch@5.46.3)
+      '@algolia/client-search': 5.47.0
       algoliasearch: 5.46.3
     dev: true
 
-  /@algolia/autocomplete-shared@1.17.7(@algolia/client-search@5.46.3)(algoliasearch@5.46.3):
+  /@algolia/autocomplete-shared@1.17.7(@algolia/client-search@5.47.0)(algoliasearch@5.46.3):
     resolution: {integrity: sha512-o/1Vurr42U/qskRSuhBH+VKxMvkkUVTLU6WZQr+L5lGZZLYWyhdzWjW0iGXY7EkwRTjBqvN2EsR81yCTGV/kmg==}
     peerDependencies:
       '@algolia/client-search': '>= 4.9.1 < 6'
       algoliasearch: '>= 4.9.1 < 6'
     dependencies:
-      '@algolia/client-search': 5.46.3
+      '@algolia/client-search': 5.47.0
       algoliasearch: 5.46.3
     dev: true
 
@@ -1285,6 +1285,11 @@ packages:
   /@algolia/client-common@5.46.3:
     resolution: {integrity: sha512-SN+yK840nXa+2+mF72hrDfGd8+B7eBjF8TK/8KoRMdjlAkO/P3o3vtpjKRKI/Sk4L8kYYkB/avW8l+cwR+O1Ew==}
     engines: {node: '>= 14.0.0'}
+
+  /@algolia/client-common@5.47.0:
+    resolution: {integrity: sha512-Wzg5Me2FqgRDj0lFuPWFK05UOWccSMsIBL2YqmTmaOzxVlLZ+oUqvKbsUSOE5ud8Fo1JU7JyiLmEXBtgDKzTwg==}
+    engines: {node: '>= 14.0.0'}
+    dev: true
 
   /@algolia/client-insights@5.46.3:
     resolution: {integrity: sha512-5ic1liG0VucNPi6gKCWh5bEUGWQfyEmVeXiNKS+rOSppg7B7nKH0PEEJOFXBbHmgK5aPfNNZINiKcyUoH4XsFA==}
@@ -1321,6 +1326,16 @@ packages:
       '@algolia/requester-browser-xhr': 5.46.3
       '@algolia/requester-fetch': 5.46.3
       '@algolia/requester-node-http': 5.46.3
+
+  /@algolia/client-search@5.47.0:
+    resolution: {integrity: sha512-b5hlU69CuhnS2Rqgsz7uSW0t4VqrLMLTPbUpEl0QVz56rsSwr1Sugyogrjb493sWDA+XU1FU5m9eB8uH7MoI0g==}
+    engines: {node: '>= 14.0.0'}
+    dependencies:
+      '@algolia/client-common': 5.47.0
+      '@algolia/requester-browser-xhr': 5.47.0
+      '@algolia/requester-fetch': 5.47.0
+      '@algolia/requester-node-http': 5.47.0
+    dev: true
 
   /@algolia/events@4.0.1:
     resolution: {integrity: sha512-FQzvOCgoFXAbf5Y6mYozw2aj5KCJoA3m4heImceldzPSMbdyS4atVjJzXKMsfX3wnZTFYwkkt8/z8UesLHlSBQ==}
@@ -1359,17 +1374,38 @@ packages:
     dependencies:
       '@algolia/client-common': 5.46.3
 
+  /@algolia/requester-browser-xhr@5.47.0:
+    resolution: {integrity: sha512-Ja+zPoeSA2SDowPwCNRbm5Q2mzDvVV8oqxCQ4m6SNmbKmPlCfe30zPfrt9ho3kBHnsg37pGucwOedRIOIklCHw==}
+    engines: {node: '>= 14.0.0'}
+    dependencies:
+      '@algolia/client-common': 5.47.0
+    dev: true
+
   /@algolia/requester-fetch@5.46.3:
     resolution: {integrity: sha512-Uw+SPy/zpfwbH1AxQaeOWvWVzPEcO0XbtLbbSz0HPcEIiBGWyfa9LUCxD5UferbDjrSQNVimmzl3FaWi4u8Ykw==}
     engines: {node: '>= 14.0.0'}
     dependencies:
       '@algolia/client-common': 5.46.3
 
+  /@algolia/requester-fetch@5.47.0:
+    resolution: {integrity: sha512-N6nOvLbaR4Ge+oVm7T4W/ea1PqcSbsHR4O58FJ31XtZjFPtOyxmnhgCmGCzP9hsJI6+x0yxJjkW5BMK/XI8OvA==}
+    engines: {node: '>= 14.0.0'}
+    dependencies:
+      '@algolia/client-common': 5.47.0
+    dev: true
+
   /@algolia/requester-node-http@5.46.3:
     resolution: {integrity: sha512-4No9iTjr1GZ0JWsFbQJj9aZBnmKyY1sTxOoEud9+SGe3U6iAulF0A0lI4cWi/F/Gcfg8V3jkaddcqSQKDnE45w==}
     engines: {node: '>= 14.0.0'}
     dependencies:
       '@algolia/client-common': 5.46.3
+
+  /@algolia/requester-node-http@5.47.0:
+    resolution: {integrity: sha512-z1oyLq5/UVkohVXNDEY70mJbT/sv/t6HYtCvCwNrOri6pxBJDomP9R83KOlwcat+xqBQEdJHjbrPh36f1avmZA==}
+    engines: {node: '>= 14.0.0'}
+    dependencies:
+      '@algolia/client-common': 5.47.0
+    dev: true
 
   /@ampproject/remapping@2.3.0:
     resolution: {integrity: sha512-30iZtAPgz+LTIYoeivqYo853f02jBYSd5uGnGpkFV0M3xOt9aN73erkgYAmZU43x4VfqcnLxW9Kpg3R5LC4YYw==}
@@ -2905,7 +2941,7 @@ packages:
       '@changesets/types': 6.1.0
     dev: true
 
-  /@changesets/cli@2.29.8(@types/node@20.19.30):
+  /@changesets/cli@2.29.8(@types/node@25.0.10):
     resolution: {integrity: sha512-1weuGZpP63YWUYjay/E84qqwcnt5yJMM0tep10Up7Q5cS/DGe2IZ0Uj3HNMxGhCINZuR7aO9WBMdKnPit5ZDPA==}
     hasBin: true
     dependencies:
@@ -2923,7 +2959,7 @@ packages:
       '@changesets/should-skip-package': 0.1.2
       '@changesets/types': 6.1.0
       '@changesets/write': 0.4.0
-      '@inquirer/external-editor': 1.0.3(@types/node@20.19.30)
+      '@inquirer/external-editor': 1.0.3(@types/node@25.0.10)
       '@manypkg/get-packages': 1.1.3
       ansi-colors: 4.1.3
       ci-info: 3.9.0
@@ -3680,10 +3716,10 @@ packages:
     resolution: {integrity: sha512-kUpHaxn0AgI3LQfyzTYkNUuaFY4uEz/Ym9/N/FvyDE+PzSgZsCyDH9jE49B6N6f1eLCm9Yp64J9wENd6vypdxA==}
     dev: false
 
-  /@docsearch/js@3.8.2(@algolia/client-search@5.46.3)(search-insights@2.17.3):
+  /@docsearch/js@3.8.2(@algolia/client-search@5.47.0)(search-insights@2.17.3):
     resolution: {integrity: sha512-Q5wY66qHn0SwA7Taa0aDbHiJvaFJLOJyHmooQ7y8hlwwQLQ/5WwCcoX0g7ii04Qi2DJlHsd0XXzJ8Ypw9+9YmQ==}
     dependencies:
-      '@docsearch/react': 3.8.2(@algolia/client-search@5.46.3)(search-insights@2.17.3)
+      '@docsearch/react': 3.8.2(@algolia/client-search@5.47.0)(search-insights@2.17.3)
       preact: 10.28.2
     transitivePeerDependencies:
       - '@algolia/client-search'
@@ -3693,7 +3729,7 @@ packages:
       - search-insights
     dev: true
 
-  /@docsearch/react@3.8.2(@algolia/client-search@5.46.3)(search-insights@2.17.3):
+  /@docsearch/react@3.8.2(@algolia/client-search@5.47.0)(search-insights@2.17.3):
     resolution: {integrity: sha512-xCRrJQlTt8N9GU0DG4ptwHRkfnSnD/YpdeaXe02iKfqs97TkZJv60yE+1eq/tjPcVnTW8dP5qLP7itifFVV5eg==}
     peerDependencies:
       '@types/react': '>= 16.8.0 < 19.0.0'
@@ -3710,8 +3746,8 @@ packages:
       search-insights:
         optional: true
     dependencies:
-      '@algolia/autocomplete-core': 1.17.7(@algolia/client-search@5.46.3)(algoliasearch@5.46.3)(search-insights@2.17.3)
-      '@algolia/autocomplete-preset-algolia': 1.17.7(@algolia/client-search@5.46.3)(algoliasearch@5.46.3)
+      '@algolia/autocomplete-core': 1.17.7(@algolia/client-search@5.47.0)(algoliasearch@5.46.3)(search-insights@2.17.3)
+      '@algolia/autocomplete-preset-algolia': 1.17.7(@algolia/client-search@5.47.0)(algoliasearch@5.46.3)
       '@docsearch/css': 3.8.2
       algoliasearch: 5.46.3
       search-insights: 2.17.3
@@ -6148,7 +6184,7 @@ packages:
       mlly: 1.8.0
     dev: false
 
-  /@inquirer/external-editor@1.0.3(@types/node@20.19.30):
+  /@inquirer/external-editor@1.0.3(@types/node@25.0.10):
     resolution: {integrity: sha512-RWbSrDiYmO4LbejWY7ttpxczuwQyZLBUyygsA9Nsv95hpzUWwnNTVQmAq3xuh7vNwCp07UTmE5i11XAEExx4RA==}
     engines: {node: '>=18'}
     peerDependencies:
@@ -6157,7 +6193,7 @@ packages:
       '@types/node':
         optional: true
     dependencies:
-      '@types/node': 20.19.30
+      '@types/node': 25.0.10
       chardet: 2.1.1
       iconv-lite: 0.7.2
     dev: true
@@ -6226,7 +6262,7 @@ packages:
     dependencies:
       '@jest/fake-timers': 29.7.0
       '@jest/types': 29.6.3
-      '@types/node': 20.19.30
+      '@types/node': 25.0.10
       jest-mock: 29.7.0
     dev: false
 
@@ -6236,7 +6272,7 @@ packages:
     dependencies:
       '@jest/types': 29.6.3
       '@sinonjs/fake-timers': 10.3.0
-      '@types/node': 20.19.30
+      '@types/node': 25.0.10
       jest-message-util: 29.7.0
       jest-mock: 29.7.0
       jest-util: 29.7.0
@@ -6278,7 +6314,7 @@ packages:
       '@jest/schemas': 29.6.3
       '@types/istanbul-lib-coverage': 2.0.6
       '@types/istanbul-reports': 3.0.4
-      '@types/node': 20.19.30
+      '@types/node': 25.0.10
       '@types/yargs': 17.0.35
       chalk: 4.1.2
     dev: false
@@ -7572,7 +7608,7 @@ packages:
       '@sveltejs/vite-plugin-svelte': 3.1.2(svelte@4.2.20)(vite@5.4.21)
       debug: 4.4.3
       svelte: 4.2.20
-      vite: 5.4.21(@types/node@20.19.30)
+      vite: 5.4.21(@types/node@25.0.10)
     transitivePeerDependencies:
       - supports-color
     dev: true
@@ -7591,7 +7627,7 @@ packages:
       magic-string: 0.30.21
       svelte: 4.2.20
       svelte-hmr: 0.16.0(svelte@4.2.20)
-      vite: 5.4.21(@types/node@20.19.30)
+      vite: 5.4.21(@types/node@25.0.10)
       vitefu: 0.2.5(vite@5.4.21)
     transitivePeerDependencies:
       - supports-color
@@ -7879,20 +7915,20 @@ packages:
   /@types/better-sqlite3@7.6.13:
     resolution: {integrity: sha512-NMv9ASNARoKksWtsq/SHakpYAYnhBrQgGD8zkLYk/jaK8jUGn08CfEdTRgYhMypUQAfzSP8W6gNLe0q19/t4VA==}
     dependencies:
-      '@types/node': 20.19.30
+      '@types/node': 25.0.10
     dev: true
 
   /@types/body-parser@1.19.6:
     resolution: {integrity: sha512-HLFeCYgz89uk22N5Qg3dvGvsv46B8GLvKKo1zKG4NybA8U2DiEO3w9lqGg29t/tfLRJpJ6iQxnVw4OnB7MoM9g==}
     dependencies:
       '@types/connect': 3.4.38
-      '@types/node': 20.19.30
+      '@types/node': 25.0.10
     dev: false
 
   /@types/bonjour@3.5.13:
     resolution: {integrity: sha512-z9fJ5Im06zvUL548KvYNecEVlA7cVDkGUi6kZusb04mpyEFKCIZJvloCcmpmLaIahDpOQGHaHmG6imtPMmPXGQ==}
     dependencies:
-      '@types/node': 20.19.30
+      '@types/node': 25.0.10
     dev: false
 
   /@types/cacheable-request@6.0.3:
@@ -7900,7 +7936,7 @@ packages:
     dependencies:
       '@types/http-cache-semantics': 4.0.4
       '@types/keyv': 3.1.4
-      '@types/node': 20.19.30
+      '@types/node': 25.0.10
       '@types/responselike': 1.0.3
     dev: true
 
@@ -7908,13 +7944,13 @@ packages:
     resolution: {integrity: sha512-n6Cr2xS1h4uAulPRdlw6Jl6s1oG8KrVilPN2yUITEs+K48EzMJJ3W1xy8K5eWuFvjp3R74AOIGSmp2UfBJ8HFw==}
     dependencies:
       '@types/express-serve-static-core': 4.19.8
-      '@types/node': 20.19.30
+      '@types/node': 25.0.10
     dev: false
 
   /@types/connect@3.4.38:
     resolution: {integrity: sha512-K6uROf1LD88uDQqJCktA4yzL1YYAK6NgfsI0v/mTgyPKWsX1CnJ0XPSDhViejru1GcRkLWb8RlzFYJRqGUbaug==}
     dependencies:
-      '@types/node': 20.19.30
+      '@types/node': 25.0.10
     dev: false
 
   /@types/d3-array@3.2.2:
@@ -8124,7 +8160,7 @@ packages:
   /@types/express-serve-static-core@4.19.8:
     resolution: {integrity: sha512-02S5fmqeoKzVZCHPZid4b8JH2eM5HzQLZWN2FohQEy/0eXTq8VXZfSN6Pcr3F6N9R/vNrj7cpgbhjie6m/1tCA==}
     dependencies:
-      '@types/node': 20.19.30
+      '@types/node': 25.0.10
       '@types/qs': 6.14.0
       '@types/range-parser': 1.2.7
       '@types/send': 1.2.1
@@ -8146,7 +8182,7 @@ packages:
   /@types/graceful-fs@4.1.9:
     resolution: {integrity: sha512-olP3sd1qOEe5dXTSaFvQG+02VdRXcdytWLAZsAq1PecU8uqQAhkrnbli7DagjtXKW/Bl7YJbUsa8MPcuc8LHEQ==}
     dependencies:
-      '@types/node': 20.19.30
+      '@types/node': 25.0.10
     dev: false
 
   /@types/gtag.js@0.0.12:
@@ -8175,7 +8211,7 @@ packages:
   /@types/http-proxy@1.17.17:
     resolution: {integrity: sha512-ED6LB+Z1AVylNTu7hdzuBqOgMnvG/ld6wGCG8wFnAzKX5uyW2K3WD52v0gnLCTK/VLpXtKckgWuyScYK6cSPaw==}
     dependencies:
-      '@types/node': 20.19.30
+      '@types/node': 25.0.10
     dev: false
 
   /@types/istanbul-lib-coverage@2.0.6:
@@ -8200,7 +8236,7 @@ packages:
   /@types/keyv@3.1.4:
     resolution: {integrity: sha512-BQ5aZNSCpj7D6K2ksrRCTmKRLEpnPvWDiLPfoGyhZ++8YtiK9d/3DBKPJgry359X/P1PfruyYwvnvwFjuEiEIg==}
     dependencies:
-      '@types/node': 20.19.30
+      '@types/node': 25.0.10
     dev: true
 
   /@types/linkify-it@5.0.0:
@@ -8236,7 +8272,7 @@ packages:
   /@types/node-fetch@2.6.13:
     resolution: {integrity: sha512-QGpRVpzSaUs30JBSGPjOg4Uveu384erbHBoT1zeONvyCfwQxIkUshLAOqN/k9EjGviPRmWTTe6aH2qySWKTVSw==}
     dependencies:
-      '@types/node': 20.19.30
+      '@types/node': 25.0.10
       form-data: 4.0.5
     dev: true
 
@@ -8254,10 +8290,10 @@ packages:
       undici-types: 5.26.5
     dev: true
 
-  /@types/node@20.19.30:
-    resolution: {integrity: sha512-WJtwWJu7UdlvzEAUm484QNg5eAoq5QR08KDNx7g45Usrs2NtOPiX8ugDqmKdXkyL03rBqU5dYNYVQetEpBHq2g==}
+  /@types/node@25.0.10:
+    resolution: {integrity: sha512-zWW5KPngR/yvakJgGOmZ5vTBemDoSqF3AcV/LrO5u5wTWyEAVVh+IT39G4gtyAkh3CtTZs8aX/yRM82OfzHJRg==}
     dependencies:
-      undici-types: 6.21.0
+      undici-types: 7.16.0
 
   /@types/prismjs@1.26.5:
     resolution: {integrity: sha512-AUZTa7hQ2KY5L7AmtSiqxlhWxb4ina0yd8hNbl4TWuqnv/pFP0nDMb3YrfSBf4hJVGLh2YEIBfKaBW/9UEl6IQ==}
@@ -8311,7 +8347,7 @@ packages:
   /@types/responselike@1.0.3:
     resolution: {integrity: sha512-H/+L+UkTV33uf49PH5pCAUBVPNj2nDBXTN+qS1dOwyyg24l3CcicicCA7ca+HMvJBZcFgl5r8e+RR6elsb4Lyw==}
     dependencies:
-      '@types/node': 20.19.30
+      '@types/node': 25.0.10
     dev: true
 
   /@types/retry@0.12.2:
@@ -8321,20 +8357,20 @@ packages:
   /@types/sax@1.2.7:
     resolution: {integrity: sha512-rO73L89PJxeYM3s3pPPjiPgVVcymqU490g0YO5n5By0k2Erzj6tay/4lr1CHAAU4JyOWd1rpQ8bCf6cZfHU96A==}
     dependencies:
-      '@types/node': 20.19.30
+      '@types/node': 25.0.10
     dev: false
 
   /@types/send@0.17.6:
     resolution: {integrity: sha512-Uqt8rPBE8SY0RK8JB1EzVOIZ32uqy8HwdxCnoCOsYrvnswqmFZ/k+9Ikidlk/ImhsdvBsloHbAlewb2IEBV/Og==}
     dependencies:
       '@types/mime': 1.3.5
-      '@types/node': 20.19.30
+      '@types/node': 25.0.10
     dev: false
 
   /@types/send@1.2.1:
     resolution: {integrity: sha512-arsCikDvlU99zl1g69TcAB3mzZPpxgw0UQnaHeC1Nwb015xp8bknZv5rIfri9xTOcMuaVgvabfIRA7PSZVuZIQ==}
     dependencies:
-      '@types/node': 20.19.30
+      '@types/node': 25.0.10
     dev: false
 
   /@types/serve-index@1.9.4:
@@ -8347,14 +8383,14 @@ packages:
     resolution: {integrity: sha512-tRs1dB+g8Itk72rlSI2ZrW6vZg0YrLI81iQSTkMmOqnqCaNr/8Ek4VwWcN5vZgCYWbg/JJSGBlUaYGAOP73qBw==}
     dependencies:
       '@types/http-errors': 2.0.5
-      '@types/node': 20.19.30
+      '@types/node': 25.0.10
       '@types/send': 0.17.6
     dev: false
 
   /@types/sockjs@0.3.36:
     resolution: {integrity: sha512-MK9V6NzAS1+Ud7JV9lJLFqW85VbC9dq3LmwZCuBe4wBDgKC0Kj/jd8Xl+nSviU+Qc3+m7umHHyHg//2KSa0a0Q==}
     dependencies:
-      '@types/node': 20.19.30
+      '@types/node': 25.0.10
     dev: false
 
   /@types/stack-utils@2.0.3:
@@ -8380,7 +8416,7 @@ packages:
   /@types/ws@8.18.1:
     resolution: {integrity: sha512-ThVF6DCVhA8kUGy+aazFQ4kXQ7E1Ty7A3ypFOe0IcJV8O/M511G99AW24irKrW56Wt44yG9+ij8FaqoBGkuBXg==}
     dependencies:
-      '@types/node': 20.19.30
+      '@types/node': 25.0.10
 
   /@types/yargs-parser@21.0.3:
     resolution: {integrity: sha512-I4q9QU9MQv4oEOz4tAHJtNz1cwuLxn2F3xcc2iV5WdqLPpUnj30aUuxt1mAxYTG+oe8CZMV/+6rU4S4gRDzqtQ==}
@@ -8396,7 +8432,7 @@ packages:
     resolution: {integrity: sha512-oJoftv0LSuaDZE3Le4DbKX+KS9G36NzOeSap90UIK0yMA/NhKJhqlSGtNDORNRaIbQfzjXDrQa0ytJ6mNRGz/Q==}
     requiresBuild: true
     dependencies:
-      '@types/node': 20.19.30
+      '@types/node': 25.0.10
     dev: true
     optional: true
 
@@ -8573,7 +8609,7 @@ packages:
       '@rolldown/pluginutils': 1.0.0-beta.27
       '@types/babel__core': 7.20.5
       react-refresh: 0.17.0
-      vite: 5.4.21(@types/node@20.19.30)
+      vite: 5.4.21(@types/node@25.0.10)
     transitivePeerDependencies:
       - supports-color
     dev: true
@@ -8585,7 +8621,7 @@ packages:
       vite: ^5.0.0 || ^6.0.0
       vue: ^3.2.25
     dependencies:
-      vite: 5.4.21(@types/node@20.19.30)
+      vite: 5.4.21(@types/node@25.0.10)
       vue: 3.5.26(typescript@5.9.3)
     dev: true
 
@@ -8607,7 +8643,7 @@ packages:
       std-env: 3.10.0
       strip-literal: 2.1.1
       test-exclude: 6.0.0
-      vitest: 1.6.1(@types/node@20.19.30)(happy-dom@12.10.3)(jsdom@27.4.0)
+      vitest: 1.6.1(@types/node@25.0.10)(happy-dom@12.10.3)(jsdom@27.4.0)
     transitivePeerDependencies:
       - supports-color
     dev: true
@@ -10071,7 +10107,7 @@ packages:
     engines: {node: '>=12.13.0'}
     hasBin: true
     dependencies:
-      '@types/node': 20.19.30
+      '@types/node': 25.0.10
       escape-string-regexp: 4.0.0
       is-wsl: 2.2.0
       lighthouse-logger: 1.4.2
@@ -10086,7 +10122,7 @@ packages:
   /chromium-edge-launcher@0.2.0:
     resolution: {integrity: sha512-JfJjUnq25y9yg4FABRRVPmBGWPZZi+AQXT4mxupb67766/0UlhG8PAZCz6xzEMXTbW3CsSoE8PcCWA49n35mKg==}
     dependencies:
-      '@types/node': 20.19.30
+      '@types/node': 25.0.10
       escape-string-regexp: 4.0.0
       is-wsl: 2.2.0
       lighthouse-logger: 1.4.2
@@ -12105,7 +12141,7 @@ packages:
     resolution: {integrity: sha512-EzV94NYKoO09GLXGjXj9JIlXijVck4ONSr5wiCWDvhsvj5jxSrzTmRU/9C1DyB6uToszLs8aifA6NQ7lEQdvFw==}
     engines: {node: '>= 0.8'}
     dependencies:
-      '@types/node': 20.19.30
+      '@types/node': 25.0.10
       require-like: 0.1.2
     dev: false
 
@@ -14124,7 +14160,7 @@ packages:
       '@jest/environment': 29.7.0
       '@jest/fake-timers': 29.7.0
       '@jest/types': 29.6.3
-      '@types/node': 20.19.30
+      '@types/node': 25.0.10
       jest-mock: 29.7.0
       jest-util: 29.7.0
     dev: false
@@ -14140,7 +14176,7 @@ packages:
     dependencies:
       '@jest/types': 29.6.3
       '@types/graceful-fs': 4.1.9
-      '@types/node': 20.19.30
+      '@types/node': 25.0.10
       anymatch: 3.1.3
       fb-watchman: 2.0.2
       graceful-fs: 4.2.11
@@ -14173,7 +14209,7 @@ packages:
     engines: {node: ^14.15.0 || ^16.10.0 || >=18.0.0}
     dependencies:
       '@jest/types': 29.6.3
-      '@types/node': 20.19.30
+      '@types/node': 25.0.10
       jest-util: 29.7.0
     dev: false
 
@@ -14187,7 +14223,7 @@ packages:
     engines: {node: ^14.15.0 || ^16.10.0 || >=18.0.0}
     dependencies:
       '@jest/types': 29.6.3
-      '@types/node': 20.19.30
+      '@types/node': 25.0.10
       chalk: 4.1.2
       ci-info: 3.9.0
       graceful-fs: 4.2.11
@@ -14210,7 +14246,7 @@ packages:
     resolution: {integrity: sha512-7vuh85V5cdDofPyxn58nrPjBktZo0u9x1g8WtjQol+jZDaE+fhN+cIvTj11GndBnMnyfrUOG1sZQxCdjKh+DKg==}
     engines: {node: '>= 10.13.0'}
     dependencies:
-      '@types/node': 20.19.30
+      '@types/node': 25.0.10
       merge-stream: 2.0.0
       supports-color: 8.1.1
 
@@ -14218,7 +14254,7 @@ packages:
     resolution: {integrity: sha512-eIz2msL/EzL9UFTFFx7jBTkeZfku0yUAyZZZmJ93H2TYEiroIx2PQjEXcwYtYl8zXCxb+PAmA2hLIt/6ZEkPHw==}
     engines: {node: ^14.15.0 || ^16.10.0 || >=18.0.0}
     dependencies:
-      '@types/node': 20.19.30
+      '@types/node': 25.0.10
       jest-util: 29.7.0
       merge-stream: 2.0.0
       supports-color: 8.1.1
@@ -19962,8 +19998,8 @@ packages:
     resolution: {integrity: sha512-JlCMO+ehdEIKqlFxk6IfVoAUVmgz7cU7zD/h9XZ0qzeosSHmUJVOzSQvvYSYWXkFXC+IfLKSIffhv0sVZup6pA==}
     dev: true
 
-  /undici-types@6.21.0:
-    resolution: {integrity: sha512-iwDZqg0QAGrg9Rav5H4n0M64c3mkR59cJ6wQp+7C4nI0gsmExaedaYLNO44eT4AtBBwjbTiGPMlt2Md0T9H9JQ==}
+  /undici-types@7.16.0:
+    resolution: {integrity: sha512-Zz+aZWSj8LE6zoxD+xrjh4VfkIG8Ya6LvYkZqtUQGJPZjYl53ypCaUwWqo7eI0x66KBGeRo+mlBEkMSeSZ38Nw==}
 
   /undici@6.23.0:
     resolution: {integrity: sha512-VfQPToRA5FZs/qJxLIinmU59u0r7LXqoJkCzinq3ckNJp3vKEh7jTWN589YQ5+aoAC/TGRLyJLCPKcLQbM8r9g==}
@@ -20193,7 +20229,7 @@ packages:
       '@types/unist': 3.0.3
       vfile-message: 4.0.3
 
-  /vite-node@1.6.1(@types/node@20.19.30):
+  /vite-node@1.6.1(@types/node@25.0.10):
     resolution: {integrity: sha512-YAXkfvGtuTzwWbDSACdJSg4A4DZiAqckWe90Zapc/sEX3XvHcw1NdurM/6od8J207tSDqNbSsgdCacBgvJKFuA==}
     engines: {node: ^18.0.0 || >=20.0.0}
     hasBin: true
@@ -20202,7 +20238,7 @@ packages:
       debug: 4.4.3
       pathe: 1.1.2
       picocolors: 1.1.1
-      vite: 5.4.21(@types/node@20.19.30)
+      vite: 5.4.21(@types/node@25.0.10)
     transitivePeerDependencies:
       - '@types/node'
       - less
@@ -20215,7 +20251,7 @@ packages:
       - terser
     dev: true
 
-  /vite@5.4.21(@types/node@20.19.30):
+  /vite@5.4.21(@types/node@25.0.10):
     resolution: {integrity: sha512-o5a9xKjbtuhY6Bi5S3+HvbRERmouabWbyUcpXXUA1u+GNUKoROi9byOJ8M0nHbHYHkYICiMlqxkg1KkYmm25Sw==}
     engines: {node: ^18.0.0 || >=20.0.0}
     hasBin: true
@@ -20246,7 +20282,7 @@ packages:
       terser:
         optional: true
     dependencies:
-      '@types/node': 20.19.30
+      '@types/node': 25.0.10
       esbuild: 0.21.5
       postcss: 8.5.6
       rollup: 4.55.1
@@ -20262,10 +20298,10 @@ packages:
       vite:
         optional: true
     dependencies:
-      vite: 5.4.21(@types/node@20.19.30)
+      vite: 5.4.21(@types/node@25.0.10)
     dev: true
 
-  /vitepress@1.6.4(@algolia/client-search@5.46.3)(@types/node@20.19.30)(search-insights@2.17.3)(typescript@5.9.3):
+  /vitepress@1.6.4(@algolia/client-search@5.47.0)(@types/node@25.0.10)(search-insights@2.17.3)(typescript@5.9.3):
     resolution: {integrity: sha512-+2ym1/+0VVrbhNyRoFFesVvBvHAVMZMK0rw60E3X/5349M1GuVdKeazuksqopEdvkKwKGs21Q729jX81/bkBJg==}
     hasBin: true
     peerDependencies:
@@ -20278,7 +20314,7 @@ packages:
         optional: true
     dependencies:
       '@docsearch/css': 3.8.2
-      '@docsearch/js': 3.8.2(@algolia/client-search@5.46.3)(search-insights@2.17.3)
+      '@docsearch/js': 3.8.2(@algolia/client-search@5.47.0)(search-insights@2.17.3)
       '@iconify-json/simple-icons': 1.2.66
       '@shikijs/core': 2.5.0
       '@shikijs/transformers': 2.5.0
@@ -20293,7 +20329,7 @@ packages:
       mark.js: 8.11.1
       minisearch: 7.2.0
       shiki: 2.5.0
-      vite: 5.4.21(@types/node@20.19.30)
+      vite: 5.4.21(@types/node@25.0.10)
       vue: 3.5.26(typescript@5.9.3)
     transitivePeerDependencies:
       - '@algolia/client-search'
@@ -20323,7 +20359,7 @@ packages:
       - universal-cookie
     dev: true
 
-  /vitest@1.6.1(@types/node@20.19.30)(happy-dom@12.10.3)(jsdom@27.4.0):
+  /vitest@1.6.1(@types/node@25.0.10)(happy-dom@12.10.3)(jsdom@27.4.0):
     resolution: {integrity: sha512-Ljb1cnSJSivGN0LqXd/zmDbWEM0RNNg2t1QW/XUhYl/qPqyu7CsqeWtqQXHVaJsecLPuDoak2oJcZN2QoRIOag==}
     engines: {node: ^18.0.0 || >=20.0.0}
     hasBin: true
@@ -20348,7 +20384,7 @@ packages:
       jsdom:
         optional: true
     dependencies:
-      '@types/node': 20.19.30
+      '@types/node': 25.0.10
       '@vitest/expect': 1.6.1
       '@vitest/runner': 1.6.1
       '@vitest/snapshot': 1.6.1
@@ -20368,8 +20404,8 @@ packages:
       strip-literal: 2.1.1
       tinybench: 2.9.0
       tinypool: 0.8.4
-      vite: 5.4.21(@types/node@20.19.30)
-      vite-node: 1.6.1(@types/node@20.19.30)
+      vite: 5.4.21(@types/node@25.0.10)
+      vite-node: 1.6.1(@types/node@25.0.10)
       why-is-node-running: 2.3.0
     transitivePeerDependencies:
       - less
