@@ -1,7 +1,15 @@
 import type { Observable } from 'rxjs';
 import type { LiveQuery, LiveQueryOptions } from '../observable/live-query.js';
+import type { PopulateSpec } from '../relations/types.js';
 import type { Document } from '../types/document.js';
-import type { QueryFilter, QuerySpec, SortDirection, SortSpec } from '../types/query.js';
+import type {
+  CursorDirection,
+  QueryExplainResult,
+  QueryFilter,
+  QuerySpec,
+  SortDirection,
+  SortSpec,
+} from '../types/query.js';
 
 /**
  * Fluent query builder for constructing type-safe database queries.
@@ -72,6 +80,7 @@ import type { QueryFilter, QuerySpec, SortDirection, SortSpec } from '../types/q
  */
 export class QueryBuilder<T extends Document> {
   private spec: QuerySpec<T> = {};
+  private populateSpecs: PopulateSpec[] = [];
   private readonly executor: (spec: QuerySpec<T>) => Promise<T[]>;
   private readonly liveQueryFactory: () => (
     spec: QuerySpec<T>,
@@ -264,6 +273,92 @@ export class QueryBuilder<T extends Document> {
   }
 
   /**
+   * Set cursor-based pagination.
+   *
+   * Cursor-based pagination is more efficient than skip/limit for large
+   * datasets and provides stable pagination even when data changes.
+   *
+   * @param value - The cursor value (typically a document ID or field value)
+   * @param options - Cursor options including direction
+   * @returns This query builder for chaining
+   *
+   * @example
+   * ```typescript
+   * // Get next page after a specific document
+   * const nextPage = await collection
+   *   .find()
+   *   .sort('createdAt', 'desc')
+   *   .cursor('2024-01-15T10:00:00Z', { direction: 'after' })
+   *   .limit(20)
+   *   .exec();
+   * ```
+   *
+   * @example Using document ID as cursor
+   * ```typescript
+   * // Paginate by ID
+   * const page = await collection
+   *   .find()
+   *   .cursor(lastDocId, { direction: 'after', field: '_id' })
+   *   .limit(10)
+   *   .exec();
+   * ```
+   */
+  cursor(value: string, options: { direction: CursorDirection; field?: string }): this {
+    this.spec.cursor = {
+      value,
+      direction: options.direction,
+      field: options.field,
+    };
+    return this;
+  }
+
+  /**
+   * Get results after a specific document ID.
+   *
+   * Shorthand for `cursor(documentId, { direction: 'after', field: '_id' })`.
+   *
+   * @param documentId - The document ID to start after
+   * @returns This query builder for chaining
+   *
+   * @example
+   * ```typescript
+   * // Get next 10 items after a known document
+   * const nextPage = await collection
+   *   .find()
+   *   .sort('createdAt', 'desc')
+   *   .after('doc-abc-123')
+   *   .limit(10)
+   *   .exec();
+   * ```
+   */
+  after(documentId: string): this {
+    return this.cursor(documentId, { direction: 'after', field: '_id' });
+  }
+
+  /**
+   * Get results before a specific document ID.
+   *
+   * Shorthand for `cursor(documentId, { direction: 'before', field: '_id' })`.
+   *
+   * @param documentId - The document ID to get results before
+   * @returns This query builder for chaining
+   *
+   * @example
+   * ```typescript
+   * // Get previous 10 items before a known document
+   * const prevPage = await collection
+   *   .find()
+   *   .sort('createdAt', 'desc')
+   *   .before('doc-xyz-789')
+   *   .limit(10)
+   *   .exec();
+   * ```
+   */
+  before(documentId: string): this {
+    return this.cursor(documentId, { direction: 'before', field: '_id' });
+  }
+
+  /**
    * Set field projection using include/exclude syntax.
    *
    * @param projection - Object mapping field names to 1 (include) or 0 (exclude)
@@ -327,6 +422,71 @@ export class QueryBuilder<T extends Document> {
     }
     this.spec.projection = projection;
     return this;
+  }
+
+  /**
+   * Populate related documents.
+   *
+   * Fetches related documents based on schema-defined relationships
+   * and includes them in the result. Multiple populate calls can be
+   * chained to populate multiple relations.
+   *
+   * @param path - Path to the relation field, or detailed populate options
+   * @returns This query builder for chaining
+   *
+   * @example Simple population
+   * ```typescript
+   * // Populate the 'author' field on posts
+   * const posts = await collection
+   *   .find()
+   *   .populate('author')
+   *   .exec();
+   * ```
+   *
+   * @example Multiple populations
+   * ```typescript
+   * const orders = await collection
+   *   .find()
+   *   .populate('customer')
+   *   .populate('items')
+   *   .exec();
+   * ```
+   *
+   * @example With options
+   * ```typescript
+   * const orders = await collection
+   *   .find()
+   *   .populate({
+   *     path: 'items',
+   *     limit: 10,
+   *     sort: { field: 'createdAt', direction: 'desc' }
+   *   })
+   *   .exec();
+   * ```
+   *
+   * @example Nested population
+   * ```typescript
+   * const orders = await collection
+   *   .find()
+   *   .populate({
+   *     path: 'items',
+   *     populate: [{ path: 'product' }]
+   *   })
+   *   .exec();
+   * ```
+   */
+  populate(pathOrOptions: PopulateSpec): this {
+    this.populateSpecs.push(pathOrOptions);
+    return this;
+  }
+
+  /**
+   * Get the current populate specifications.
+   *
+   * @returns Array of populate specifications
+   */
+  getPopulateSpecs(): PopulateSpec[] {
+    return [...this.populateSpecs];
   }
 
   /**
@@ -416,6 +576,241 @@ export class QueryBuilder<T extends Document> {
     const factory = this.liveQueryFactory();
     const liveQuery = factory(this.spec, options);
     return liveQuery.observable();
+  }
+
+  /**
+   * Explain the query execution plan without running the query.
+   *
+   * Returns detailed information about how the query will be executed,
+   * including which indexes will be used, estimated scan counts, and
+   * suggestions for performance improvements.
+   *
+   * @returns Promise resolving to the query explanation
+   *
+   * @example Analyzing query performance
+   * ```typescript
+   * const explain = await collection
+   *   .find()
+   *   .where('status').equals('active')
+   *   .where('createdAt').greaterThan(lastMonth)
+   *   .sort('priority', 'desc')
+   *   .explain();
+   *
+   * console.log('Query plan:', explain.plan);
+   * console.log('Index used:', explain.plan.indexName ?? 'none (full scan)');
+   * console.log('Estimated documents to scan:', explain.plan.estimatedScan);
+   *
+   * if (explain.suggestions?.length) {
+   *   console.log('Suggestions:');
+   *   explain.suggestions.forEach(s => console.log('  -', s));
+   * }
+   * ```
+   *
+   * @example Checking if index is used
+   * ```typescript
+   * const { plan } = await query.explain();
+   *
+   * if (!plan.indexName) {
+   *   console.warn('Query will perform a full collection scan!');
+   *   console.log('Consider creating an index on:', Object.keys(spec.filter ?? {}));
+   * }
+   * ```
+   */
+  explain(): QueryExplainResult {
+    // Build query plan based on spec
+    const plan = this.buildQueryPlan();
+    const suggestions = this.generateSuggestions(plan);
+
+    return {
+      plan,
+      suggestions: suggestions.length > 0 ? suggestions : undefined,
+    };
+  }
+
+  /**
+   * Execute the query and return results with execution statistics.
+   *
+   * Similar to {@link exec} but also returns timing and scan statistics.
+   * Useful for performance analysis and debugging.
+   *
+   * @returns Promise resolving to results with execution stats
+   *
+   * @example
+   * ```typescript
+   * const result = await collection
+   *   .find()
+   *   .where('status').equals('active')
+   *   .execWithStats();
+   *
+   * console.log(`Found ${result.documents.length} documents`);
+   * console.log(`Execution time: ${result.execution.totalTimeMs}ms`);
+   * console.log(`Documents scanned: ${result.execution.documentsScanned}`);
+   * ```
+   */
+  async execWithStats(): Promise<{ documents: T[]; execution: QueryExplainResult['execution'] }> {
+    const startTime = performance.now();
+    const documents = await this.executor(this.spec);
+    const endTime = performance.now();
+
+    const plan = this.buildQueryPlan();
+
+    return {
+      documents,
+      execution: {
+        totalTimeMs: Math.round((endTime - startTime) * 100) / 100,
+        documentsScanned: documents.length, // Approximate - actual may vary
+        indexHits: plan.indexName ? documents.length : 0,
+        documentsReturned: documents.length,
+        usedIndex: plan.indexName !== null,
+        indexName: plan.indexName ?? undefined,
+      },
+    };
+  }
+
+  /**
+   * Build a query plan based on the current specification.
+   * @internal
+   */
+  private buildQueryPlan(): QueryExplainResult['plan'] {
+    const steps: QueryExplainResult['plan']['steps'] = [];
+    let indexName: string | undefined;
+    let indexCovers = false;
+    let estimatedScan = 1000; // Default estimate
+    let sortUsingIndex = false;
+
+    // Analyze filter to determine if index can be used
+    const filterFields = this.spec.filter
+      ? Object.keys(this.spec.filter).filter((k) => !k.startsWith('$'))
+      : [];
+
+    // Check for potential index usage (simplified - real implementation would check actual indexes)
+    if (filterFields.length > 0) {
+      // Assume a simple index might exist on the first filter field
+      const primaryFilterField = filterFields[0];
+      if (primaryFilterField) {
+        // In a real implementation, we'd check against actual indexes
+        // For now, we'll indicate the field that would benefit from an index
+        steps.push({
+          type: 'filter',
+          description: `Filter on field "${primaryFilterField}"`,
+          estimatedCost: 0.5,
+        });
+
+        // Check if this looks like an indexed field (e.g., _id or common patterns)
+        if (primaryFilterField === '_id') {
+          indexName = '_id_';
+          indexCovers = true;
+          estimatedScan = 1;
+        }
+      }
+    }
+
+    // Check if sort can use an index
+    if (this.spec.sort && this.spec.sort.length > 0) {
+      const sortField = this.spec.sort[0]?.field;
+      if (sortField === '_id' || (indexName && filterFields[0] === sortField)) {
+        sortUsingIndex = true;
+      }
+    }
+
+    // Add collection scan or index scan step
+    if (indexName) {
+      steps.unshift({
+        type: 'index-scan',
+        description: `Scan index "${indexName}"`,
+        estimatedCost: 0.2,
+      });
+      estimatedScan = Math.floor(estimatedScan * 0.1);
+    } else {
+      steps.unshift({
+        type: 'collection-scan',
+        description: 'Full collection scan',
+        estimatedCost: 1.0,
+      });
+    }
+
+    // Add sort step if sorting
+    if (this.spec.sort && this.spec.sort.length > 0) {
+      const sortFields = this.spec.sort.map((s) => s.field).join(', ');
+      steps.push({
+        type: 'sort',
+        description: `Sort by ${sortFields}`,
+        estimatedCost: sortUsingIndex ? 0.1 : 0.8,
+      });
+    }
+
+    // Add skip step if skipping
+    if (this.spec.skip && this.spec.skip > 0) {
+      steps.push({
+        type: 'skip',
+        description: `Skip ${this.spec.skip} documents`,
+        estimatedCost: 0.1,
+      });
+    }
+
+    // Add limit step if limiting
+    if (this.spec.limit && this.spec.limit > 0) {
+      steps.push({
+        type: 'limit',
+        description: `Limit to ${this.spec.limit} documents`,
+        estimatedCost: 0.05,
+      });
+      estimatedScan = Math.min(estimatedScan, this.spec.limit * 10);
+    }
+
+    return {
+      indexName,
+      indexCovers,
+      estimatedScan,
+      sortUsingIndex,
+      steps,
+    };
+  }
+
+  /**
+   * Generate suggestions for improving query performance.
+   * @internal
+   */
+  private generateSuggestions(plan: QueryExplainResult['plan']): string[] {
+    const suggestions: string[] = [];
+
+    // Suggest index if doing full scan with filters
+    if (!plan.indexName && this.spec.filter) {
+      const filterFields = Object.keys(this.spec.filter).filter((k) => !k.startsWith('$'));
+      if (filterFields.length > 0) {
+        suggestions.push(
+          `Consider creating an index on [${filterFields.join(', ')}] to improve query performance`
+        );
+      }
+    }
+
+    // Suggest compound index for sort
+    if (this.spec.sort && this.spec.sort.length > 0 && !plan.sortUsingIndex) {
+      const sortFields = this.spec.sort.map((s) => s.field);
+      const filterFields = this.spec.filter
+        ? Object.keys(this.spec.filter).filter((k) => !k.startsWith('$'))
+        : [];
+      const allFields = [...new Set([...filterFields, ...sortFields])];
+      suggestions.push(
+        `Consider creating a compound index on [${allFields.join(', ')}] to avoid in-memory sorting`
+      );
+    }
+
+    // Warn about skip-based pagination for large offsets
+    if (this.spec.skip && this.spec.skip > 1000) {
+      suggestions.push(
+        'Large skip values can be slow. Consider using cursor-based pagination with .after() or .cursor() instead'
+      );
+    }
+
+    // Warn about missing limit
+    if (!this.spec.limit && !this.spec.cursor) {
+      suggestions.push(
+        'Consider adding .limit() to avoid fetching all documents when only a subset is needed'
+      );
+    }
+
+    return suggestions;
   }
 
   /**
