@@ -1,19 +1,72 @@
 /**
- * Checkpoint for tracking sync progress
+ * Represents sync progress state for resumable synchronization.
+ *
+ * Checkpoints track the last synced sequence number for each collection,
+ * allowing sync to resume from where it left off after disconnection.
+ *
+ * ## Sequence Numbers
+ *
+ * Each change in a collection has an incrementing sequence number.
+ * The checkpoint stores the highest synced sequence per collection:
+ *
+ * ```
+ * {
+ *   sequences: {
+ *     "todos": 42,      // Synced up to change #42
+ *     "users": 15,      // Synced up to change #15
+ *   }
+ * }
+ * ```
+ *
+ * When pulling changes, the client sends its checkpoint. The server
+ * returns only changes with sequence > checkpoint.sequences[collection].
  */
 export interface Checkpoint {
-  /** Checkpoint ID */
+  /** Unique identifier for this checkpoint (format: `{nodeId}_{timestamp}`) */
   id: string;
-  /** Sequence number per collection */
+  /** Map of collection names to their last synced sequence numbers */
   sequences: Record<string, number>;
-  /** Timestamp of checkpoint */
+  /** Unix timestamp of when checkpoint was last updated */
   timestamp: number;
-  /** Node ID that created this checkpoint */
+  /** Unique identifier for the client node */
   nodeId: string;
 }
 
 /**
- * Checkpoint manager for tracking sync state
+ * Manages sync checkpoints for tracking and resuming synchronization.
+ *
+ * The CheckpointManager persists sync progress to localStorage, enabling
+ * efficient resumption after app restarts or reconnections. Each client
+ * maintains its own checkpoint, identified by a unique node ID.
+ *
+ * ## How It Works
+ *
+ * ```
+ * Client                              Server
+ *   │                                    │
+ *   │ ── pull(checkpoint) ─────────────► │
+ *   │                                    │ (finds changes after checkpoint)
+ *   │ ◄───────── changes[] ────────────  │
+ *   │                                    │
+ *   │ updateSequence(collection, seq)    │
+ *   │ (checkpoint saved to localStorage) │
+ * ```
+ *
+ * @example
+ * ```typescript
+ * const checkpoint = new CheckpointManager('client-123');
+ *
+ * // Get current progress for a collection
+ * const lastSeq = checkpoint.getSequence('todos'); // 0 initially
+ *
+ * // After syncing changes up to sequence 42
+ * checkpoint.updateSequence('todos', 42);
+ *
+ * // Later, resume sync from sequence 42
+ * const resumeFrom = checkpoint.getSequence('todos'); // 42
+ * ```
+ *
+ * @see {@link SyncEngine} - Uses CheckpointManager internally
  */
 export class CheckpointManager {
   private checkpoint: Checkpoint;
@@ -116,14 +169,20 @@ export class CheckpointManager {
 }
 
 /**
- * Serialize checkpoint for transmission
+ * Serializes a checkpoint to JSON string for network transmission.
+ *
+ * @param checkpoint - The checkpoint to serialize
+ * @returns JSON string representation
  */
 export function serializeCheckpoint(checkpoint: Checkpoint): string {
   return JSON.stringify(checkpoint);
 }
 
 /**
- * Deserialize checkpoint from transmission
+ * Deserializes a checkpoint from JSON string.
+ *
+ * @param data - JSON string representation of a checkpoint
+ * @returns Parsed Checkpoint object
  */
 export function deserializeCheckpoint(data: string): Checkpoint {
   return JSON.parse(data);

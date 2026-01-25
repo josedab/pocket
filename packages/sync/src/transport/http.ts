@@ -1,7 +1,52 @@
 import type { SyncProtocolMessage, SyncTransport, TransportConfig } from './types.js';
 
 /**
- * HTTP transport implementation (fallback for environments without WebSocket)
+ * HTTP-based transport implementation for sync operations.
+ *
+ * A fallback transport for environments that don't support WebSocket
+ * (some edge runtimes, restricted networks, etc.). Uses standard HTTP
+ * POST requests for each sync operation.
+ *
+ * ## Limitations
+ *
+ * Unlike {@link WebSocketTransport}, HTTP transport:
+ * - **No server push**: Cannot receive server-initiated messages
+ * - **Higher latency**: Each operation requires a new HTTP request
+ * - **No auto-reconnect**: Connection state is per-request
+ *
+ * ## When to Use
+ *
+ * - Edge runtimes without WebSocket support (Cloudflare Workers, etc.)
+ * - Corporate networks blocking WebSocket connections
+ * - Simple sync scenarios without real-time requirements
+ *
+ * ## API Endpoints
+ *
+ * The transport expects these server endpoints:
+ * - `GET /health` - Health check for connection verification
+ * - `POST /sync/push` - Push local changes to server
+ * - `POST /sync/pull` - Pull server changes
+ * - `POST /sync` - Generic sync endpoint
+ *
+ * @example
+ * ```typescript
+ * const transport = createHttpTransport({
+ *   serverUrl: 'https://api.example.com',
+ *   authToken: 'user-token',
+ *   timeout: 30000,
+ * });
+ *
+ * await transport.connect(); // Performs health check
+ *
+ * const response = await transport.send<PushResponseMessage>({
+ *   type: 'push',
+ *   id: generateMessageId(),
+ *   changes: myChanges,
+ * });
+ * ```
+ *
+ * @see {@link createHttpTransport} - Factory function
+ * @see {@link WebSocketTransport} - Preferred transport with real-time support
  */
 export class HttpTransport implements SyncTransport {
   private readonly config: Required<TransportConfig>;
@@ -144,7 +189,24 @@ export class HttpTransport implements SyncTransport {
 }
 
 /**
- * Create an HTTP transport
+ * Creates an HTTP transport for sync operations.
+ *
+ * Use this as a fallback when WebSocket is not available.
+ * For most applications, prefer {@link createWebSocketTransport}.
+ *
+ * @param config - Transport configuration including server URL and auth
+ * @returns A configured HttpTransport instance
+ *
+ * @example
+ * ```typescript
+ * // For edge runtime without WebSocket support
+ * const transport = createHttpTransport({
+ *   serverUrl: 'https://api.example.com',
+ *   authToken: getAuthToken(),
+ * });
+ *
+ * const syncEngine = new SyncEngine(db, { transport });
+ * ```
  */
 export function createHttpTransport(config: TransportConfig): HttpTransport {
   return new HttpTransport(config);
