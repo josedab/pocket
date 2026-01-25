@@ -1,13 +1,26 @@
+/**
+ * React hooks for monitoring and controlling sync status.
+ *
+ * @module hooks/use-sync-status
+ * @see {@link useSyncStatus} - Full sync status and controls
+ * @see {@link useOnlineStatus} - Simple online/offline detection
+ */
+
 import { useCallback, useEffect, useRef, useState } from 'react';
 import type { Observable } from 'rxjs';
 
 /**
- * Sync status
+ * Possible states of the sync engine.
+ *
+ * - `'idle'` - Not currently syncing
+ * - `'syncing'` - Actively syncing data
+ * - `'error'` - Sync encountered an error
+ * - `'offline'` - Device is offline
  */
 export type SyncStatus = 'idle' | 'syncing' | 'error' | 'offline';
 
 /**
- * Sync statistics
+ * Statistics about sync operations.
  */
 export interface SyncStats {
   /** Number of documents pushed */
@@ -23,7 +36,10 @@ export interface SyncStats {
 }
 
 /**
- * Sync engine interface (matches @pocket/sync)
+ * Sync engine interface for integration with @pocket/sync.
+ *
+ * This interface defines the contract that sync engines must implement
+ * to work with {@link useSyncStatus}.
  */
 export interface SyncEngine {
   start(): Promise<void>;
@@ -36,7 +52,9 @@ export interface SyncEngine {
 }
 
 /**
- * Sync status result
+ * Result returned by {@link useSyncStatus}.
+ *
+ * Contains sync state, statistics, and control functions.
  */
 export interface SyncStatusResult {
   /** Current sync status */
@@ -62,7 +80,7 @@ export interface SyncStatusResult {
 }
 
 /**
- * Sync status options
+ * Configuration options for {@link useSyncStatus}.
  */
 export interface UseSyncStatusOptions {
   /** Auto-start syncing */
@@ -70,7 +88,53 @@ export interface UseSyncStatusOptions {
 }
 
 /**
- * Hook to track sync status
+ * React hook to track and control sync status.
+ *
+ * Provides real-time sync state, statistics, and control functions.
+ * Automatically tracks browser online/offline status.
+ *
+ * @param syncEngine - The sync engine instance from @pocket/sync, or `null` if not available
+ * @param options - Optional configuration (autoStart, etc.)
+ * @returns A {@link SyncStatusResult} with status, stats, and control functions
+ *
+ * @example
+ * ```tsx
+ * function SyncIndicator() {
+ *   const { status, isSyncing, stats, forceSync } = useSyncStatus(syncEngine);
+ *
+ *   return (
+ *     <div>
+ *       <span className={`status-${status}`}>
+ *         {isSyncing ? 'Syncing...' : status}
+ *       </span>
+ *       <span>Last sync: {stats.lastSyncAt ? new Date(stats.lastSyncAt).toLocaleString() : 'Never'}</span>
+ *       <button onClick={forceSync} disabled={isSyncing}>
+ *         Sync Now
+ *       </button>
+ *     </div>
+ *   );
+ * }
+ *
+ * // Manual sync control
+ * function SyncControls() {
+ *   const { start, stop, push, pull, isOnline, error } = useSyncStatus(
+ *     syncEngine,
+ *     { autoStart: false }
+ *   );
+ *
+ *   return (
+ *     <div>
+ *       <button onClick={start}>Start Sync</button>
+ *       <button onClick={stop}>Stop Sync</button>
+ *       <button onClick={push} disabled={!isOnline}>Push</button>
+ *       <button onClick={pull} disabled={!isOnline}>Pull</button>
+ *       {error && <span className="error">{error.message}</span>}
+ *     </div>
+ *   );
+ * }
+ * ```
+ *
+ * @see {@link useOnlineStatus} for simple online/offline detection
  */
 export function useSyncStatus(
   syncEngine: SyncEngine | null,
@@ -227,7 +291,36 @@ export function useSyncStatus(
 }
 
 /**
- * Hook to track online status only
+ * React hook to track browser online/offline status.
+ *
+ * A lightweight alternative to {@link useSyncStatus} when you only need
+ * to know if the device is online.
+ *
+ * @returns `true` if the browser is online, `false` if offline
+ *
+ * @example
+ * ```tsx
+ * function OnlineIndicator() {
+ *   const isOnline = useOnlineStatus();
+ *
+ *   return (
+ *     <span className={isOnline ? 'online' : 'offline'}>
+ *       {isOnline ? '🟢 Online' : '🔴 Offline'}
+ *     </span>
+ *   );
+ * }
+ *
+ * // Disable actions when offline
+ * function SubmitButton() {
+ *   const isOnline = useOnlineStatus();
+ *
+ *   return (
+ *     <button disabled={!isOnline}>
+ *       {isOnline ? 'Submit' : 'Offline - Cannot Submit'}
+ *     </button>
+ *   );
+ * }
+ * ```
  */
 export function useOnlineStatus(): boolean {
   const [isOnline, setIsOnline] = useState(
