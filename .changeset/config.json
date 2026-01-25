@@ -12,6 +12,14 @@
       "@pocket/storage-indexeddb",
       "@pocket/storage-memory",
       "@pocket/storage-opfs",
+      "@pocket/storage-sqlite",
+      "@pocket/storage-edge",
+      "@pocket/angular",
+      "@pocket/expo",
+      "@pocket/tauri",
+      "@pocket/electron",
+      "@pocket/zod",
+      "@pocket/opentelemetry",
       "pocket"
     ]
   ],
