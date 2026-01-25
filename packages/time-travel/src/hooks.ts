@@ -192,15 +192,15 @@ export function createUseTimeTravelHook(React: ReactHooks) {
     }, [inspectedRef]) as () => void;
 
     const getDocument = React.useCallback(
-      (collection: string, documentId: string) => {
+      (collection: string, documentId: string): Document | null => {
         return debugger_.getDocument(collection, documentId);
       },
       [debugger_]
     );
 
     const getCollection = React.useCallback(
-      <T extends Document>(collection: string) => {
-        return debugger_.getCollection<T>(collection);
+      (collection: string): Document[] => {
+        return debugger_.getCollection(collection);
       },
       [debugger_]
     );
