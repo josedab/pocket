@@ -13,7 +13,8 @@ import type {
 } from './types.js';
 
 /**
- * Default configuration
+ * Default configuration values.
+ * @internal
  */
 const DEFAULT_CONFIG: Required<DevToolsConfig> = {
   maxOperations: 1000,
@@ -24,7 +25,66 @@ const DEFAULT_CONFIG: Required<DevToolsConfig> = {
 };
 
 /**
- * Database inspector for DevTools
+ * Database Inspector for DevTools introspection.
+ *
+ * The inspector provides APIs for examining database state,
+ * executing queries with timing, tracking operations, and
+ * creating point-in-time snapshots for debugging.
+ *
+ * Key features:
+ * - Browse databases, collections, and documents
+ * - Execute queries with performance metrics
+ * - Track operation history
+ * - Create and restore time-travel snapshots
+ * - Subscribe to real-time changes
+ *
+ * @example Basic inspection
+ * ```typescript
+ * const inspector = createInspector();
+ * inspector.register(myDatabase);
+ *
+ * // Get all databases
+ * const dbs = await inspector.getDatabases();
+ *
+ * // Get collection info
+ * const info = await inspector.getCollectionInfo('mydb', 'users');
+ * console.log(`Users: ${info.documentCount} documents`);
+ *
+ * // Browse documents
+ * const { documents, total } = await inspector.getDocuments('mydb', 'users', {
+ *   offset: 0,
+ *   limit: 20,
+ * });
+ * ```
+ *
+ * @example Performance monitoring
+ * ```typescript
+ * // Subscribe to performance metrics
+ * inspector.getMetrics().subscribe(metric => {
+ *   console.log(`${metric.operation} on ${metric.collection}: ${metric.durationMs}ms`);
+ * });
+ *
+ * // Execute query with timing
+ * const { results, executionTimeMs } = await inspector.executeQuery(
+ *   'mydb',
+ *   'users',
+ *   { filter: { active: true } }
+ * );
+ * ```
+ *
+ * @example Time-travel debugging
+ * ```typescript
+ * // Create snapshot before changes
+ * const snapshot = await inspector.createSnapshot('mydb', 'users', 'Before update');
+ *
+ * // Make changes...
+ *
+ * // Restore if needed
+ * await inspector.restoreSnapshot(snapshot.id);
+ * ```
+ *
+ * @see {@link createInspector} - Factory function
+ * @see {@link DevToolsBridge} - Communication bridge
  */
 export class DatabaseInspector {
   private readonly databases = new Map<string, Database>();
@@ -38,12 +98,21 @@ export class DatabaseInspector {
   private changeSubscriptions = new Map<string, Subscription>();
   private operationCounter = 0;
 
+  /**
+   * Create a new DatabaseInspector.
+   *
+   * @param config - DevTools configuration options
+   */
   constructor(config: DevToolsConfig = {}) {
     this.config = { ...DEFAULT_CONFIG, ...config };
   }
 
   /**
-   * Register a database for inspection
+   * Register a database for inspection.
+   *
+   * Subscribes to all collection changes for real-time monitoring.
+   *
+   * @param database - Database to register
    */
   register(database: Database): void {
     const name = database.name;
@@ -59,7 +128,9 @@ export class DatabaseInspector {
   }
 
   /**
-   * Unregister a database
+   * Unregister a database from inspection.
+   *
+   * @param name - Name of the database to unregister
    */
   unregister(name: string): void {
     this.databases.delete(name);
@@ -73,7 +144,9 @@ export class DatabaseInspector {
   }
 
   /**
-   * Get all registered databases info
+   * Get information about all registered databases.
+   *
+   * @returns Array of database information
    */
   async getDatabases(): Promise<DatabaseInfo[]> {
     const infos: DatabaseInfo[] = [];
@@ -93,7 +166,11 @@ export class DatabaseInspector {
   }
 
   /**
-   * Get collection info
+   * Get detailed information about a collection.
+   *
+   * @param databaseName - Name of the database
+   * @param collectionName - Name of the collection
+   * @returns Collection info, or null if not found
    */
   async getCollectionInfo(
     databaseName: string,
@@ -133,7 +210,21 @@ export class DatabaseInspector {
   }
 
   /**
-   * Get documents from a collection
+   * Get documents from a collection with pagination.
+   *
+   * @param databaseName - Name of the database
+   * @param collectionName - Name of the collection
+   * @param options - Pagination and filter options
+   * @returns Paginated document list with total count
+   *
+   * @example
+   * ```typescript
+   * const { documents, total } = await inspector.getDocuments(
+   *   'mydb',
+   *   'users',
+   *   { offset: 20, limit: 10, filter: { active: true } }
+   * );
+   * ```
    */
   async getDocuments(
     databaseName: string,
@@ -161,7 +252,12 @@ export class DatabaseInspector {
   }
 
   /**
-   * Get a single document
+   * Get a single document by ID.
+   *
+   * @param databaseName - Name of the database
+   * @param collectionName - Name of the collection
+   * @param documentId - Document ID
+   * @returns The document, or null if not found
    */
   async getDocument(
     databaseName: string,
@@ -176,7 +272,10 @@ export class DatabaseInspector {
   }
 
   /**
-   * Get database stats
+   * Get statistics for a database.
+   *
+   * @param databaseName - Name of the database
+   * @returns Database statistics, or null if not found
    */
   async getStats(databaseName: string): Promise<DatabaseStats | null> {
     const db = this.databases.get(databaseName);
@@ -209,7 +308,30 @@ export class DatabaseInspector {
   }
 
   /**
-   * Execute a query with timing
+   * Execute a query with performance timing.
+   *
+   * Records the operation in history and emits performance metrics
+   * if tracking is enabled.
+   *
+   * @typeParam T - Document type
+   * @param databaseName - Name of the database
+   * @param collectionName - Name of the collection
+   * @param spec - Query specification
+   * @returns Query results and execution time
+   *
+   * @example
+   * ```typescript
+   * const { results, executionTimeMs } = await inspector.executeQuery(
+   *   'mydb',
+   *   'products',
+   *   {
+   *     filter: { category: 'electronics' },
+   *     sort: { price: 'asc' },
+   *     limit: 10,
+   *   }
+   * );
+   * console.log(`Found ${results.length} products in ${executionTimeMs}ms`);
+   * ```
    */
   async executeQuery<T extends Document>(
     databaseName: string,
@@ -271,7 +393,26 @@ export class DatabaseInspector {
   }
 
   /**
-   * Create a time snapshot
+   * Create a point-in-time snapshot for time-travel debugging.
+   *
+   * Captures all documents in a collection for later restoration.
+   *
+   * @param databaseName - Name of the database
+   * @param collectionName - Name of the collection
+   * @param label - Optional descriptive label
+   * @returns The created snapshot
+   * @throws Error if database not found
+   *
+   * @example
+   * ```typescript
+   * // Create snapshot before risky operation
+   * const snapshot = await inspector.createSnapshot(
+   *   'mydb',
+   *   'users',
+   *   'Before bulk update'
+   * );
+   * console.log(`Snapshot ${snapshot.id} created`);
+   * ```
    */
   async createSnapshot(
     databaseName: string,
@@ -298,7 +439,23 @@ export class DatabaseInspector {
   }
 
   /**
-   * Restore from a snapshot
+   * Restore a collection from a snapshot.
+   *
+   * **Warning**: This clears the collection and replaces all documents
+   * with the snapshot data. Use with caution.
+   *
+   * @param snapshotId - ID of the snapshot to restore
+   * @throws Error if snapshot or database not found
+   *
+   * @example
+   * ```typescript
+   * try {
+   *   await inspector.restoreSnapshot(snapshot.id);
+   *   console.log('Restored successfully');
+   * } catch (error) {
+   *   console.error('Restore failed:', error);
+   * }
+   * ```
    */
   async restoreSnapshot(snapshotId: string): Promise<void> {
     const snapshot = this.snapshots.get(snapshotId);
@@ -317,49 +474,65 @@ export class DatabaseInspector {
   }
 
   /**
-   * Get snapshots
+   * Get all stored snapshots.
+   *
+   * @returns Array of all snapshots
    */
   getSnapshots(): TimeSnapshot[] {
     return [...this.snapshots.values()];
   }
 
   /**
-   * Delete a snapshot
+   * Delete a snapshot.
+   *
+   * @param snapshotId - ID of the snapshot to delete
+   * @returns True if deleted, false if not found
    */
   deleteSnapshot(snapshotId: string): boolean {
     return this.snapshots.delete(snapshotId);
   }
 
   /**
-   * Get operations history
+   * Get an observable of the operations history.
+   *
+   * @returns Observable of operation records
    */
   getOperations(): Observable<OperationRecord[]> {
     return this.operations$.asObservable();
   }
 
   /**
-   * Get changes stream
+   * Get an observable of real-time changes.
+   *
+   * @returns Observable of change events from all registered databases
    */
   getChanges(): Observable<ChangeEvent<Document>> {
     return this.changes$.asObservable();
   }
 
   /**
-   * Get performance metrics stream
+   * Get an observable of performance metrics.
+   *
+   * Only emits if `trackPerformance` is enabled in config.
+   *
+   * @returns Observable of performance metrics
    */
   getMetrics(): Observable<PerformanceMetric> {
     return this.metrics$.asObservable();
   }
 
   /**
-   * Clear operations history
+   * Clear the operations history.
    */
   clearOperations(): void {
     this.operations$.next([]);
   }
 
   /**
-   * Destroy the inspector
+   * Destroy the inspector and clean up resources.
+   *
+   * Unsubscribes from all changes, clears databases and snapshots,
+   * and completes all observables.
    */
   destroy(): void {
     for (const sub of this.changeSubscriptions.values()) {
@@ -374,7 +547,8 @@ export class DatabaseInspector {
   }
 
   /**
-   * Subscribe to changes from database
+   * Subscribe to changes from a database's collections.
+   * @internal
    */
   private async subscribeToChanges(database: Database): Promise<void> {
     const collections = await database.listCollections();
@@ -405,7 +579,8 @@ export class DatabaseInspector {
   }
 
   /**
-   * Record an operation
+   * Record an operation to history.
+   * @internal
    */
   private recordOperation(operation: OperationRecord): void {
     const current = this.operations$.getValue();
@@ -414,14 +589,16 @@ export class DatabaseInspector {
   }
 
   /**
-   * Generate operation ID
+   * Generate a unique operation ID.
+   * @internal
    */
   private generateOperationId(): string {
     return `op_${++this.operationCounter}_${Date.now()}`;
   }
 
   /**
-   * Create document preview
+   * Create a truncated preview of a document for list display.
+   * @internal
    */
   private createPreview(doc: Document, maxFields = 5): Record<string, unknown> {
     const preview: Record<string, unknown> = {};
@@ -447,7 +624,22 @@ export class DatabaseInspector {
 }
 
 /**
- * Create a database inspector
+ * Create a new Database Inspector.
+ *
+ * @param config - DevTools configuration options
+ * @returns A new DatabaseInspector instance
+ *
+ * @example
+ * ```typescript
+ * const inspector = createInspector({
+ *   maxOperations: 500,
+ *   trackPerformance: true,
+ * });
+ *
+ * inspector.register(myDatabase);
+ * ```
+ *
+ * @see {@link DatabaseInspector}
  */
 export function createInspector(config?: DevToolsConfig): DatabaseInspector {
   return new DatabaseInspector(config);
