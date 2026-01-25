@@ -51,8 +51,10 @@ export type {
   StorageBackend,
   SubscribeMessage,
   SyncChange,
+  SyncCompressionConfig,
   SyncMessage,
   SyncMessageType,
+  SyncRateLimiterConfig,
   SyncResponseMessage,
   SyncServerConfig,
   UnsubscribeMessage,
@@ -65,3 +67,13 @@ export { SyncServer, createSyncServer } from './sync-server.js';
 
 // Storage backends
 export { MemoryStorage, createMemoryStorage } from './storage/index.js';
+
+// Middleware
+export {
+  DEFAULT_RATE_LIMITER_CONFIG,
+  RateLimiter,
+  createRateLimiter,
+  rateLimiterMiddleware,
+  type RateLimitResult,
+  type RateLimiterConfig,
+} from './middleware/index.js';
