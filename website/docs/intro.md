@@ -190,14 +190,71 @@ function TodoList() {
 
 Pocket is modular. Install what you need:
 
+### All-in-One
+
+| Package | Description |
+|---------|-------------|
+| `pocket` | All-in-one (core + React + browser storage) |
+
+### Core
+
 | Package | Description | Size |
 |---------|-------------|------|
-| `pocket` | All-in-one (core + React + storage) | - |
 | `@pocket/core` | Core database engine | ~25KB |
-| `@pocket/react` | React hooks | ~8KB |
-| `@pocket/sync` | Sync engine | ~12KB |
-| `@pocket/storage-indexeddb` | IndexedDB adapter | ~5KB |
-| `@pocket/storage-opfs` | OPFS adapter | ~8KB |
+| `@pocket/sync` | Sync engine for client-server sync | ~12KB |
+| `@pocket/query` | Advanced query utilities | ~4KB |
+
+### Framework SDKs
+
+| Package | Description | Size |
+|---------|-------------|------|
+| `@pocket/react` | React hooks & components | ~8KB |
+| `@pocket/vue` | Vue 3 composables | ~6KB |
+| `@pocket/svelte` | Svelte stores | ~5KB |
+| `@pocket/solid` | Solid.js primitives | ~5KB |
+| `@pocket/angular` | Angular signals & observables | ~7KB |
+
+### Mobile & Desktop
+
+| Package | Description |
+|---------|-------------|
+| `@pocket/react-native` | React Native with AsyncStorage/MMKV |
+| `@pocket/expo` | Expo with expo-sqlite |
+| `@pocket/electron` | Electron desktop apps |
+| `@pocket/tauri` | Tauri desktop apps |
+
+### Storage Adapters
+
+| Package | Description | Size |
+|---------|-------------|------|
+| `@pocket/storage-indexeddb` | IndexedDB adapter (browser) | ~5KB |
+| `@pocket/storage-opfs` | OPFS adapter (browser) | ~8KB |
 | `@pocket/storage-memory` | In-memory adapter | ~3KB |
+| `@pocket/storage-sqlite` | SQLite adapter (Node.js) | ~6KB |
+| `@pocket/storage-edge` | Cloudflare D1 & Durable Objects | ~5KB |
+
+### Schema & Validation
+
+| Package | Description |
+|---------|-------------|
+| `@pocket/zod` | Zod schema integration |
+
+### Advanced Features
+
+| Package | Description |
+|---------|-------------|
+| `@pocket/encryption` | End-to-end encryption |
+| `@pocket/crdt` | CRDT conflict resolution |
+| `@pocket/vectors` | Vector embeddings for AI |
+| `@pocket/time-travel` | Undo/redo & history |
+| `@pocket/devtools` | Browser DevTools extension |
+| `@pocket/opentelemetry` | OpenTelemetry observability |
+
+### Server
+
+| Package | Description |
+|---------|-------------|
+| `@pocket/server` | Sync server endpoint |
+| `@pocket/sync-server` | WebSocket sync server |
 
 For most projects, just install `pocket` and you're ready to go.
