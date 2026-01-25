@@ -15,14 +15,64 @@ import type {
 } from './types.js';
 
 /**
- * Last-Writer-Wins Register (LWW-Register)
- * Concurrent writes are resolved by timestamp, with node ID as tie-breaker
+ * Last-Writer-Wins Register (LWW-Register) for single-value storage.
+ *
+ * A CRDT register that resolves concurrent writes by choosing the
+ * value with the most recent timestamp. Node ID is used as a
+ * deterministic tiebreaker for identical timestamps.
+ *
+ * Key properties:
+ * - Simple conflict resolution (last write wins)
+ * - Single value at any time
+ * - May lose concurrent writes
+ *
+ * Use cases:
+ * - User preferences
+ * - Configuration values
+ * - Any single-value setting where latest wins is acceptable
+ *
+ * @typeParam T - Value type
+ *
+ * @example Basic usage
+ * ```typescript
+ * const name = createLWWRegister<string>('node-1', 'Initial');
+ *
+ * const op = name.set('New Value');
+ * console.log(name.get()); // 'New Value'
+ *
+ * // Broadcast operation for replication
+ * broadcastToOthers(op);
+ * ```
+ *
+ * @example Conflict resolution
+ * ```typescript
+ * // Two nodes write concurrently
+ * const regA = createLWWRegister<string>('node-a', 'initial');
+ * const regB = createLWWRegister<string>('node-b', 'initial');
+ *
+ * const opA = regA.set('value-A'); // timestamp: 1
+ * const opB = regB.set('value-B'); // timestamp: 1
+ *
+ * // After merge, one value wins based on timestamp/nodeId
+ * regA.merge(opB);
+ * // regA.get() === 'value-A' or 'value-B' (deterministic)
+ * ```
+ *
+ * @see {@link createLWWRegister} - Factory function
+ * @see {@link MVRegister} - Register that preserves concurrent values
  */
 export class LWWRegister<T = unknown> {
   private value: T | undefined;
   private timestamp: LamportTimestamp;
   private readonly clock: LamportClock;
 
+  /**
+   * Create a new LWW-Register.
+   *
+   * @param nodeId - Unique identifier for this node
+   * @param initialValue - Optional initial value
+   * @param initialTimestamp - Optional initial timestamp
+   */
   constructor(nodeId: NodeId, initialValue?: T, initialTimestamp?: LamportTimestamp) {
     this.clock = new LamportClock(nodeId);
     this.value = initialValue;
@@ -30,14 +80,19 @@ export class LWWRegister<T = unknown> {
   }
 
   /**
-   * Get current value
+   * Get the current value.
+   *
+   * @returns Current value, or undefined if not set
    */
   get(): T | undefined {
     return this.value;
   }
 
   /**
-   * Set a new value (local operation)
+   * Set a new value (local operation).
+   *
+   * @param value - New value to set
+   * @returns Operation details for replication
    */
   set(value: T): LWWRegisterValue<T> {
     const newTimestamp = this.clock.tick();
@@ -48,7 +103,13 @@ export class LWWRegister<T = unknown> {
   }
 
   /**
-   * Apply a remote update
+   * Apply a remote update from another node.
+   *
+   * Only applies if the remote timestamp is greater than the current one.
+   *
+   * @param value - Remote value
+   * @param timestamp - Remote timestamp
+   * @returns True if the value was updated
    */
   applyRemote(value: T, timestamp: LamportTimestamp): boolean {
     // Update clock based on received timestamp
@@ -65,7 +126,10 @@ export class LWWRegister<T = unknown> {
   }
 
   /**
-   * Merge with another LWW-Register
+   * Merge with another LWW-Register state.
+   *
+   * @param other - State from another LWW-Register
+   * @returns Merge result with conflict information
    */
   merge(other: LWWRegisterValue<T>): MergeResult<T | undefined> {
     const hadConflict = compareLamportTimestamps(this.timestamp, other.timestamp) !== 0;
@@ -83,7 +147,9 @@ export class LWWRegister<T = unknown> {
   }
 
   /**
-   * Get state for serialization
+   * Get the full state for serialization.
+   *
+   * @returns Value and timestamp for persistence/replication
    */
   getState(): LWWRegisterValue<T | undefined> {
     return {
@@ -93,7 +159,9 @@ export class LWWRegister<T = unknown> {
   }
 
   /**
-   * Get metadata
+   * Get CRDT metadata.
+   *
+   * @returns Metadata including timestamp and vector clock
    */
   getMetadata(): CRDTMetadata {
     return {
@@ -104,8 +172,47 @@ export class LWWRegister<T = unknown> {
 }
 
 /**
- * Multi-Value Register (MV-Register)
- * Preserves all concurrent values, allowing application-level conflict resolution
+ * Multi-Value Register (MV-Register) for conflict-preserving storage.
+ *
+ * A CRDT register that preserves all concurrent values instead of
+ * choosing a winner. This allows application-level conflict resolution
+ * when concurrent writes occur.
+ *
+ * Key properties:
+ * - Preserves all concurrent values (no data loss)
+ * - Requires application to resolve conflicts
+ * - Uses vector clocks for concurrency detection
+ *
+ * Use cases:
+ * - Document editing (show merge conflicts)
+ * - Data where all versions matter
+ * - Situations requiring manual conflict resolution
+ *
+ * @typeParam T - Value type
+ *
+ * @example Basic usage
+ * ```typescript
+ * const doc = createMVRegister<string>('node-1');
+ *
+ * doc.set('Version A');
+ * console.log(doc.get()); // 'Version A'
+ * console.log(doc.hasConflict()); // false
+ * ```
+ *
+ * @example Handling conflicts
+ * ```typescript
+ * // After concurrent writes from different nodes
+ * if (doc.hasConflict()) {
+ *   const versions = doc.getConflicts();
+ *   console.log('Conflicts:', versions);
+ *
+ *   // Application resolves the conflict
+ *   doc.resolve(mergeVersions(versions));
+ * }
+ * ```
+ *
+ * @see {@link createMVRegister} - Factory function
+ * @see {@link LWWRegister} - Register with automatic conflict resolution
  */
 export class MVRegister<T = unknown> {
   private values: Map<string, { value: T; vclock: VectorClock }>;
@@ -113,6 +220,12 @@ export class MVRegister<T = unknown> {
   private readonly nodeId: NodeId;
   private counter: number;
 
+  /**
+   * Create a new MV-Register.
+   *
+   * @param nodeId - Unique identifier for this node
+   * @param initialValue - Optional initial value
+   */
   constructor(nodeId: NodeId, initialValue?: T) {
     this.nodeId = nodeId;
     this.values = new Map();
@@ -125,14 +238,23 @@ export class MVRegister<T = unknown> {
   }
 
   /**
-   * Get all current values (may be multiple during conflict)
+   * Get all current values.
+   *
+   * Returns multiple values if there are unresolved conflicts.
+   *
+   * @returns Array of all current values
    */
   getAll(): T[] {
     return Array.from(this.values.values()).map((v) => v.value);
   }
 
   /**
-   * Get a single value (first one, or undefined if conflict)
+   * Get a single value.
+   *
+   * Returns the value only if there's exactly one. Returns undefined
+   * if there are conflicts (multiple values) or no value.
+   *
+   * @returns Single value, or undefined if conflicts or empty
    */
   get(): T | undefined {
     const values = this.getAll();
@@ -140,21 +262,30 @@ export class MVRegister<T = unknown> {
   }
 
   /**
-   * Check if there's a conflict (multiple concurrent values)
+   * Check if there are unresolved conflicts.
+   *
+   * @returns True if multiple concurrent values exist
    */
   hasConflict(): boolean {
     return this.values.size > 1;
   }
 
   /**
-   * Get conflicting values
+   * Get all conflicting values.
+   *
+   * @returns Array of conflicting values, or empty if no conflict
    */
   getConflicts(): T[] {
     return this.hasConflict() ? this.getAll() : [];
   }
 
   /**
-   * Set a new value (local operation)
+   * Set a new value (local operation).
+   *
+   * Clears any existing conflicts and sets a single value.
+   *
+   * @param value - New value to set
+   * @returns Operation details for replication
    */
   set(value: T): MVRegisterValue<T> {
     this.counter++;
@@ -178,14 +309,25 @@ export class MVRegister<T = unknown> {
   }
 
   /**
-   * Resolve conflict by choosing a value
+   * Resolve conflicts by choosing a value.
+   *
+   * Sets the register to a single value, clearing all conflicts.
+   *
+   * @param value - Chosen value for resolution
    */
   resolve(value: T): void {
     this.set(value);
   }
 
   /**
-   * Apply a remote update
+   * Apply a remote update from another node.
+   *
+   * May result in conflicts if the update is concurrent with
+   * existing values.
+   *
+   * @param value - Remote value
+   * @param vclock - Remote vector clock
+   * @returns True if the update was applied
    */
   applyRemote(value: T, vclock: VectorClock): boolean {
     // Check if this is dominated by any existing value
@@ -217,7 +359,10 @@ export class MVRegister<T = unknown> {
   }
 
   /**
-   * Merge with another MV-Register
+   * Merge with another MV-Register state.
+   *
+   * @param other - State from another MV-Register
+   * @returns Merge result with conflict information
    */
   merge(other: MVRegisterValue<T>): MergeResult<T[]> {
     let hadConflict = false;
@@ -237,7 +382,9 @@ export class MVRegister<T = unknown> {
   }
 
   /**
-   * Get state for serialization
+   * Get the full state for serialization.
+   *
+   * @returns All values with their vector clocks
    */
   getState(): MVRegisterValue<T> {
     return {
@@ -253,7 +400,9 @@ export class MVRegister<T = unknown> {
   }
 
   /**
-   * Get vector clock
+   * Get the current vector clock.
+   *
+   * @returns Copy of the vector clock
    */
   getVectorClock(): VectorClock {
     return { ...this.vclock };
@@ -261,14 +410,44 @@ export class MVRegister<T = unknown> {
 }
 
 /**
- * Create an LWW-Register
+ * Create a new Last-Writer-Wins Register.
+ *
+ * @typeParam T - Value type
+ * @param nodeId - Unique identifier for this node
+ * @param initialValue - Optional initial value
+ * @returns A new LWWRegister instance
+ *
+ * @example
+ * ```typescript
+ * const setting = createLWWRegister<boolean>('device-1', true);
+ * setting.set(false);
+ * ```
+ *
+ * @see {@link LWWRegister}
  */
 export function createLWWRegister<T>(nodeId: NodeId, initialValue?: T): LWWRegister<T> {
   return new LWWRegister<T>(nodeId, initialValue);
 }
 
 /**
- * Create an MV-Register
+ * Create a new Multi-Value Register.
+ *
+ * @typeParam T - Value type
+ * @param nodeId - Unique identifier for this node
+ * @param initialValue - Optional initial value
+ * @returns A new MVRegister instance
+ *
+ * @example
+ * ```typescript
+ * const content = createMVRegister<string>('editor-1', 'Initial text');
+ * content.set('Updated text');
+ *
+ * if (content.hasConflict()) {
+ *   // Handle merge conflict
+ * }
+ * ```
+ *
+ * @see {@link MVRegister}
  */
 export function createMVRegister<T>(nodeId: NodeId, initialValue?: T): MVRegister<T> {
   return new MVRegister<T>(nodeId, initialValue);

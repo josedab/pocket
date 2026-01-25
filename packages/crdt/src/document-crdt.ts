@@ -69,8 +69,67 @@ interface FieldEntry {
 }
 
 /**
- * JSON CRDT Document
- * Supports collaborative editing of JSON documents with field-level conflict resolution
+ * JSON CRDT Document for collaborative editing.
+ *
+ * Provides conflict-free replicated data type semantics for JSON documents,
+ * enabling multiple users to edit the same document simultaneously without
+ * conflicts. Changes are tracked at the field level using Lamport timestamps
+ * for deterministic conflict resolution.
+ *
+ * @example Basic usage
+ * ```typescript
+ * // Create document on each node
+ * const doc = createJSONCRDTDocument('doc-1', 'node-abc', {
+ *   title: 'Untitled',
+ *   content: '',
+ * });
+ *
+ * // Make local changes
+ * const op = doc.set(['title'], 'My Document');
+ *
+ * // Sync operation to other nodes
+ * broadcastToOthers(op);
+ *
+ * // Apply remote operations
+ * doc.applyRemote(remoteOp);
+ * ```
+ *
+ * @example Conflict resolution
+ * ```typescript
+ * // Two nodes editing same field concurrently
+ * const op1 = node1Doc.set(['title'], 'Title A');
+ * const op2 = node2Doc.set(['title'], 'Title B');
+ *
+ * // Both apply each other's operations
+ * const result1 = node1Doc.applyRemote(op2);
+ * const result2 = node2Doc.applyRemote(op1);
+ *
+ * // Both converge to same value (deterministic winner)
+ * console.log(node1Doc.getValue()); // Same on both nodes
+ * console.log(node2Doc.getValue()); // Same on both nodes
+ * ```
+ *
+ * @example Real-time collaboration
+ * ```typescript
+ * // Subscribe to events
+ * doc.events().subscribe((event) => {
+ *   switch (event.type) {
+ *     case 'operation:local':
+ *       // Send to server/peers
+ *       broadcast(event.operation);
+ *       break;
+ *     case 'operation:remote':
+ *       // Update UI
+ *       refreshView();
+ *       break;
+ *     case 'conflict:detected':
+ *       console.log('Conflict resolved automatically');
+ *       break;
+ *   }
+ * });
+ * ```
+ *
+ * @see {@link createJSONCRDTDocument} for factory function
  */
 export class JSONCRDTDocument {
   private readonly id: string;
@@ -131,28 +190,67 @@ export class JSONCRDTDocument {
   }
 
   /**
-   * Get the document ID
+   * Get the document ID.
+   *
+   * @returns The document's unique identifier
    */
   getId(): string {
     return this.id;
   }
 
   /**
-   * Get the current value
+   * Get the current document value.
+   *
+   * Returns a deep copy to prevent accidental mutation.
+   *
+   * @returns The current document state
+   *
+   * @example
+   * ```typescript
+   * const value = doc.getValue();
+   * console.log(value.title);
+   * ```
    */
   getValue(): Record<string, unknown> {
     return JSON.parse(JSON.stringify(this.root));
   }
 
   /**
-   * Get value at a path
+   * Get value at a specific path in the document.
+   *
+   * @param path - Array of keys forming the path
+   * @returns The value at the path, or undefined if not found
+   *
+   * @example
+   * ```typescript
+   * const title = doc.getValueAt(['title']);
+   * const city = doc.getValueAt(['address', 'city']);
+   * ```
    */
   getValueAt(path: string[]): unknown {
     return getValueAtPath(this.root, path);
   }
 
   /**
-   * Set a value at a path (local operation)
+   * Set a value at a path (local operation).
+   *
+   * Creates an operation that can be synced to other nodes.
+   *
+   * @param path - Array of keys forming the path
+   * @param value - The value to set
+   * @returns The operation to broadcast to other nodes
+   *
+   * @example
+   * ```typescript
+   * // Set a top-level field
+   * const op1 = doc.set(['title'], 'New Title');
+   *
+   * // Set a nested field
+   * const op2 = doc.set(['author', 'name'], 'Alice');
+   *
+   * // Sync to other nodes
+   * broadcast([op1, op2]);
+   * ```
    */
   set(path: string[], value: unknown): JSONCRDTOperation {
     const timestamp = this.clock.tick();
@@ -189,7 +287,18 @@ export class JSONCRDTDocument {
   }
 
   /**
-   * Delete a value at a path (local operation)
+   * Delete a value at a path (local operation).
+   *
+   * @param path - Array of keys forming the path
+   * @returns The operation to broadcast, or null if path doesn't exist
+   *
+   * @example
+   * ```typescript
+   * const op = doc.delete(['metadata', 'draft']);
+   * if (op) {
+   *   broadcast(op);
+   * }
+   * ```
    */
   delete(path: string[]): JSONCRDTOperation | null {
     const timestamp = this.clock.tick();
@@ -228,7 +337,25 @@ export class JSONCRDTDocument {
   }
 
   /**
-   * Apply a remote operation
+   * Apply a remote operation received from another node.
+   *
+   * Handles conflict resolution using Lamport timestamps:
+   * - Later timestamp wins
+   * - Equal timestamps: lower node ID wins (deterministic)
+   *
+   * @param op - The remote operation to apply
+   * @returns Merge result with conflict information
+   *
+   * @example
+   * ```typescript
+   * socket.on('operation', (op) => {
+   *   const result = doc.applyRemote(op);
+   *   if (result.hadConflict) {
+   *     console.log('Conflict resolved:', result.conflictingValues);
+   *   }
+   *   updateUI(doc.getValue());
+   * });
+   * ```
    */
   applyRemote(op: JSONCRDTOperation): MergeResult {
     // Skip if already applied
@@ -312,14 +439,18 @@ export class JSONCRDTDocument {
   }
 
   /**
-   * Get pending operations
+   * Get operations that haven't been acknowledged yet.
+   *
+   * @returns Array of pending operations
    */
   getPendingOps(): JSONCRDTOperation[] {
     return [...this.pendingOps];
   }
 
   /**
-   * Acknowledge operations (mark as no longer pending)
+   * Mark operations as acknowledged (synced to server/peers).
+   *
+   * @param opIds - IDs of operations to acknowledge
    */
   acknowledgeOps(opIds: string[]): void {
     const ackSet = new Set(opIds);
@@ -334,7 +465,23 @@ export class JSONCRDTDocument {
   }
 
   /**
-   * Merge with another document state
+   * Merge with another document's state.
+   *
+   * Used for initial sync or reconciliation after network partition.
+   *
+   * @param other - The other document's state
+   * @returns Merge result with the final value and conflict info
+   *
+   * @example
+   * ```typescript
+   * // On reconnect, get server state
+   * const serverState = await fetchDocumentState(docId);
+   * const result = doc.merge(serverState);
+   *
+   * if (result.hadConflict) {
+   *   showConflictNotification();
+   * }
+   * ```
    */
   merge(other: JSONCRDTDocumentState): MergeResult<Record<string, unknown>> {
     let hadConflict = false;
@@ -362,7 +509,18 @@ export class JSONCRDTDocument {
   }
 
   /**
-   * Get state for serialization
+   * Get the complete document state for serialization.
+   *
+   * Used for persistence or full state sync.
+   *
+   * @returns Serializable state object
+   *
+   * @example
+   * ```typescript
+   * // Save to storage
+   * const state = doc.getState();
+   * await storage.save(docId, JSON.stringify(state));
+   * ```
    */
   getState(): JSONCRDTDocumentState {
     return {
@@ -380,7 +538,18 @@ export class JSONCRDTDocument {
   }
 
   /**
-   * Load state from serialization
+   * Load state from serialized data.
+   *
+   * @param state - Previously saved state
+   *
+   * @example
+   * ```typescript
+   * // Load from storage
+   * const saved = await storage.load(docId);
+   * if (saved) {
+   *   doc.loadState(JSON.parse(saved));
+   * }
+   * ```
    */
   loadState(state: JSONCRDTDocumentState): void {
     this.root = state.value;
@@ -412,7 +581,18 @@ export class JSONCRDTDocument {
   }
 
   /**
-   * Get events observable
+   * Subscribe to collaboration events.
+   *
+   * @returns Observable of collaboration events
+   *
+   * @example
+   * ```typescript
+   * doc.events().subscribe((event) => {
+   *   if (event.type === 'conflict:detected') {
+   *     showConflictIndicator();
+   *   }
+   * });
+   * ```
    */
   events(): Observable<CollaborationEvent> {
     return this.events$.asObservable();
@@ -427,7 +607,9 @@ export class JSONCRDTDocument {
 }
 
 /**
- * JSON CRDT Document state for serialization
+ * Serializable state of a JSON CRDT Document.
+ *
+ * Used for persistence and full state synchronization.
  */
 export interface JSONCRDTDocumentState {
   id: string;
@@ -441,7 +623,24 @@ export interface JSONCRDTDocumentState {
 }
 
 /**
- * Create a JSON CRDT Document
+ * Create a JSON CRDT Document for collaborative editing.
+ *
+ * @param id - Unique document identifier
+ * @param nodeId - This node's unique identifier
+ * @param initialValue - Optional initial document content
+ * @returns A new JSONCRDTDocument instance
+ *
+ * @example
+ * ```typescript
+ * const nodeId = crypto.randomUUID();
+ * const doc = createJSONCRDTDocument('doc-123', nodeId, {
+ *   title: 'Untitled',
+ *   content: '',
+ *   metadata: { created: Date.now() },
+ * });
+ * ```
+ *
+ * @see {@link JSONCRDTDocument}
  */
 export function createJSONCRDTDocument(
   id: string,

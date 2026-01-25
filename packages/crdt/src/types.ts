@@ -1,57 +1,108 @@
 /**
- * Unique identifier for a node/replica in the CRDT network
+ * Unique identifier for a node/replica in the CRDT network.
+ *
+ * Each client/device participating in collaborative editing needs
+ * a unique NodeId to track operations and resolve conflicts.
+ *
+ * @example
+ * ```typescript
+ * const nodeId: NodeId = crypto.randomUUID();
+ * const doc = createJSONCRDTDocument('doc-1', nodeId);
+ * ```
  */
 export type NodeId = string;
 
 /**
- * Lamport timestamp for ordering operations
+ * Lamport timestamp for ordering distributed operations.
+ *
+ * Provides a logical clock that can order events across multiple nodes.
+ * When timestamps have the same counter, nodeId is used as a tiebreaker.
+ *
+ * @example
+ * ```typescript
+ * const ts: LamportTimestamp = { counter: 42, nodeId: 'node-abc' };
+ * ```
  */
 export interface LamportTimestamp {
-  /** Counter value */
+  /** Logical clock counter value */
   counter: number;
-  /** Node ID for tie-breaking */
+
+  /** Node ID for deterministic tie-breaking */
   nodeId: NodeId;
 }
 
 /**
- * Vector clock for tracking causality
+ * Vector clock for tracking causality between distributed nodes.
+ *
+ * Maps each node to the latest counter value seen from that node.
+ * Used to detect concurrent operations and determine causal ordering.
+ *
+ * @example
+ * ```typescript
+ * const vclock: VectorClock = {
+ *   'node-a': 5,
+ *   'node-b': 3,
+ *   'node-c': 1,
+ * };
+ * ```
  */
 export type VectorClock = Record<NodeId, number>;
 
 /**
- * Operation types for CRDT
+ * Types of operations in CRDT documents.
  */
 export type OperationType = 'insert' | 'delete' | 'update' | 'move';
 
 /**
- * Base operation interface
+ * Base interface for all CRDT operations.
+ *
+ * Operations are the atomic units of change in CRDTs. They are
+ * designed to be commutative (order-independent) so that any
+ * two nodes applying the same set of operations will converge
+ * to the same state.
  */
 export interface CRDTOperation {
-  /** Operation ID */
+  /** Unique operation ID */
   id: string;
-  /** Operation type */
+
+  /** Type of operation */
   type: OperationType;
-  /** Lamport timestamp */
+
+  /** Lamport timestamp for ordering */
   timestamp: LamportTimestamp;
-  /** Node that created the operation */
+
+  /** Node that created this operation */
   origin: NodeId;
-  /** Dependencies (operations that must be applied first) */
+
+  /** IDs of operations this depends on (for causal ordering) */
   dependencies?: string[];
 }
 
 /**
- * CRDT data types
+ * Supported CRDT data types.
+ *
+ * Each type has different conflict resolution semantics:
+ *
+ * - `'lww-register'` - Last-Writer-Wins Register: most recent write wins
+ * - `'mv-register'` - Multi-Value Register: preserves all concurrent values
+ * - `'g-counter'` - Grow-only Counter: can only increment
+ * - `'pn-counter'` - Positive-Negative Counter: can increment and decrement
+ * - `'g-set'` - Grow-only Set: can only add elements
+ * - `'or-set'` - Observed-Remove Set: can add and remove elements
+ * - `'lww-map'` - Last-Writer-Wins Map: LWW semantics per key
+ * - `'rga'` - Replicated Growable Array: for collaborative text editing
+ * - `'json'` - JSON CRDT: for structured document editing
  */
 export type CRDTType =
-  | 'lww-register' // Last-Writer-Wins Register
-  | 'mv-register' // Multi-Value Register
-  | 'g-counter' // Grow-only Counter
-  | 'pn-counter' // Positive-Negative Counter
-  | 'g-set' // Grow-only Set
-  | 'or-set' // Observed-Remove Set
-  | 'lww-map' // Last-Writer-Wins Map
-  | 'rga' // Replicated Growable Array (for text)
-  | 'json'; // JSON CRDT
+  | 'lww-register'
+  | 'mv-register'
+  | 'g-counter'
+  | 'pn-counter'
+  | 'g-set'
+  | 'or-set'
+  | 'lww-map'
+  | 'rga'
+  | 'json';
 
 /**
  * CRDT value wrapper
@@ -164,14 +215,27 @@ export interface CRDTDocument {
 }
 
 /**
- * Merge result
+ * Result from merging two CRDT states.
+ *
+ * @typeParam T - The value type
+ *
+ * @example
+ * ```typescript
+ * const result = doc.merge(remoteState);
+ * if (result.hadConflict) {
+ *   console.log('Conflicts resolved:', result.conflictingValues);
+ * }
+ * console.log('Merged value:', result.value);
+ * ```
  */
 export interface MergeResult<T = unknown> {
-  /** Merged value */
+  /** The merged value after conflict resolution */
   value: T;
-  /** Whether there was a conflict */
+
+  /** Whether any conflicts were detected during merge */
   hadConflict: boolean;
-  /** Conflicting values (if any) */
+
+  /** The conflicting values that were resolved (if any) */
   conflictingValues?: T[];
 }
 
@@ -194,26 +258,43 @@ export interface CRDTSyncMessage {
 }
 
 /**
- * Awareness state for collaborative cursors/presence
+ * Awareness state for collaborative presence and cursors.
+ *
+ * Used to show other users' cursors, selections, and online status
+ * in real-time collaborative editing.
+ *
+ * @example
+ * ```typescript
+ * const awareness: AwarenessState = {
+ *   user: { name: 'Alice', color: '#ff0000' },
+ *   cursor: { anchor: 42, head: 42 },
+ *   lastUpdated: Date.now(),
+ * };
+ *
+ * session.setLocalAwareness(awareness);
+ * ```
  */
 export interface AwarenessState {
-  /** User information */
+  /** User information for display */
   user?: {
     name?: string;
     color?: string;
     avatar?: string;
   };
-  /** Cursor position (for text) */
+
+  /** Cursor position for text editing (anchor and head for selection) */
   cursor?: {
     anchor: number;
     head: number;
   };
-  /** Selection (for structured data) */
+
+  /** Selection for structured data editing */
   selection?: {
     path: string[];
     type: 'field' | 'element' | 'range';
   };
-  /** Last update timestamp */
+
+  /** Unix timestamp of last awareness update */
   lastUpdated: number;
 }
 
