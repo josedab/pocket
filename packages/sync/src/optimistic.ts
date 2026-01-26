@@ -1,27 +1,108 @@
+/**
+ * Optimistic update management for local-first sync.
+ *
+ * Optimistic updates allow immediate UI feedback by applying changes locally
+ * before server confirmation. This module tracks pending changes and enables
+ * rollback if server sync fails.
+ *
+ * ## How It Works
+ *
+ * ```
+ * User Action             Local State              Sync Queue
+ *     │                      │                         │
+ *     │ ─── Update ────────► │                         │
+ *     │                      │ (immediate feedback)    │
+ *     │                      │ ─── Add to queue ─────► │
+ *     │                      │                         │ (pending)
+ *     │                      │                         │
+ *     │                      │ ◄─── Server confirms ── │
+ *     │                      │      (mark synced)      │
+ *     │                      │                         │
+ *     │           OR         │                         │
+ *     │                      │                         │
+ *     │                      │ ◄─── Server rejects ─── │
+ *     │                      │      (rollback)         │
+ * ```
+ *
+ * @module sync/optimistic
+ *
+ * @see {@link OptimisticUpdateManager} for managing pending changes
+ * @see {@link RollbackManager} for reverting failed changes
+ */
+
 import type { ChangeEvent, Document } from '@pocket/core';
 
 /**
- * Pending optimistic update
+ * Represents a local change waiting to be synced with the server.
+ *
+ * Each optimistic update tracks:
+ * - The change event (what was modified)
+ * - The previous document state (for rollback)
+ * - Sync attempt metadata (for retry logic)
+ *
+ * @typeParam T - The document type
+ *
+ * @see {@link OptimisticUpdateManager}
  */
 export interface OptimisticUpdate<T extends Document = Document> {
-  /** Unique ID for this update */
+  /** Unique identifier for this update (format: `{collection}_{docId}_{timestamp}`) */
   id: string;
-  /** Collection name */
+  /** Name of the collection containing the document */
   collection: string;
-  /** Original change event */
+  /** The change event representing the local modification */
   change: ChangeEvent<T>;
-  /** Previous document state (for rollback) */
+  /** Document state before the change, enabling rollback. Null for inserts. */
   previousDocument: T | null;
-  /** Timestamp when created */
+  /** Unix timestamp when the update was created */
   createdAt: number;
-  /** Number of sync attempts */
+  /** Number of times sync has been attempted for this update */
   attempts: number;
-  /** Last error if any */
+  /** Error from the last failed sync attempt, if any */
   lastError?: Error;
 }
 
 /**
- * Optimistic updates manager
+ * Manages pending optimistic updates for local-first synchronization.
+ *
+ * This manager:
+ * - Tracks local changes before server confirmation
+ * - Persists pending updates to localStorage (survives page refresh)
+ * - Supports retry logic with attempt counting
+ * - Enables rollback by storing previous document states
+ *
+ * @example Basic usage with SyncEngine
+ * ```typescript
+ * const manager = new OptimisticUpdateManager();
+ *
+ * // Local change occurs
+ * const updateId = manager.add('todos', changeEvent, previousDoc);
+ *
+ * // After successful sync
+ * manager.markSynced(updateId);
+ *
+ * // After failed sync
+ * manager.markFailed(updateId, new Error('Network error'));
+ *
+ * // Get updates that need retry
+ * const pending = manager.getPendingSync();
+ * ```
+ *
+ * @example Checking pending changes
+ * ```typescript
+ * if (manager.hasPending) {
+ *   console.log(`${manager.count} changes waiting to sync`);
+ * }
+ *
+ * // Show warning before page unload
+ * window.onbeforeunload = () => {
+ *   if (manager.hasPending) {
+ *     return 'You have unsaved changes';
+ *   }
+ * };
+ * ```
+ *
+ * @see {@link OptimisticUpdate} for the update data structure
+ * @see {@link RollbackManager} for reverting failed updates
  */
 export class OptimisticUpdateManager {
   private readonly updates = new Map<string, OptimisticUpdate>();
