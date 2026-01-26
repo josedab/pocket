@@ -35,6 +35,13 @@ What becomes easier or more difficult to do because of this change?
 | [ADR-003](./adr-003-pluggable-storage-adapters.md) | Pluggable Storage Adapters | Accepted |
 | [ADR-004](./adr-004-vector-clocks-for-sync.md) | Vector Clocks for Sync | Accepted |
 | [ADR-005](./adr-005-monorepo-structure.md) | Monorepo Structure | Accepted |
+| [ADR-006](./adr-006-plugin-system-architecture.md) | Plugin System Architecture | Accepted |
+| [ADR-007](./adr-007-event-reduce-algorithm.md) | EventReduce Algorithm for Live Queries | Accepted |
+| [ADR-008](./adr-008-react-hooks-integration.md) | React Hooks as Primary Integration Pattern | Accepted |
+| [ADR-009](./adr-009-transport-layer-abstraction.md) | Transport Layer Abstraction for Sync | Accepted |
+| [ADR-010](./adr-010-optimistic-updates-with-rollback.md) | Optimistic Updates with Rollback | Accepted |
+| [ADR-011](./adr-011-bundle-size-constraints.md) | Strict Bundle Size Constraints | Accepted |
+| [ADR-012](./adr-012-umbrella-package-pattern.md) | Umbrella Package with Selective Re-exports | Accepted |
 
 ## Creating a New ADR
 
