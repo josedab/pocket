@@ -1,3 +1,50 @@
+/**
+ * AsyncStorage adapter for React Native Pocket storage.
+ *
+ * This module provides a document store implementation using React Native's
+ * AsyncStorage for persistence. While not as fast as MMKV, it works with
+ * the standard `@react-native-async-storage/async-storage` package.
+ *
+ * ## Features
+ *
+ * - **Standard Storage**: Uses the common AsyncStorage API
+ * - **In-Memory Cache**: Caches documents for faster reads
+ * - **Change Tracking**: Emits change events for reactive updates
+ * - **Query Support**: Filtering, sorting, and pagination in-memory
+ *
+ * ## Performance Characteristics
+ *
+ * | Operation | Performance | Notes |
+ * |-----------|-------------|-------|
+ * | Read (cached) | Fast | From memory |
+ * | Read (cold) | Moderate | Async I/O |
+ * | Write | Moderate | Async I/O |
+ * | Query | Fast | In-memory after load |
+ *
+ * ## Limitations
+ *
+ * - No native index support (indexes are ignored)
+ * - Async operations (vs MMKV's sync operations)
+ * - All queries execute in-memory after initial load
+ *
+ * @module storage/async-storage-adapter
+ *
+ * @example Basic usage
+ * ```typescript
+ * import AsyncStorage from '@react-native-async-storage/async-storage';
+ * import { createAsyncStorageDocumentStore } from '@pocket/react-native';
+ *
+ * const store = createAsyncStorageDocumentStore<Todo>(
+ *   'todos',
+ *   AsyncStorage,
+ *   'my-app'
+ * );
+ *
+ * await store.put({ _id: '1', title: 'Learn Pocket' });
+ * const todo = await store.get('1');
+ * ```
+ */
+
 import type {
   ChangeEvent,
   Document,
@@ -10,8 +57,29 @@ import { Subject, type Observable } from 'rxjs';
 import type { AsyncStorageInterface } from '../types.js';
 
 /**
- * Document store implementation using AsyncStorage
- * Suitable for React Native apps using @react-native-async-storage/async-storage
+ * Document store implementation using React Native's AsyncStorage.
+ *
+ * Provides CRUD operations and query support with an in-memory cache
+ * for improved read performance after initial load.
+ *
+ * @typeParam T - The document type stored in this collection
+ *
+ * @example
+ * ```typescript
+ * const store = new AsyncStorageDocumentStore<Todo>('todos', AsyncStorage);
+ *
+ * // CRUD operations
+ * await store.put({ _id: '1', title: 'Buy milk' });
+ * const todo = await store.get('1');
+ * await store.delete('1');
+ *
+ * // Queries
+ * const incomplete = await store.query({
+ *   spec: { filter: { completed: false } }
+ * });
+ * ```
+ *
+ * @see {@link createAsyncStorageDocumentStore} for the factory function
  */
 export class AsyncStorageDocumentStore<T extends Document = Document> implements DocumentStore<T> {
   readonly name: string;
@@ -373,7 +441,36 @@ export class AsyncStorageDocumentStore<T extends Document = Document> implements
 }
 
 /**
- * Create an AsyncStorage document store
+ * Creates an AsyncStorage document store for a collection.
+ *
+ * @typeParam T - The document type
+ * @param collectionName - Name of the collection
+ * @param storage - AsyncStorage instance (from @react-native-async-storage/async-storage)
+ * @param dbName - Optional database name prefix (default: 'pocket')
+ * @returns A new AsyncStorageDocumentStore instance
+ *
+ * @example Basic usage
+ * ```typescript
+ * import AsyncStorage from '@react-native-async-storage/async-storage';
+ *
+ * const todosStore = createAsyncStorageDocumentStore<Todo>(
+ *   'todos',
+ *   AsyncStorage,
+ *   'my-app'
+ * );
+ * ```
+ *
+ * @example With custom database name
+ * ```typescript
+ * // Keys will be prefixed with 'my-custom-db:todos:'
+ * const store = createAsyncStorageDocumentStore<Todo>(
+ *   'todos',
+ *   AsyncStorage,
+ *   'my-custom-db'
+ * );
+ * ```
+ *
+ * @see {@link AsyncStorageDocumentStore} for the store class
  */
 export function createAsyncStorageDocumentStore<T extends Document>(
   collectionName: string,
