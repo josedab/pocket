@@ -109,6 +109,7 @@ export function createUseTimeTravelHook(React: ReactHooks) {
           documentHistory: history,
         }));
       }
+      return undefined;
     }, [state.currentIndex, inspectedRef, debugger_, tracker]);
 
     const enterTimeTravel = React.useCallback(() => {
@@ -190,10 +191,9 @@ export function createUseTimeTravelHook(React: ReactHooks) {
       }));
     }, [inspectedRef]) as () => void;
 
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-parameters
     const getDocument = React.useCallback(
-      <T extends Document>(collection: string, documentId: string) => {
-        return debugger_.getDocument<T>(collection, documentId);
+      (collection: string, documentId: string) => {
+        return debugger_.getDocument(collection, documentId);
       },
       [debugger_]
     );

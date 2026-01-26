@@ -262,6 +262,7 @@ export function createUsePageTrackingHook(React: ReactHooks) {
   ): void {
     React.useEffect(() => {
       tracker.page(pageName, properties);
+      return undefined;
     }, [tracker, pageName, JSON.stringify(properties)]);
   };
 }
