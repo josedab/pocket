@@ -1,0 +1,110 @@
+---
+id: playground
+title: Interactive Playground
+sidebar_label: Playground
+sidebar_position: 2
+---
+
+import { PlaygroundWithSelector } from '@site/src/components/Playground';
+import { allExamples, crudExample, reactiveExample, searchExample, schemaExample } from '@site/src/components/Playground/examples';
+
+# Interactive Playground
+
+Try Pocket directly in your browser! No installation required.
+
+<PlaygroundWithSelector examples={allExamples} defaultExample="CRUD Operations" height="650px" />
+
+## About the Playground
+
+The interactive playground uses [StackBlitz](https://stackblitz.com) to run a full development environment in your browser. You can:
+
+- **Edit code** in real-time and see changes instantly
+- **Explore** the full project structure
+- **Share** your experiments with others
+- **Fork** examples to save your work
+
+## Available Examples
+
+### CRUD Operations
+
+Learn the basics of working with Pocket: creating, reading, updating, and deleting documents.
+
+```typescript
+// Insert a document
+await db.collection('todos').insert({
+  title: 'Learn Pocket',
+  completed: false,
+});
+
+// Query documents
+const todos = await db.collection('todos').find().exec();
+
+// Update a document
+await db.collection('todos').update(
+  { _id: todoId },
+  { $set: { completed: true } }
+);
+
+// Delete a document
+await db.collection('todos').remove({ _id: todoId });
+```
+
+### Reactive Queries
+
+See how Pocket's live queries automatically update when data changes.
+
+```typescript
+// React hook that auto-updates
+const { data: messages } = useLiveQuery<Message>(
+  'messages',
+  (query) => query.orderBy('timestamp', 'desc').limit(10)
+);
+```
+
+### Full-Text Search
+
+Explore Pocket's built-in search capabilities.
+
+```typescript
+// Search with filters
+const results = await db.collection('articles')
+  .find()
+  .where('category').equals('tutorial')
+  .search('pocket queries')
+  .exec();
+```
+
+### Schema Validation
+
+Define schemas to validate your data.
+
+```typescript
+const db = Database.create({
+  name: 'my-app',
+  schema: {
+    users: {
+      properties: {
+        name: { type: 'string', required: true },
+        email: { type: 'string', pattern: '^[^@]+@[^@]+\\.[^@]+$' },
+        age: { type: 'number', minimum: 0 },
+      },
+    },
+  },
+});
+```
+
+## Running Locally
+
+Want to run these examples on your machine? Use `create-pocket-app`:
+
+```bash
+npx create-pocket-app my-app --template react-todo
+cd my-app
+npm run dev
+```
+
+## Need Help?
+
+- Check out the [Getting Started guide](/docs/intro)
+- Read the [API Reference](/docs/api/database)
+- Join our [Discord community](https://discord.gg/pocket-db)
