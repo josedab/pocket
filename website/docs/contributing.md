@@ -8,6 +8,25 @@ description: How to contribute to Pocket development
 
 Thank you for your interest in contributing to Pocket! This guide covers everything you need to know to make meaningful contributions to the project.
 
+:::tip First Time?
+Look for issues labeled [`good first issue`](https://github.com/pocket-db/pocket/labels/good%20first%20issue) - these are beginner-friendly and a great way to start.
+:::
+
+## Contribution Workflow
+
+```mermaid
+flowchart LR
+    A[Find Issue] --> B[Fork & Clone]
+    B --> C[Create Branch]
+    C --> D[Make Changes]
+    D --> E[Test & Lint]
+    E --> F[Create Changeset]
+    F --> G[Submit PR]
+    G --> H{Review}
+    H -->|Changes Requested| D
+    H -->|Approved| I[Merge]
+```
+
 ## Quick Start
 
 ```bash
@@ -47,29 +66,86 @@ corepack prepare pnpm@8.12.0 --activate
 
 ## Project Structure
 
-```
-pocket/
-├── packages/
-│   ├── core/              # Core database engine
-│   ├── react/             # React hooks and components
-│   ├── react-native/      # React Native adapter
-│   ├── sync/              # Sync engine
-│   ├── sync-server/       # WebSocket sync server
-│   ├── storage-indexeddb/ # IndexedDB storage adapter
-│   ├── storage-opfs/      # OPFS storage adapter
-│   ├── storage-memory/    # In-memory storage adapter
-│   ├── storage-sqlite/    # SQLite storage adapter
-│   ├── encryption/        # End-to-end encryption
-│   ├── crdt/              # CRDT support
-│   ├── vectors/           # Vector storage
-│   ├── ai/                # AI integration
-│   └── pocket/            # All-in-one package
-├── examples/              # Example applications
-├── website/               # Documentation website
-└── test/                  # Integration tests
+```mermaid
+graph TB
+    subgraph Packages["packages/"]
+        subgraph Core["Core"]
+            core["@pocket/core"]
+            sync["@pocket/sync"]
+            pocket["pocket (all-in-one)"]
+        end
+
+        subgraph SDKs["Framework SDKs"]
+            react["@pocket/react"]
+            vue["@pocket/vue"]
+            rn["@pocket/react-native"]
+        end
+
+        subgraph Storage["Storage Adapters"]
+            idb["storage-indexeddb"]
+            opfs["storage-opfs"]
+            memory["storage-memory"]
+            sqlite["storage-sqlite"]
+        end
+
+        subgraph Features["Feature Packages"]
+            encryption["@pocket/encryption"]
+            crdt["@pocket/crdt"]
+            vectors["@pocket/vectors"]
+        end
+    end
+
+    subgraph Other["Other"]
+        examples["examples/"]
+        website["website/"]
+        test["test/"]
+    end
 ```
 
+### Directory Layout
+
+| Directory | Description |
+|-----------|-------------|
+| `packages/core` | Core database engine - the heart of Pocket |
+| `packages/react` | React hooks and components |
+| `packages/sync` | Client-side sync engine |
+| `packages/server` | Server-side sync endpoint |
+| `packages/storage-*` | Storage adapter implementations |
+| `packages/pocket` | All-in-one umbrella package |
+| `examples/` | Example applications |
+| `website/` | Docusaurus documentation site |
+| `test/` | Integration and E2E tests |
+
 ## Development Workflow
+
+```mermaid
+flowchart TB
+    subgraph Choose["1. Choose Issue"]
+        GFI[good first issue]
+        HW[help wanted]
+        Bug[bug]
+        Feat[enhancement]
+    end
+
+    subgraph Claim["2. Claim Work"]
+        Comment["Comment on issue"]
+        Wait["Wait for assignment"]
+    end
+
+    subgraph Develop["3. Develop"]
+        Branch["Create branch"]
+        Code["Write code & tests"]
+        Lint["Run lint & typecheck"]
+    end
+
+    subgraph Submit["4. Submit"]
+        Changeset["Create changeset"]
+        PR["Open PR"]
+        Review["Address feedback"]
+    end
+
+    Choose --> Claim --> Develop --> Submit
+```
 
 ### 1. Choose What to Work On
 
@@ -337,6 +413,34 @@ Use this for critical warnings
 ```
 
 ## Areas for Contribution
+
+```mermaid
+mindmap
+  root((Contribute))
+    Core Development
+      Storage adapters
+      Query optimization
+      CRDT types
+      Sync protocol
+    Documentation
+      Guides & tutorials
+      API docs
+      Translations
+      Fix typos
+    Testing
+      Unit tests
+      Integration tests
+      Benchmarks
+      Edge cases
+    Examples
+      Sample apps
+      Sandbox demos
+      Video tutorials
+    Tooling
+      DevTools
+      VS Code extension
+      CLI improvements
+```
 
 ### Core Development
 
