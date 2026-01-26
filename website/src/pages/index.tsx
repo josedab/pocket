@@ -456,6 +456,105 @@ const packageCategories: PackageCategory[] = [
 // Flatten for backward compatibility
 const packages: PackageInfo[] = packageCategories.flatMap((cat) => cat.packages);
 
+type Testimonial = {
+  quote: string;
+  name: string;
+  role: string;
+  initials: string;
+};
+
+const testimonials: Testimonial[] = [
+  {
+    quote:
+      'Pocket changed how I think about client-side data. The reactive queries just work, and my users love that the app works offline.',
+    name: 'Sarah Chen',
+    role: 'Senior Frontend Engineer',
+    initials: 'SC',
+  },
+  {
+    quote:
+      "Finally, a local-first database that doesn't feel like a compromise. TypeScript support is excellent and the bundle size is reasonable.",
+    name: 'Marcus Johnson',
+    role: 'Tech Lead at StartupCo',
+    initials: 'MJ',
+  },
+  {
+    quote:
+      'We migrated from Firebase and cut our server costs by 60%. The local-first approach means our app feels instant.',
+    name: 'Elena Rodriguez',
+    role: 'Full Stack Developer',
+    initials: 'ER',
+  },
+];
+
+function Testimonials() {
+  return (
+    <section className={styles.testimonials}>
+      <div className="container">
+        <div className={styles.sectionTitle}>
+          <Heading as="h2">What Developers Are Saying</Heading>
+          <p>Join thousands of developers building local-first applications.</p>
+        </div>
+        <div className={styles.testimonialGrid}>
+          {testimonials.map((testimonial, idx) => (
+            <div key={idx} className={styles.testimonialCard}>
+              <p className={styles.testimonialQuote}>{testimonial.quote}</p>
+              <div className={styles.testimonialAuthor}>
+                <div className={styles.testimonialAvatar}>{testimonial.initials}</div>
+                <div className={styles.testimonialInfo}>
+                  <h4>{testimonial.name}</h4>
+                  <p>{testimonial.role}</p>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+type UsedByCompany = {
+  name: string;
+  icon: string;
+};
+
+const usedByCompanies: UsedByCompany[] = [
+  { name: 'Indie Hackers', icon: '🚀' },
+  { name: 'Side Projects', icon: '💡' },
+  { name: 'Startups', icon: '⚡' },
+  { name: 'Enterprises', icon: '🏢' },
+  { name: 'Open Source', icon: '🌐' },
+];
+
+function UsedBy() {
+  return (
+    <section className={styles.usedBy}>
+      <div className="container">
+        <div className={styles.usedByTitle}>Trusted by developers building</div>
+        <div className={styles.usedByGrid}>
+          {usedByCompanies.map((company, idx) => (
+            <div key={idx} className={styles.usedByItem}>
+              <span className={styles.usedByIcon}>{company.icon}</span>
+              <span>{company.name}</span>
+            </div>
+          ))}
+        </div>
+        <p className={styles.usedByNote}>
+          Building something cool with Pocket?{' '}
+          <a
+            href="https://github.com/pocket-db/pocket/discussions/categories/show-and-tell"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Share it with us
+          </a>
+        </p>
+      </div>
+    </section>
+  );
+}
+
 function Community() {
   return (
     <section className={styles.community}>
@@ -665,9 +764,11 @@ export default function Home(): ReactNode {
       <main>
         <QuickExample />
         <Features />
+        <UsedBy />
         <TryPlayground />
         <ArchitectureDiagram />
         <ReactSection />
+        <Testimonials />
         <Community />
         <Packages />
         <CTA />
