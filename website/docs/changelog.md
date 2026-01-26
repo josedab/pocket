@@ -11,6 +11,12 @@ All notable changes to Pocket are documented on this page.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+:::tip Stay Updated
+Subscribe to [GitHub releases](https://github.com/pocket-db/pocket/releases) to get notified about new versions.
+:::
+
+---
+
 ## [Unreleased]
 
 ### Added
@@ -24,7 +30,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Plugin system guide with middleware patterns
 - Schema migrations guide with rollback support
 
+---
+
 ## [0.7.0] - 2025-01
+
+> **Highlights**: AI integration with RAG pipelines, advanced conflict resolution strategies, and high-performance vector storage.
+
+| Package | Version |
+|---------|---------|
+| `pocket` | 0.7.0 |
+| `@pocket/core` | 0.7.0 |
+| `@pocket/sync` | 0.7.0 |
+| `@pocket/react` | 0.7.0 |
+| `@pocket/vectors` | 0.7.0 |
+| `@pocket/ai` | 0.7.0 |
 
 ### Added
 
@@ -58,7 +77,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Memory leak in reactive query subscriptions
 - Type errors in generic collection methods
 
+---
+
 ## [0.6.0] - 2024-12
+
+> **Highlights**: Real-time sync server with WebSocket support, time-travel debugging, and row-level security.
+
+| Package | Version |
+|---------|---------|
+| `pocket` | 0.6.0 |
+| `@pocket/core` | 0.6.0 |
+| `@pocket/sync` | 0.6.0 |
+| `@pocket/server` | 0.6.0 |
+| `@pocket/time-travel` | 0.6.0 |
 
 ### Added
 
@@ -88,7 +119,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Refactored sync engine for better extensibility
 - Improved error messages and stack traces
 
+---
+
 ## [0.5.0] - 2024-11
+
+> **Highlights**: Schema-driven form generation, real-time presence system, and cross-tab synchronization.
 
 ### Added
 
@@ -118,7 +153,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Enhanced query builder with more operators
 - Improved collection type inference
 
+---
+
 ## [0.4.0] - 2024-10
+
+> **Highlights**: React Native support with native storage adapters, browser DevTools extension, and end-to-end encryption.
 
 ### Added
 
@@ -150,7 +189,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Standardized storage adapter interface
 - Improved React hook performance
 
+---
+
 ## [0.3.0] - 2024-09
+
+> **Highlights**: CRDT support for conflict-free collaboration and selective sync with document filters.
 
 ### Added
 
@@ -174,7 +217,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Improved vector clock implementation
 - Better merge algorithm for documents
 
+---
+
 ## [0.2.0] - 2024-08
+
+> **Highlights**: Full-text search with BM25 scoring, plugin system with lifecycle hooks, and schema migrations.
 
 ### Added
 
@@ -204,7 +251,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Refactored core database internals
 - Improved TypeScript generics
 
+---
+
 ## [0.1.0] - 2024-07
+
+> **Initial Release**: Local-first database with reactive queries, React hooks, IndexedDB/OPFS storage, and basic sync.
 
 ### Added
 
