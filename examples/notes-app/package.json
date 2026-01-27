@@ -16,11 +16,11 @@
     "@pocket/storage-indexeddb": "workspace:*",
     "@pocket/storage-memory": "workspace:*",
     "@pocket/sync": "workspace:*",
-    "react": "^18.2.0",
+    "react": "^19.2.4",
     "react-dom": "^18.2.0"
   },
   "devDependencies": {
-    "@types/react": "^18.2.45",
+    "@types/react": "^19.2.10",
     "@types/react-dom": "^18.2.18",
     "@vitejs/plugin-react": "^4.2.1",
     "tsx": "^4.7.0",
