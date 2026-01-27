@@ -2,6 +2,19 @@
   "name": "@pocket/crdt",
   "version": "0.1.0",
   "description": "CRDT (Conflict-free Replicated Data Types) for Pocket local-first database",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/pocket-db/pocket",
+    "directory": "packages/crdt"
+  },
+  "homepage": "https://pocket-db.dev",
+  "bugs": {
+    "url": "https://github.com/pocket-db/pocket/issues"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
   "type": "module",
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",

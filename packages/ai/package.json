@@ -2,6 +2,19 @@
   "name": "@pocket/ai",
   "version": "0.1.0",
   "description": "Offline AI assistant for Pocket with local LLM inference and RAG",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/pocket-db/pocket",
+    "directory": "packages/ai"
+  },
+  "homepage": "https://pocket-db.dev",
+  "bugs": {
+    "url": "https://github.com/pocket-db/pocket/issues"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
   "type": "module",
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
