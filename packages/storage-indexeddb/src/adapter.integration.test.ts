@@ -1,7 +1,7 @@
-import 'fake-indexeddb/auto';
-import { describe, it, expect, beforeEach, afterEach } from 'vitest';
-import { createIndexedDBStorage, type IndexedDBAdapter } from './adapter.js';
 import type { DocumentStore } from '@pocket/core';
+import 'fake-indexeddb/auto';
+import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+import { createIndexedDBStorage, type IndexedDBAdapter } from './adapter.js';
 
 interface TestDocument {
   _id: string;
@@ -302,8 +302,7 @@ describe('IndexedDBAdapter', () => {
       expect(results.map((d) => d.name).sort()).toEqual(['Alice', 'Charlie']);
     });
 
-    // TODO: Investigate sorting in QueryExecutor - results come back unsorted
-    it.skip('should query with sort', async () => {
+    it('should query with sort', async () => {
       const store = await getStoreReady<TestDocument>(adapter, 'users');
 
       const docs: TestDocument[] = [
@@ -316,7 +315,7 @@ describe('IndexedDBAdapter', () => {
 
       const results = await store.query({
         spec: {
-          sort: { age: 'asc' },
+          sort: [{ field: 'age', direction: 'asc' }],
         },
       });
 
