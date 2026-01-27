@@ -169,6 +169,32 @@ export interface SyncChange<T extends Document = Document> {
 }
 
 /**
+ * Rate limiter configuration for sync server
+ */
+export interface SyncRateLimiterConfig {
+  /** Maximum tokens per bucket (burst capacity) */
+  maxTokens?: number;
+  /** Token refill rate per second */
+  refillRate?: number;
+  /** Skip rate limiting for authenticated clients */
+  skipAuthenticated?: boolean;
+}
+
+/**
+ * Compression configuration
+ */
+export interface SyncCompressionConfig {
+  /** Enable WebSocket per-message deflate compression */
+  enabled?: boolean;
+  /** Compression level (1-9, higher = more compression, more CPU) */
+  level?: number;
+  /** Minimum message size to compress (bytes) */
+  threshold?: number;
+  /** Memory level for zlib (1-9) */
+  memLevel?: number;
+}
+
+/**
  * Server configuration
  */
 export interface SyncServerConfig {
@@ -194,6 +220,10 @@ export interface SyncServerConfig {
   storage?: StorageBackend;
   /** Enable logging */
   logging?: boolean | LogLevel;
+  /** Rate limiting configuration */
+  rateLimit?: SyncRateLimiterConfig | boolean;
+  /** Compression configuration */
+  compression?: SyncCompressionConfig | boolean;
 }
 
 /**
@@ -214,6 +244,8 @@ export const DEFAULT_SERVER_CONFIG: Required<Omit<SyncServerConfig, 'validateAut
   clientTimeout: 60000,
   maxMessageSize: 1024 * 1024, // 1MB
   logging: 'info',
+  rateLimit: false,
+  compression: false,
 };
 
 /**

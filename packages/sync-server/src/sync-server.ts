@@ -4,6 +4,7 @@
 
 import type { IncomingMessage } from 'http';
 import { WebSocket, WebSocketServer } from 'ws';
+import { RateLimiter } from './middleware/rate-limiter.js';
 import { MemoryStorage } from './storage/memory-storage.js';
 import type {
   ConnectedClient,
@@ -14,6 +15,8 @@ import type {
   ServerEvent,
   StorageBackend,
   SubscribeMessage,
+  SyncCompressionConfig,
+  SyncRateLimiterConfig,
   SyncServerConfig,
   UnsubscribeMessage,
 } from './types.js';
@@ -25,6 +28,16 @@ import { DEFAULT_SERVER_CONFIG } from './types.js';
 function generateId(): string {
   return `${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
 }
+
+/**
+ * Default compression configuration
+ */
+const DEFAULT_COMPRESSION_CONFIG: Required<SyncCompressionConfig> = {
+  enabled: false,
+  level: 6,
+  threshold: 1024, // 1KB
+  memLevel: 8,
+};
 
 /**
  * Internal config type
@@ -40,6 +53,8 @@ interface InternalConfig {
   maxMessageSize: number;
   logging: boolean | LogLevel;
   validateAuth?: (token: string) => Promise<boolean | { userId: string; [key: string]: unknown }>;
+  rateLimit?: SyncRateLimiterConfig | boolean;
+  compression: Required<SyncCompressionConfig>;
 }
 
 /**
@@ -53,14 +68,31 @@ export class SyncServer {
   private readonly collectionSubscribers = new Map<string, Set<string>>();
   private heartbeatInterval_: ReturnType<typeof setInterval> | null = null;
   private readonly eventHandlers: ((event: ServerEvent) => void)[] = [];
+  private readonly rateLimiter: RateLimiter | null = null;
 
   constructor(config: SyncServerConfig = {}) {
+    // Parse compression config
+    let compressionConfig = DEFAULT_COMPRESSION_CONFIG;
+    if (config.compression === true) {
+      compressionConfig = { ...DEFAULT_COMPRESSION_CONFIG, enabled: true };
+    } else if (typeof config.compression === 'object') {
+      compressionConfig = { ...DEFAULT_COMPRESSION_CONFIG, ...config.compression };
+    }
+
     this.config = {
       ...DEFAULT_SERVER_CONFIG,
       ...config,
+      compression: compressionConfig,
     };
 
     this.storage = config.storage ?? new MemoryStorage();
+
+    // Initialize rate limiter if configured
+    if (config.rateLimit === true) {
+      this.rateLimiter = new RateLimiter();
+    } else if (typeof config.rateLimit === 'object') {
+      this.rateLimiter = new RateLimiter(config.rateLimit);
+    }
   }
 
   /**
@@ -74,13 +106,30 @@ export class SyncServer {
     // Initialize storage
     await this.storage.init?.();
 
-    // Create WebSocket server
-    this.wss = new WebSocketServer({
+    // Create WebSocket server with optional compression
+    const wsOptions: ConstructorParameters<typeof WebSocketServer>[0] = {
       port: this.config.port,
       host: this.config.host,
       path: this.config.path,
       maxPayload: this.config.maxMessageSize,
-    });
+    };
+
+    // Enable per-message deflate compression if configured
+    if (this.config.compression.enabled) {
+      wsOptions.perMessageDeflate = {
+        zlibDeflateOptions: {
+          level: this.config.compression.level,
+          memLevel: this.config.compression.memLevel,
+        },
+        zlibInflateOptions: {
+          chunkSize: 10 * 1024, // 10KB chunks
+        },
+        threshold: this.config.compression.threshold,
+        concurrencyLimit: 10,
+      };
+    }
+
+    this.wss = new WebSocketServer(wsOptions);
 
     this.wss.on('connection', (socket, request) => {
       void this.handleConnection(socket, request);
@@ -110,6 +159,11 @@ export class SyncServer {
     if (this.heartbeatInterval_) {
       clearInterval(this.heartbeatInterval_);
       this.heartbeatInterval_ = null;
+    }
+
+    // Stop rate limiter
+    if (this.rateLimiter) {
+      this.rateLimiter.stop();
     }
 
     // Close all client connections
@@ -292,6 +346,24 @@ export class SyncServer {
 
     client.lastActivity = Date.now();
     this.emitEvent('message_received', clientId, { message });
+
+    // Check rate limit if enabled
+    if (this.rateLimiter) {
+      const result = this.rateLimiter.check(
+        clientId,
+        message as Parameters<RateLimiter['check']>[1],
+        client
+      );
+      if (!result.allowed) {
+        this.sendError(
+          client.socket as WebSocket,
+          'RATE_LIMIT_EXCEEDED',
+          `Rate limit exceeded. Retry after ${result.retryAfter}ms`,
+          message.id
+        );
+        return;
+      }
+    }
 
     switch (message.type) {
       case 'subscribe':
@@ -609,6 +681,8 @@ export class SyncServer {
     host: string;
     clientCount: number;
     collections: string[];
+    compression: boolean;
+    rateLimit: boolean;
   } {
     return {
       running: this.wss !== null,
@@ -616,6 +690,8 @@ export class SyncServer {
       host: this.config.host,
       clientCount: this.clients.size,
       collections: Array.from(this.collectionSubscribers.keys()),
+      compression: this.config.compression.enabled,
+      rateLimit: this.rateLimiter !== null,
     };
   }
 }
