@@ -673,7 +673,7 @@ export class QueryBuilder<T extends Document> {
    */
   private buildQueryPlan(): QueryExplainResult['plan'] {
     const steps: QueryExplainResult['plan']['steps'] = [];
-    let indexName: string | undefined;
+    let indexName: string | null = null;
     let indexCovers = false;
     let estimatedScan = 1000; // Default estimate
     let sortUsingIndex = false;
