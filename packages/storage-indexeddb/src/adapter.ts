@@ -80,6 +80,7 @@
 import {
   matchesFilter,
   QueryExecutor,
+  StorageError,
   type ChangeEvent,
   type Document,
   type DocumentStore,
@@ -569,7 +570,10 @@ export class IndexedDBAdapter implements StorageAdapter {
 
   getStore<T extends Document>(name: string): DocumentStore<T> {
     if (!this.db) {
-      throw new Error('Database not initialized');
+      throw new StorageError('POCKET_S303', 'Database not initialized', {
+        adapter: this.name,
+        operation: 'getStore',
+      });
     }
 
     let store = this.stores.get(name);

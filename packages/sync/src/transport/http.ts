@@ -1,3 +1,4 @@
+import { ConnectionError } from '@pocket/core';
 import type { SyncProtocolMessage, SyncTransport, TransportConfig } from './types.js';
 
 /**
@@ -76,7 +77,10 @@ export class HttpTransport implements SyncTransport {
     });
 
     if (!response.ok) {
-      throw new Error(`Server health check failed: ${response.status}`);
+      throw new ConnectionError('POCKET_C501', `Server health check failed: ${response.status}`, {
+        transport: 'http',
+        statusCode: response.status,
+      });
     }
 
     this.connected = true;
@@ -97,7 +101,10 @@ export class HttpTransport implements SyncTransport {
 
   async send<T extends SyncProtocolMessage>(message: SyncProtocolMessage): Promise<T> {
     if (!this.connected) {
-      throw new Error('Not connected');
+      throw new ConnectionError('POCKET_C501', 'Not connected', {
+        transport: 'http',
+        operation: 'send',
+      });
     }
 
     const endpoint = this.getEndpoint(message);
@@ -117,7 +124,11 @@ export class HttpTransport implements SyncTransport {
       clearTimeout(timeoutId);
 
       if (!response.ok) {
-        throw new Error(`HTTP error: ${response.status}`);
+        throw new ConnectionError('POCKET_C500', `HTTP error: ${response.status}`, {
+          transport: 'http',
+          statusCode: response.status,
+          url: url.toString(),
+        });
       }
 
       const responseMessage = await response.json();
@@ -126,7 +137,10 @@ export class HttpTransport implements SyncTransport {
       clearTimeout(timeoutId);
 
       if (error instanceof Error && error.name === 'AbortError') {
-        throw new Error('Request timeout');
+        throw new ConnectionError('POCKET_C504', 'Request timeout', {
+          transport: 'http',
+          timeout: this.config.timeout,
+        });
       }
 
       // Handle connection errors

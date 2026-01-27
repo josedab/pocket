@@ -1,4 +1,5 @@
 import type { Document } from '@pocket/core';
+import { StorageError } from '@pocket/core';
 import { Subject, type Observable } from 'rxjs';
 import { bytesToString, compress, decompress, stringToBytes } from './crypto-utils.js';
 import { getEncryptionProvider } from './encryption-provider.js';
@@ -47,7 +48,7 @@ export class DocumentEncryptor {
   setCurrentKey(keyId: string): void {
     const key = this.keyManager.getKey(keyId);
     if (!key) {
-      throw new Error(`Key not found: ${keyId}`);
+      throw new StorageError('POCKET_S300', `Key not found: ${keyId}`, { keyId });
     }
     this.currentKeyId = keyId;
   }
@@ -65,12 +66,12 @@ export class DocumentEncryptor {
   async encrypt(doc: Document, options?: DocumentEncryptionOptions): Promise<EncryptedDocument> {
     const keyId = options?.keyId ?? this.currentKeyId;
     if (!keyId) {
-      throw new Error('No encryption key set');
+      throw new StorageError('POCKET_S300', 'No encryption key set', { operation: 'encrypt' });
     }
 
     const key = this.keyManager.getKey(keyId);
     if (!key) {
-      throw new Error(`Key not found: ${keyId}`);
+      throw new StorageError('POCKET_S300', `Key not found: ${keyId}`, { keyId });
     }
 
     const { toEncrypt, unencrypted } = this.splitDocument(doc, options?.fields);
@@ -121,13 +122,18 @@ export class DocumentEncryptor {
   async decrypt<T extends Document>(encryptedDoc: EncryptedDocument, keyId?: string): Promise<T> {
     const envelope = encryptedDoc._encrypted;
     if (!envelope) {
-      throw new Error('Document is not encrypted');
+      throw new StorageError('POCKET_S300', 'Document is not encrypted', {
+        documentId: encryptedDoc._id,
+      });
     }
 
     // Try provided key, then try to find the right key
     const key = this.findDecryptionKey(envelope, keyId);
     if (!key) {
-      throw new Error('No valid decryption key found');
+      throw new StorageError('POCKET_S300', 'No valid decryption key found', {
+        documentId: encryptedDoc._id,
+        algorithm: envelope.algorithm,
+      });
     }
 
     // Decrypt

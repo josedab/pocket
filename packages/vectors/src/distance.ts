@@ -1,3 +1,4 @@
+import { PocketError } from '@pocket/core';
 import type { DistanceMetric, Vector } from './types.js';
 
 /**
@@ -6,7 +7,11 @@ import type { DistanceMetric, Vector } from './types.js';
  */
 export function cosineSimilarity(a: Vector, b: Vector): number {
   if (a.length !== b.length) {
-    throw new Error(`Vector dimensions must match: ${a.length} vs ${b.length}`);
+    throw PocketError.fromCode('POCKET_V102', {
+      message: `Vector dimensions must match: ${a.length} vs ${b.length}`,
+      expected: a.length,
+      actual: b.length,
+    });
   }
 
   let dotProduct = 0;
@@ -43,7 +48,11 @@ export function cosineDistance(a: Vector, b: Vector): number {
  */
 export function euclideanDistance(a: Vector, b: Vector): number {
   if (a.length !== b.length) {
-    throw new Error(`Vector dimensions must match: ${a.length} vs ${b.length}`);
+    throw PocketError.fromCode('POCKET_V102', {
+      message: `Vector dimensions must match: ${a.length} vs ${b.length}`,
+      expected: a.length,
+      actual: b.length,
+    });
   }
 
   let sum = 0;
@@ -60,7 +69,11 @@ export function euclideanDistance(a: Vector, b: Vector): number {
  */
 export function dotProduct(a: Vector, b: Vector): number {
   if (a.length !== b.length) {
-    throw new Error(`Vector dimensions must match: ${a.length} vs ${b.length}`);
+    throw PocketError.fromCode('POCKET_V102', {
+      message: `Vector dimensions must match: ${a.length} vs ${b.length}`,
+      expected: a.length,
+      actual: b.length,
+    });
   }
 
   let result = 0;
@@ -132,7 +145,11 @@ export function magnitude(vector: Vector): number {
  */
 export function addVectors(a: Vector, b: Vector): Vector {
   if (a.length !== b.length) {
-    throw new Error(`Vector dimensions must match: ${a.length} vs ${b.length}`);
+    throw PocketError.fromCode('POCKET_V102', {
+      message: `Vector dimensions must match: ${a.length} vs ${b.length}`,
+      expected: a.length,
+      actual: b.length,
+    });
   }
 
   return a.map((val, i) => val + b[i]!);
@@ -143,7 +160,11 @@ export function addVectors(a: Vector, b: Vector): Vector {
  */
 export function subtractVectors(a: Vector, b: Vector): Vector {
   if (a.length !== b.length) {
-    throw new Error(`Vector dimensions must match: ${a.length} vs ${b.length}`);
+    throw PocketError.fromCode('POCKET_V102', {
+      message: `Vector dimensions must match: ${a.length} vs ${b.length}`,
+      expected: a.length,
+      actual: b.length,
+    });
   }
 
   return a.map((val, i) => val - b[i]!);
@@ -161,7 +182,10 @@ export function scaleVector(vector: Vector, scalar: number): Vector {
  */
 export function averageVectors(vectors: Vector[]): Vector {
   if (vectors.length === 0) {
-    throw new Error('Cannot average empty vector array');
+    throw PocketError.fromCode('POCKET_V100', {
+      message: 'Cannot average empty vector array',
+      operation: 'averageVectors',
+    });
   }
 
   const dimensions = vectors[0]!.length;
@@ -169,7 +193,11 @@ export function averageVectors(vectors: Vector[]): Vector {
 
   for (const vector of vectors) {
     if (vector.length !== dimensions) {
-      throw new Error('All vectors must have the same dimensions');
+      throw PocketError.fromCode('POCKET_V102', {
+        message: 'All vectors must have the same dimensions',
+        expected: dimensions,
+        actual: vector.length,
+      });
     }
     for (let i = 0; i < dimensions; i++) {
       result[i] = (result[i] ?? 0) + (vector[i] ?? 0);

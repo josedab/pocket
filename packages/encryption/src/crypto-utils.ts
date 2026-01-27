@@ -1,3 +1,5 @@
+import { StorageError } from '@pocket/core';
+
 /**
  * Crypto utilities for browser and Node.js environments
  */
@@ -9,7 +11,9 @@ export function getCrypto(): Crypto {
   if (typeof globalThis.crypto !== 'undefined') {
     return globalThis.crypto;
   }
-  throw new Error('Web Crypto API not available');
+  throw new StorageError('POCKET_S301', 'Web Crypto API not available', {
+    operation: 'getCrypto',
+  });
 }
 
 /**

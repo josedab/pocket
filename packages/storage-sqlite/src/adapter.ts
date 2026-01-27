@@ -109,6 +109,7 @@ import type {
   StorageQuery,
   StorageStats,
 } from '@pocket/core';
+import { StorageError } from '@pocket/core';
 import { Subject, type Observable } from 'rxjs';
 import { createDriver } from './driver.js';
 import type {
@@ -219,7 +220,10 @@ export class SQLiteStorageAdapter implements StorageAdapter {
 
   getStore<T extends Document>(name: string): DocumentStore<T> {
     if (!this.driver) {
-      throw new Error('Storage not initialized');
+      throw new StorageError('POCKET_S303', 'Storage not initialized', {
+        adapter: 'sqlite',
+        operation: 'getStore',
+      });
     }
 
     if (!this.stores.has(name)) {
@@ -271,7 +275,10 @@ export class SQLiteStorageAdapter implements StorageAdapter {
     fn: () => Promise<R>
   ): Promise<R> {
     if (!this.driver) {
-      throw new Error('Storage not initialized');
+      throw new StorageError('POCKET_S303', 'Storage not initialized', {
+        adapter: 'sqlite',
+        operation: 'transaction',
+      });
     }
 
     // SQLite handles transactions automatically

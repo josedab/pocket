@@ -1,3 +1,4 @@
+import { StorageError } from '@pocket/core';
 import { concatBytes, fromBase64, getSubtleCrypto, randomBytes, toBase64 } from './crypto-utils.js';
 import type {
   EncryptedEnvelope,
@@ -164,6 +165,12 @@ export function getEncryptionProvider(algorithm: EncryptionAlgorithm): Encryptio
     case 'AES-CBC':
       return new AESCBCProvider();
     default:
-      throw new Error(`Unsupported encryption algorithm: ${algorithm as string}`);
+      throw new StorageError(
+        'POCKET_S300',
+        `Unsupported encryption algorithm: ${algorithm as string}`,
+        {
+          algorithm,
+        }
+      );
   }
 }

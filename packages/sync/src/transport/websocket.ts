@@ -1,3 +1,4 @@
+import { ConnectionError } from '@pocket/core';
 import type { SyncProtocolMessage, SyncTransport, TransportConfig } from './types.js';
 
 /**
@@ -150,7 +151,10 @@ export class WebSocketTransport implements SyncTransport {
 
   async send<T extends SyncProtocolMessage>(message: SyncProtocolMessage): Promise<T> {
     if (!this.isConnected()) {
-      throw new Error('Not connected');
+      throw new ConnectionError('POCKET_C501', 'Not connected', {
+        transport: 'websocket',
+        operation: 'send',
+      });
     }
 
     return new Promise((resolve, reject) => {
