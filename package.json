@@ -16,7 +16,8 @@
   "scripts": {
     "build": "turbo run build",
     "dev": "turbo run dev",
-    "test": "vitest run",
+    "test": "turbo run test --continue",
+    "test:unit": "vitest run --project unit",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
     "test:integration": "vitest run --project integration",
