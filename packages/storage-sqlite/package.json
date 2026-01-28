@@ -42,13 +42,13 @@
     "dev": "tsup --watch",
     "typecheck": "tsc --noEmit",
     "lint": "eslint src --ext .ts,.tsx",
-    "test": "vitest run",
+    "test": "vitest run --passWithNoTests",
     "test:watch": "vitest",
     "clean": "rm -rf dist"
   },
   "dependencies": {
     "@pocket/core": "workspace:*",
-    "rxjs": "^7.8.0"
+    "rxjs": "^7.8.1"
   },
   "peerDependencies": {
     "better-sqlite3": ">=9.0.0",
