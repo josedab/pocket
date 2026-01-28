@@ -5,8 +5,16 @@ import Heading from '@theme/Heading';
 import Layout from '@theme/Layout';
 import clsx from 'clsx';
 import type { ReactNode } from 'react';
+import { Suspense, lazy } from 'react';
 
 import styles from './index.module.css';
+
+// Lazy load playground to avoid SSR issues
+const PlaygroundWithSelector = lazy(() =>
+  import('../components/Playground').then((mod) => ({
+    default: mod.PlaygroundWithSelector,
+  }))
+);
 
 function Badges() {
   return (
@@ -538,6 +546,46 @@ function Packages() {
   );
 }
 
+function TryPlayground() {
+  // Only render on client side
+  if (typeof window === 'undefined') {
+    return null;
+  }
+
+  // Import examples dynamically
+  const examples = require('../components/Playground/examples').allExamples;
+
+  return (
+    <section className={styles.playgroundSection}>
+      <div className="container">
+        <div className={styles.sectionTitle}>
+          <Heading as="h2">Try It Now</Heading>
+          <p>Experiment with Pocket directly in your browser. No setup required.</p>
+        </div>
+        <Suspense
+          fallback={
+            <div className={styles.playgroundLoading}>
+              <div className={styles.playgroundSpinner} />
+              <span>Loading playground...</span>
+            </div>
+          }
+        >
+          <PlaygroundWithSelector
+            examples={examples}
+            defaultExample="CRUD Operations"
+            height="550px"
+          />
+        </Suspense>
+        <div className={styles.playgroundLinks}>
+          <Link to="/docs/playground">See all examples</Link>
+          <span className={styles.linkSeparator}>|</span>
+          <Link to="/docs/intro">Full documentation</Link>
+        </div>
+      </div>
+    </section>
+  );
+}
+
 function CTA() {
   return (
     <section className={styles.cta}>
@@ -571,6 +619,7 @@ export default function Home(): ReactNode {
       <main>
         <QuickExample />
         <Features />
+        <TryPlayground />
         <ArchitectureDiagram />
         <ReactSection />
         <Community />
