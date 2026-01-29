@@ -1,13 +1,86 @@
+/**
+ * EventReduce algorithm for efficient live query updates.
+ *
+ * The EventReduce algorithm is a key performance optimization for reactive queries.
+ * Instead of re-executing the entire query whenever data changes, it analyzes the
+ * change event and determines the minimal update needed to keep results current.
+ *
+ * ## How It Works
+ *
+ * ```
+ * Change Event (insert/update/delete)
+ *         │
+ *         ▼
+ * ┌───────────────────┐
+ * │   reduceEvent()   │  ← Analyzes change against current results
+ * └─────────┬─────────┘
+ *           │
+ *           ▼
+ * ┌───────────────────┐
+ * │ EventReduceAction │  ← Minimal action: insert-at, remove-at, move, etc.
+ * └─────────┬─────────┘
+ *           │
+ *           ▼
+ * ┌───────────────────┐
+ * │   applyAction()   │  ← Applies action to result array
+ * └───────────────────┘
+ * ```
+ *
+ * ## Performance Benefits
+ *
+ * - **O(log n)** for sorted inserts (binary search)
+ * - **O(1)** for updates without sort field changes
+ * - Avoids full query re-execution in most cases
+ * - Only falls back to re-execute when necessary (e.g., limit boundary cases)
+ *
+ * ## When Re-execution is Required
+ *
+ * The algorithm returns `'re-execute'` action when:
+ * - A document is deleted and results are at limit (need to pull in replacement)
+ * - Complex edge cases that can't be handled incrementally
+ *
+ * @module observable/event-reduce
+ * @see {@link LiveQuery} - Uses EventReduce for reactive updates
+ * @see {@link reduceEvent} - Main entry point for the algorithm
+ */
+
 import { compareValues, getNestedValue, matchesFilter } from '../query/operators.js';
 import type { ChangeEvent, Document } from '../types/document.js';
 import type { QuerySpec, SortSpec } from '../types/query.js';
 
 /**
- * EventReduce algorithm for efficient live query updates
+ * Represents the action to apply to a result set after analyzing a change event.
  *
- * Instead of re-executing the entire query on every change,
- * this algorithm determines the minimal update needed based
- * on the change event and current results.
+ * The action types from most efficient to least:
+ * - `'no-change'` - Change doesn't affect results, do nothing
+ * - `'update-at'` - Document updated in place (no reordering)
+ * - `'insert-at'` - Insert new document at specific index
+ * - `'remove-at'` - Remove document at specific index
+ * - `'move'` - Document changed position due to sort field change
+ * - `'re-execute'` - Must re-run the full query
+ *
+ * @typeParam T - The document type
+ *
+ * @example
+ * ```typescript
+ * // No change - document doesn't match query
+ * { type: 'no-change' }
+ *
+ * // Insert at position 2
+ * { type: 'insert-at', index: 2, document: newDoc }
+ *
+ * // Remove from position 5
+ * { type: 'remove-at', index: 5 }
+ *
+ * // Update in place at position 3
+ * { type: 'update-at', index: 3, document: updatedDoc }
+ *
+ * // Move from position 1 to position 4
+ * { type: 'move', fromIndex: 1, toIndex: 4, document: movedDoc }
+ *
+ * // Full re-execution required
+ * { type: 're-execute' }
+ * ```
  */
 export type EventReduceAction<T extends Document> =
   | { type: 'no-change' }
@@ -18,7 +91,37 @@ export type EventReduceAction<T extends Document> =
   | { type: 'move'; fromIndex: number; toIndex: number; document: T };
 
 /**
- * Determine the action to apply to a result set based on a change event
+ * Analyzes a change event and determines the minimal action to update cached results.
+ *
+ * This is the main entry point for the EventReduce algorithm. It examines:
+ * 1. The type of change (insert, update, delete)
+ * 2. Whether the document currently exists in results
+ * 3. Whether the changed document matches the query filter
+ * 4. Whether sort fields were affected (for updates)
+ *
+ * @typeParam T - The document type
+ * @param event - The change event containing operation type and document data
+ * @param currentResults - The current cached result set
+ * @param spec - The query specification (filter, sort, limit, skip)
+ * @returns An {@link EventReduceAction} describing the minimal update needed
+ *
+ * @example
+ * ```typescript
+ * // Handle a new todo being inserted
+ * const action = reduceEvent(
+ *   { operation: 'insert', documentId: '123', document: newTodo },
+ *   currentTodos,
+ *   { filter: { completed: false }, sort: [{ field: 'createdAt', direction: 'desc' }] }
+ * );
+ *
+ * // Apply the action
+ * if (action.type !== 're-execute') {
+ *   const newResults = applyAction(currentTodos, action, spec);
+ * } else {
+ *   // Fall back to full query
+ *   const newResults = await collection.find(spec).exec();
+ * }
+ * ```
  */
 export function reduceEvent<T extends Document>(
   event: ChangeEvent<T>,
@@ -55,7 +158,14 @@ export function reduceEvent<T extends Document>(
 }
 
 /**
- * Handle insert operation
+ * Handles an insert operation, determining where (if anywhere) to add the document.
+ *
+ * Logic:
+ * 1. If document doesn't match query filter → `no-change`
+ * 2. If at limit and document would sort after last result → `no-change`
+ * 3. Otherwise, find sorted insert position → `insert-at`
+ *
+ * @internal
  */
 function handleInsert<T extends Document>(
   document: T | null,
@@ -91,7 +201,16 @@ function handleInsert<T extends Document>(
 }
 
 /**
- * Handle update operation
+ * Handles an update operation, determining the appropriate action.
+ *
+ * Cases:
+ * 1. Was in results, no longer matches → `remove-at`
+ * 2. Wasn't in results, now matches → delegate to `handleInsert`
+ * 3. Still in results and matches:
+ *    - No sort or sort fields unchanged → `update-at` (in place)
+ *    - Sort fields changed → calculate new position → `move` or `update-at`
+ *
+ * @internal
  */
 function handleUpdate<T extends Document>(
   document: T | null,
@@ -144,7 +263,17 @@ function handleUpdate<T extends Document>(
 }
 
 /**
- * Handle delete operation
+ * Handles a delete operation.
+ *
+ * Cases:
+ * 1. Document not in results → `no-change`
+ * 2. At limit capacity → `re-execute` (need to pull in replacement document)
+ * 3. Otherwise → `remove-at`
+ *
+ * The re-execute case is necessary because we can't know what document
+ * would fill the vacated slot without running the full query.
+ *
+ * @internal
  */
 function handleDelete<T extends Document>(
   isInResults: boolean,
@@ -166,7 +295,18 @@ function handleDelete<T extends Document>(
 }
 
 /**
- * Find the position to insert a document while maintaining sort order
+ * Finds the correct position to insert a document while maintaining sort order.
+ *
+ * Uses binary search for O(log n) performance. Handles the special case of
+ * moving a document (where we need to skip its current position).
+ *
+ * @param document - The document to insert
+ * @param results - The current sorted results
+ * @param sort - The sort specification (if any)
+ * @param skipIndex - Index to skip (used when moving a document)
+ * @returns The index where the document should be inserted
+ *
+ * @internal
  */
 function findInsertPosition<T extends Document>(
   document: T,
@@ -209,7 +349,17 @@ function findInsertPosition<T extends Document>(
 }
 
 /**
- * Compare two documents using sort specification
+ * Compares two documents according to the sort specification.
+ *
+ * Iterates through sort fields in priority order, returning on first
+ * non-zero comparison. Uses {@link compareValues} for type-aware comparison.
+ *
+ * @param a - First document
+ * @param b - Second document
+ * @param sort - Sort specification with fields and directions
+ * @returns Negative if a < b, positive if a > b, zero if equal
+ *
+ * @internal
  */
 function compareDocuments<T extends Document>(a: T, b: T, sort: SortSpec<T>[]): number {
   for (const { field, direction } of sort) {
@@ -222,7 +372,17 @@ function compareDocuments<T extends Document>(a: T, b: T, sort: SortSpec<T>[]): 
 }
 
 /**
- * Check if any sort field changed between old and new document
+ * Checks if any sort-relevant field changed between document versions.
+ *
+ * This optimization allows updates to non-sort fields to be applied in-place
+ * without recalculating position.
+ *
+ * @param newDoc - The updated document
+ * @param oldDoc - The previous document version
+ * @param sort - Sort specification listing fields that affect order
+ * @returns `true` if any sort field value changed
+ *
+ * @internal
  */
 function hasSortFieldChanged<T extends Document>(
   newDoc: T,
@@ -238,7 +398,32 @@ function hasSortFieldChanged<T extends Document>(
 }
 
 /**
- * Apply an action to a result set
+ * Applies an {@link EventReduceAction} to a result array, producing updated results.
+ *
+ * This function immutably updates the result array based on the action type:
+ * - `'no-change'` → Returns the same array reference
+ * - `'re-execute'` → Returns `null` (caller should re-run the query)
+ * - `'insert-at'` → Creates new array with document inserted, respects limit
+ * - `'remove-at'` → Creates new array with document removed
+ * - `'update-at'` → Creates new array with document replaced in place
+ * - `'move'` → Creates new array with document relocated
+ *
+ * @typeParam T - The document type
+ * @param results - The current result array
+ * @param action - The action to apply (from {@link reduceEvent})
+ * @param spec - The query specification (needed for limit enforcement)
+ * @returns Updated result array, or `null` if full re-execution is required
+ *
+ * @example
+ * ```typescript
+ * const action = reduceEvent(changeEvent, results, querySpec);
+ * const newResults = applyAction(results, action, querySpec);
+ *
+ * if (newResults === null) {
+ *   // Fall back to full query execution
+ *   newResults = await collection.find(querySpec).exec();
+ * }
+ * ```
  */
 export function applyAction<T extends Document>(
   results: T[],
