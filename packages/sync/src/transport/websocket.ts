@@ -1,7 +1,61 @@
 import type { SyncProtocolMessage, SyncTransport, TransportConfig } from './types.js';
 
 /**
- * WebSocket transport implementation
+ * WebSocket-based transport implementation for real-time sync.
+ *
+ * Provides a persistent, bidirectional connection for sync operations.
+ * This is the recommended transport for applications requiring low-latency
+ * sync and real-time updates.
+ *
+ * ## Features
+ *
+ * - **Persistent connection**: Maintains an open WebSocket for instant sync
+ * - **Auto-reconnection**: Configurable exponential backoff reconnection
+ * - **Request/response matching**: Tracks pending requests with timeouts
+ * - **Authentication**: Supports token-based auth via query parameter
+ *
+ * ## Connection Lifecycle
+ *
+ * ```
+ * connect() ──→ [connected] ──→ disconnect()
+ *                    │
+ *                    ▼ (connection lost)
+ *             [reconnecting] ──→ [connected] (success)
+ *                    │
+ *                    ▼ (max attempts)
+ *               [failed]
+ * ```
+ *
+ * @example
+ * ```typescript
+ * const transport = createWebSocketTransport({
+ *   serverUrl: 'wss://sync.example.com',
+ *   authToken: 'user-token',
+ *   timeout: 30000,
+ *   autoReconnect: true,
+ *   reconnectDelay: 1000,
+ *   maxReconnectAttempts: 10,
+ * });
+ *
+ * await transport.connect();
+ *
+ * // Send sync messages
+ * const response = await transport.send<PushResponseMessage>({
+ *   type: 'push',
+ *   id: generateMessageId(),
+ *   changes: myChanges,
+ * });
+ *
+ * // Handle incoming messages
+ * transport.onMessage((msg) => console.log('Received:', msg));
+ *
+ * // Handle connection events
+ * transport.onDisconnect(() => console.log('Disconnected'));
+ * transport.onReconnect(() => console.log('Reconnected'));
+ * ```
+ *
+ * @see {@link createWebSocketTransport} - Factory function
+ * @see {@link HttpTransport} - Fallback for environments without WebSocket
  */
 export class WebSocketTransport implements SyncTransport {
   private readonly config: Required<TransportConfig>;
@@ -205,7 +259,24 @@ export class WebSocketTransport implements SyncTransport {
 }
 
 /**
- * Create a WebSocket transport
+ * Creates a WebSocket transport for sync operations.
+ *
+ * This is the recommended transport for most web applications.
+ * For environments that don't support WebSocket (some edge runtimes),
+ * use {@link createHttpTransport} instead.
+ *
+ * @param config - Transport configuration including server URL and auth
+ * @returns A configured WebSocketTransport instance
+ *
+ * @example
+ * ```typescript
+ * const transport = createWebSocketTransport({
+ *   serverUrl: 'wss://sync.example.com',
+ *   authToken: localStorage.getItem('token'),
+ * });
+ *
+ * const syncEngine = new SyncEngine(db, { transport });
+ * ```
  */
 export function createWebSocketTransport(config: TransportConfig): WebSocketTransport {
   return new WebSocketTransport(config);
