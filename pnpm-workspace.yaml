@@ -3,3 +3,4 @@ packages:
   - 'examples/*'
   - 'benchmarks'
   - 'docs'
+  - 'website'
