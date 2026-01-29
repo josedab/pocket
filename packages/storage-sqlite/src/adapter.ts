@@ -1,3 +1,103 @@
+/**
+ * SQLite storage adapter for Pocket.
+ *
+ * This module provides SQL-based storage using SQLite, which can run in
+ * various environments via different driver backends:
+ *
+ * - **sql.js**: Pure JavaScript SQLite (browser/Node.js)
+ * - **better-sqlite3**: Native Node.js SQLite bindings
+ * - **wa-sqlite**: WebAssembly SQLite for browsers
+ *
+ * ## Features
+ *
+ * - **SQL Queries**: Full SQL power for complex queries
+ * - **ACID Transactions**: Atomic, consistent, isolated, durable operations
+ * - **JSON Support**: Documents stored as JSON with json_extract indexes
+ * - **Portable**: Same code works in browser and Node.js
+ * - **Exportable**: Database can be exported as a binary blob
+ *
+ * ## Architecture
+ *
+ * ```
+ * ┌─────────────────────────────────────────────────────────────────┐
+ * │                    SQLiteStorageAdapter                         │
+ * │                                                                  │
+ * │  ┌──────────────────────────────────────────────────────────┐  │
+ * │  │                    SQLiteDriver                           │  │
+ * │  │  (Abstraction over different SQLite implementations)     │  │
+ * │  └──────────────────────────┬───────────────────────────────┘  │
+ * │                             │                                   │
+ * │  ┌──────────────────────────┼───────────────────────────────┐  │
+ * │  │                          ▼                                │  │
+ * │  │  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐       │  │
+ * │  │  │   sql.js    │  │better-sqlite│  │  wa-sqlite  │       │  │
+ * │  │  │  (WASM)     │  │  (Native)   │  │  (WASM)     │       │  │
+ * │  │  └─────────────┘  └─────────────┘  └─────────────┘       │  │
+ * │  └──────────────────────────────────────────────────────────┘  │
+ * │                                                                  │
+ * │  ┌──────────────────────────────────────────────────────────┐  │
+ * │  │              SQLiteDocumentStore (per collection)         │  │
+ * │  │  - Table: pocket_{collection}                            │  │
+ * │  │  - Columns: _id, _rev, _deleted, _updatedAt, _data       │  │
+ * │  │  - JSON indexes via json_extract()                       │  │
+ * │  └──────────────────────────────────────────────────────────┘  │
+ * └─────────────────────────────────────────────────────────────────┘
+ * ```
+ *
+ * ## Table Schema
+ *
+ * Each collection is stored as a table with this schema:
+ *
+ * | Column | Type | Description |
+ * |--------|------|-------------|
+ * | _id | TEXT PRIMARY KEY | Document ID |
+ * | _rev | TEXT | Revision for conflict detection |
+ * | _deleted | INTEGER | Soft delete flag (0/1) |
+ * | _updatedAt | INTEGER | Unix timestamp |
+ * | _vclock | TEXT | Vector clock JSON (for sync) |
+ * | _data | TEXT | Document fields as JSON |
+ *
+ * @module storage-sqlite
+ *
+ * @example Basic usage
+ * ```typescript
+ * import { Database } from '@pocket/core';
+ * import { createSQLiteStorage } from '@pocket/storage-sqlite';
+ *
+ * const db = await Database.create({
+ *   name: 'my-app',
+ *   storage: createSQLiteStorage()
+ * });
+ * ```
+ *
+ * @example With sql.js (browser)
+ * ```typescript
+ * import initSqlJs from 'sql.js';
+ *
+ * const SQL = await initSqlJs();
+ * const db = await Database.create({
+ *   name: 'my-app',
+ *   storage: createSQLiteStorage({
+ *     driver: 'sqljs',
+ *     sqlJsFactory: () => new SQL.Database()
+ *   })
+ * });
+ * ```
+ *
+ * @example Exporting database
+ * ```typescript
+ * const adapter = db.storage as SQLiteStorageAdapter;
+ * const data = adapter.export();
+ * if (data) {
+ *   // Save data to file or send to server
+ *   const blob = new Blob([data], { type: 'application/x-sqlite3' });
+ * }
+ * ```
+ *
+ * @see {@link SQLiteStorageAdapter} for the adapter class
+ * @see {@link createSQLiteStorage} for the factory function
+ */
+
 import type {
   ChangeEvent,
   Document,
@@ -19,7 +119,49 @@ import type {
 } from './types.js';
 
 /**
- * SQLite storage adapter
+ * SQLite storage adapter implementing the Pocket StorageAdapter interface.
+ *
+ * This adapter stores documents in SQLite tables with full SQL query support.
+ * Documents are serialized to JSON and stored in a `_data` column, with
+ * metadata fields (`_id`, `_rev`, etc.) stored as separate columns for indexing.
+ *
+ * ## Key Features
+ *
+ * - **Full SQL Support**: Use json_extract for querying JSON fields
+ * - **ACID Transactions**: Wrap operations in transactions
+ * - **Index Support**: Create indexes on JSON fields
+ * - **Export/Import**: Serialize entire database to Uint8Array
+ *
+ * @example Basic operations
+ * ```typescript
+ * const adapter = new SQLiteStorageAdapter();
+ * await adapter.initialize({ name: 'my-app' });
+ *
+ * const todos = adapter.getStore<Todo>('todos');
+ * await todos.put({ _id: '1', title: 'Learn SQLite' });
+ *
+ * const stats = await adapter.getStats();
+ * console.log(`Size: ${stats.storageSize} bytes`);
+ * ```
+ *
+ * @example Creating indexes
+ * ```typescript
+ * const todos = adapter.getStore<Todo>('todos');
+ *
+ * // Create index on JSON field
+ * await todos.createIndex({
+ *   name: 'idx_todos_completed',
+ *   fields: ['completed']
+ * });
+ *
+ * // Queries on 'completed' field will use the index
+ * const incomplete = await todos.query({
+ *   filter: { completed: false }
+ * });
+ * ```
+ *
+ * @see {@link createSQLiteStorage} for the factory function
+ * @see {@link SQLiteAdapterConfig} for configuration options
  */
 export class SQLiteStorageAdapter implements StorageAdapter {
   readonly name = 'sqlite';
@@ -211,7 +353,27 @@ export class SQLiteStorageAdapter implements StorageAdapter {
 }
 
 /**
- * SQLite document store
+ * SQLite implementation of the DocumentStore interface.
+ *
+ * Each instance manages a single SQLite table representing a collection.
+ * Documents are stored with metadata columns for efficient filtering and
+ * a JSON `_data` column for arbitrary document fields.
+ *
+ * ## Table Structure
+ *
+ * ```sql
+ * CREATE TABLE pocket_{collection} (
+ *   _id TEXT PRIMARY KEY,
+ *   _rev TEXT,
+ *   _deleted INTEGER DEFAULT 0,
+ *   _updatedAt INTEGER,
+ *   _vclock TEXT,
+ *   _data TEXT NOT NULL
+ * );
+ * ```
+ *
+ * @typeParam T - The document type stored in this collection
+ * @internal
  */
 class SQLiteDocumentStore<T extends Document> implements DocumentStore<T> {
   readonly name: string;
@@ -483,7 +645,49 @@ class SQLiteDocumentStore<T extends Document> implements DocumentStore<T> {
 }
 
 /**
- * Create SQLite storage adapter
+ * Creates a SQLite storage adapter for use with Pocket databases.
+ *
+ * SQLite provides powerful SQL-based querying and ACID transactions.
+ * The adapter supports multiple SQLite implementations for different
+ * environments (browser, Node.js).
+ *
+ * @param config - Optional configuration for the adapter
+ * @returns A new SQLiteStorageAdapter instance
+ *
+ * @example Basic usage
+ * ```typescript
+ * import { Database } from '@pocket/core';
+ * import { createSQLiteStorage } from '@pocket/storage-sqlite';
+ *
+ * const db = await Database.create({
+ *   name: 'my-app',
+ *   storage: createSQLiteStorage()
+ * });
+ * ```
+ *
+ * @example With custom driver configuration
+ * ```typescript
+ * const storage = createSQLiteStorage({
+ *   driver: 'sqljs',
+ *   // Other driver-specific options
+ * });
+ * ```
+ *
+ * @example Export database for backup
+ * ```typescript
+ * const adapter = createSQLiteStorage();
+ * await adapter.initialize({ name: 'my-app' });
+ *
+ * // After some operations...
+ * const backup = adapter.export();
+ * if (backup) {
+ *   // Save to file or IndexedDB
+ *   localStorage.setItem('db-backup', btoa(String.fromCharCode(...backup)));
+ * }
+ * ```
+ *
+ * @see {@link SQLiteStorageAdapter} for the adapter class
+ * @see {@link SQLiteAdapterConfig} for configuration options
  */
 export function createSQLiteStorage(config?: SQLiteAdapterConfig): SQLiteStorageAdapter {
   return new SQLiteStorageAdapter(config);

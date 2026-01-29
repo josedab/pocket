@@ -1,3 +1,82 @@
+/**
+ * IndexedDB storage adapter for Pocket.
+ *
+ * This module provides persistent browser storage using the IndexedDB API.
+ * IndexedDB is the recommended storage adapter for web applications due to:
+ *
+ * - **Large Storage Capacity**: Typically 50% of available disk space
+ * - **Structured Data**: Native support for objects and arrays
+ * - **Indexed Queries**: Efficient lookups via database indexes
+ * - **Persistence**: Data survives browser restarts and refreshes
+ * - **Wide Support**: Available in all modern browsers
+ *
+ * ## Architecture
+ *
+ * ```
+ * ┌─────────────────────────────────────────────────────────────────┐
+ * │                    IndexedDBAdapter                             │
+ * │                                                                  │
+ * │  ┌──────────────────────────────────────────────────────────┐  │
+ * │  │                   IDBDatabase                             │  │
+ * │  │                                                            │  │
+ * │  │  ┌─────────────────┐  ┌─────────────────┐                 │  │
+ * │  │  │ Object Store    │  │ Object Store    │  ...            │  │
+ * │  │  │ (collection)    │  │ (collection)    │                 │  │
+ * │  │  │                 │  │                 │                 │  │
+ * │  │  │ ┌─────────────┐ │  │ ┌─────────────┐ │                 │  │
+ * │  │  │ │ IDB Indexes │ │  │ │ IDB Indexes │ │                 │  │
+ * │  │  │ └─────────────┘ │  │ └─────────────┘ │                 │  │
+ * │  │  └─────────────────┘  └─────────────────┘                 │  │
+ * │  └──────────────────────────────────────────────────────────┘  │
+ * │                                                                  │
+ * │  ┌──────────────────────────────────────────────────────────┐  │
+ * │  │              IndexedDBDocumentStore (per collection)      │  │
+ * │  │  - get/put/delete operations                              │  │
+ * │  │  - Query execution with index hints                       │  │
+ * │  │  - Change event emission                                  │  │
+ * │  └──────────────────────────────────────────────────────────┘  │
+ * └─────────────────────────────────────────────────────────────────┘
+ * ```
+ *
+ * ## Version Management
+ *
+ * IndexedDB uses schema versioning. When collections or indexes need to be
+ * created, the adapter automatically triggers a version upgrade:
+ *
+ * | Action | Requires Version Upgrade |
+ * |--------|-------------------------|
+ * | Create collection | Yes |
+ * | Create index | Yes |
+ * | Read/Write data | No |
+ * | Delete data | No |
+ *
+ * @module storage-indexeddb
+ *
+ * @example Basic usage
+ * ```typescript
+ * import { Database } from '@pocket/core';
+ * import { createIndexedDBStorage } from '@pocket/storage-indexeddb';
+ *
+ * const db = await Database.create({
+ *   name: 'my-app',
+ *   storage: createIndexedDBStorage()
+ * });
+ * ```
+ *
+ * @example With custom IndexedDB factory (testing)
+ * ```typescript
+ * import { createIndexedDBStorage } from '@pocket/storage-indexeddb';
+ * import 'fake-indexeddb/auto';
+ *
+ * const storage = createIndexedDBStorage({
+ *   indexedDB: indexedDB // Use fake-indexeddb
+ * });
+ * ```
+ *
+ * @see {@link IndexedDBAdapter} for the adapter class
+ * @see {@link createIndexedDBStorage} for the factory function
+ */
+
 import {
   matchesFilter,
   QueryExecutor,
@@ -21,11 +100,46 @@ import {
   promisifyRequest,
 } from './transaction.js';
 
+/** Internal meta store name for Pocket metadata */
 const META_STORE = '__pocket_meta__';
+
+/** Prefix for IndexedDB index names */
 const INDEX_PREFIX = 'idx_';
 
 /**
- * IndexedDB document store implementation
+ * IndexedDB implementation of the DocumentStore interface.
+ *
+ * Each instance wraps a single IndexedDB object store (collection) and provides:
+ * - CRUD operations (get, put, delete)
+ * - Bulk operations for efficiency
+ * - Query execution with optional index hints
+ * - Observable change stream for reactive updates
+ *
+ * Documents are serialized/deserialized to handle special types like Date
+ * that IndexedDB stores as-is but may lose type information.
+ *
+ * @typeParam T - The document type stored in this collection
+ *
+ * @example
+ * ```typescript
+ * // Typically accessed via IndexedDBAdapter.getStore()
+ * const store = adapter.getStore<Todo>('todos');
+ *
+ * // Single document operations
+ * const todo = await store.get('todo-123');
+ * await store.put({ _id: 'todo-456', title: 'New task' });
+ * await store.delete('todo-789');
+ *
+ * // Bulk operations (more efficient for multiple docs)
+ * await store.bulkPut([todo1, todo2, todo3]);
+ *
+ * // Subscribe to changes
+ * store.changes().subscribe(event => {
+ *   console.log(`${event.operation}: ${event.documentId}`);
+ * });
+ * ```
+ *
+ * @internal
  */
 class IndexedDBDocumentStore<T extends Document> implements DocumentStore<T> {
   readonly name: string;
@@ -301,15 +415,87 @@ function normalizeIndex(index: IndexDefinition): NormalizedIndex {
 }
 
 /**
- * IndexedDB storage adapter options
+ * Configuration options for the IndexedDB storage adapter.
+ *
+ * @example Using a custom IndexedDB factory for testing
+ * ```typescript
+ * import 'fake-indexeddb/auto';
+ *
+ * const storage = createIndexedDBStorage({
+ *   indexedDB: indexedDB // Use fake-indexeddb
+ * });
+ * ```
  */
 export interface IndexedDBAdapterOptions {
-  /** Custom IndexedDB factory (for testing) */
+  /**
+   * Custom IndexedDB factory instance.
+   *
+   * Use this to inject a mock/fake IndexedDB implementation for testing,
+   * or to use a specific IndexedDB instance in environments with multiple
+   * global contexts (e.g., Web Workers).
+   *
+   * @default globalThis.indexedDB
+   */
   indexedDB?: IDBFactory;
 }
 
 /**
- * IndexedDB storage adapter
+ * IndexedDB storage adapter implementing the Pocket StorageAdapter interface.
+ *
+ * This adapter provides persistent storage using the browser's IndexedDB API.
+ * It manages database connections, object stores (collections), and handles
+ * schema version upgrades automatically.
+ *
+ * ## Key Features
+ *
+ * - **Automatic Schema Management**: Collections and indexes are created
+ *   automatically via version upgrades
+ * - **Efficient Bulk Operations**: Batched writes use single transactions
+ * - **Index Support**: Create indexes for optimized queries
+ * - **Change Tracking**: All mutations emit change events for reactive queries
+ *
+ * ## Lifecycle
+ *
+ * ```
+ * create → initialize() → getStore() → ... → close()
+ *   │           │              │
+ *   │           └── Opens IDB  └── Returns DocumentStore
+ *   └── Factory
+ * ```
+ *
+ * @example Basic usage
+ * ```typescript
+ * const adapter = new IndexedDBAdapter();
+ *
+ * // Check if IndexedDB is available
+ * if (!adapter.isAvailable()) {
+ *   throw new Error('IndexedDB not supported');
+ * }
+ *
+ * // Initialize with database name
+ * await adapter.initialize({ name: 'my-app', version: 1 });
+ *
+ * // Get a document store (collection)
+ * const todos = adapter.getStore<Todo>('todos');
+ *
+ * // Perform operations
+ * await todos.put({ _id: '1', title: 'Buy milk' });
+ *
+ * // Clean up
+ * await adapter.close();
+ * ```
+ *
+ * @example Getting storage statistics
+ * ```typescript
+ * const stats = await adapter.getStats();
+ * console.log(`Documents: ${stats.documentCount}`);
+ * console.log(`Storage: ${stats.storageSize} bytes`);
+ * console.log(`Collections: ${stats.storeCount}`);
+ * console.log(`Indexes: ${stats.indexCount}`);
+ * ```
+ *
+ * @see {@link createIndexedDBStorage} for the factory function
+ * @see {@link IndexedDBDocumentStore} for per-collection operations
  */
 export class IndexedDBAdapter implements StorageAdapter {
   readonly name = 'indexeddb';
@@ -501,7 +687,40 @@ export class IndexedDBAdapter implements StorageAdapter {
 }
 
 /**
- * Create an IndexedDB storage adapter
+ * Creates an IndexedDB storage adapter for use with Pocket databases.
+ *
+ * This is the recommended factory function for creating IndexedDB storage.
+ * The adapter provides persistent, indexed storage in the browser.
+ *
+ * @param options - Optional configuration for the adapter
+ * @returns A new IndexedDBAdapter instance
+ *
+ * @example Basic usage with Database.create
+ * ```typescript
+ * import { Database } from '@pocket/core';
+ * import { createIndexedDBStorage } from '@pocket/storage-indexeddb';
+ *
+ * const db = await Database.create({
+ *   name: 'my-app',
+ *   storage: createIndexedDBStorage()
+ * });
+ *
+ * // Use the database
+ * const todos = db.collection<Todo>('todos');
+ * await todos.insert({ title: 'Buy groceries' });
+ * ```
+ *
+ * @example With testing mock
+ * ```typescript
+ * import 'fake-indexeddb/auto';
+ *
+ * const storage = createIndexedDBStorage({
+ *   indexedDB: indexedDB // fake-indexeddb injects this global
+ * });
+ * ```
+ *
+ * @see {@link IndexedDBAdapter} for the adapter class
+ * @see {@link IndexedDBAdapterOptions} for configuration options
  */
 export function createIndexedDBStorage(options?: IndexedDBAdapterOptions): IndexedDBAdapter {
   return new IndexedDBAdapter(options);

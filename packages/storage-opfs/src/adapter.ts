@@ -1,3 +1,74 @@
+/**
+ * Origin Private File System (OPFS) storage adapter for Pocket.
+ *
+ * This module provides high-performance file-based storage using the OPFS API.
+ * OPFS is ideal for applications requiring:
+ *
+ * - **High-Performance I/O**: Synchronous access in Web Workers
+ * - **Large Data Sets**: No practical size limits (uses file system)
+ * - **Isolation**: Private to the origin, not visible to users
+ * - **SQLite Compatibility**: Excellent for running SQLite in the browser
+ *
+ * ## Architecture
+ *
+ * ```
+ * ┌────────────────────────────────────────────────────────────────┐
+ * │                       Main Thread                               │
+ * │  ┌──────────────────────────────────────────────────────────┐  │
+ * │  │                    OPFSAdapter                            │  │
+ * │  │  - Manages worker communication                          │  │
+ * │  │  - Coordinates document stores                           │  │
+ * │  │  - Handles request/response messaging                    │  │
+ * │  └─────────────────────────┬────────────────────────────────┘  │
+ * └────────────────────────────┼────────────────────────────────────┘
+ *                              │ postMessage
+ *                              ▼
+ * ┌────────────────────────────────────────────────────────────────┐
+ * │                       Web Worker                                │
+ * │  ┌──────────────────────────────────────────────────────────┐  │
+ * │  │                  OPFS Worker                              │  │
+ * │  │  - Direct OPFS file access                               │  │
+ * │  │  - Synchronous file operations                           │  │
+ * │  │  - WAL (Write-Ahead Log) support                        │  │
+ * │  └─────────────────────────┬────────────────────────────────┘  │
+ * └────────────────────────────┼────────────────────────────────────┘
+ *                              │
+ *                              ▼
+ * ┌────────────────────────────────────────────────────────────────┐
+ * │                    Origin Private File System                   │
+ * │  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐            │
+ * │  │ collection1 │  │ collection2 │  │ collection3 │  ...       │
+ * │  │ (file)      │  │ (file)      │  │ (file)      │            │
+ * │  └─────────────┘  └─────────────┘  └─────────────┘            │
+ * └────────────────────────────────────────────────────────────────┘
+ * ```
+ *
+ * ## Worker Requirement
+ *
+ * For optimal performance, OPFS operations run in a Web Worker.
+ * This enables synchronous file access APIs that are much faster
+ * than async alternatives.
+ *
+ * @module storage-opfs
+ *
+ * @example Basic usage with worker
+ * ```typescript
+ * import { Database } from '@pocket/core';
+ * import { createOPFSStorage } from '@pocket/storage-opfs';
+ *
+ * const db = await Database.create({
+ *   name: 'my-app',
+ *   storage: createOPFSStorage({
+ *     workerUrl: '/opfs-worker.js',
+ *     useWorker: true
+ *   })
+ * });
+ * ```
+ *
+ * @see {@link OPFSAdapter} for the adapter class
+ * @see {@link createOPFSStorage} for the factory function
+ */
+
 import type {
   ChangeEvent,
   Document,
@@ -15,17 +86,46 @@ import { type Observable, Subject } from 'rxjs';
 import type { WorkerRequest, WorkerResponse } from './worker.js';
 
 /**
- * OPFS adapter options
+ * Configuration options for the OPFS storage adapter.
+ *
+ * @example Using a custom worker URL
+ * ```typescript
+ * const storage = createOPFSStorage({
+ *   workerUrl: '/path/to/opfs-worker.js',
+ *   useWorker: true
+ * });
+ * ```
  */
 export interface OPFSAdapterOptions {
-  /** URL to the worker script */
+  /**
+   * URL to the OPFS worker script.
+   *
+   * The worker handles file system operations off the main thread,
+   * enabling synchronous OPFS access for better performance.
+   *
+   * @example '/workers/opfs-worker.js'
+   */
   workerUrl?: string;
-  /** Use worker for operations (recommended for performance) */
+
+  /**
+   * Whether to use a Web Worker for OPFS operations.
+   *
+   * Highly recommended for production use. Direct main-thread access
+   * is only suitable for simple testing scenarios.
+   *
+   * @default true
+   */
   useWorker?: boolean;
 }
 
 /**
- * OPFS document store
+ * OPFS implementation of the DocumentStore interface.
+ *
+ * Each instance manages documents for a single collection, storing them
+ * as JSON files in the Origin Private File System via a Web Worker.
+ *
+ * @typeParam T - The document type stored in this collection
+ * @internal
  */
 class OPFSDocumentStore<T extends Document> implements DocumentStore<T> {
   readonly name: string;
@@ -211,7 +311,50 @@ class OPFSDocumentStore<T extends Document> implements DocumentStore<T> {
 }
 
 /**
- * OPFS storage adapter
+ * Origin Private File System storage adapter implementing the Pocket StorageAdapter interface.
+ *
+ * This adapter provides high-performance persistent storage using the browser's
+ * Origin Private File System API. Operations are delegated to a Web Worker
+ * for optimal performance.
+ *
+ * ## Key Features
+ *
+ * - **Worker-Based I/O**: File operations run in dedicated Web Worker
+ * - **Synchronous Access**: Uses synchronous file APIs in worker (faster)
+ * - **Request Queuing**: Handles concurrent operations via message passing
+ * - **Change Tracking**: Emits change events for reactive queries
+ *
+ * ## Browser Support
+ *
+ * OPFS is supported in modern browsers:
+ * - Chrome 86+
+ * - Edge 86+
+ * - Safari 15.2+ (partial)
+ * - Firefox 111+
+ *
+ * @example Basic usage
+ * ```typescript
+ * const adapter = new OPFSAdapter({
+ *   workerUrl: '/workers/opfs-worker.js',
+ *   useWorker: true
+ * });
+ *
+ * if (adapter.isAvailable()) {
+ *   await adapter.initialize({ name: 'my-app' });
+ *   const todos = adapter.getStore<Todo>('todos');
+ *   await todos.put({ _id: '1', title: 'Learn OPFS' });
+ * }
+ * ```
+ *
+ * @example Checking storage usage
+ * ```typescript
+ * const stats = await adapter.getStats();
+ * console.log(`Documents: ${stats.documentCount}`);
+ * console.log(`Estimated size: ${stats.storageSize} bytes`);
+ * ```
+ *
+ * @see {@link createOPFSStorage} for the factory function
+ * @see {@link OPFSAdapterOptions} for configuration options
  */
 export class OPFSAdapter implements StorageAdapter {
   readonly name = 'opfs';
@@ -377,7 +520,39 @@ export class OPFSAdapter implements StorageAdapter {
 }
 
 /**
- * Create an OPFS storage adapter
+ * Creates an OPFS storage adapter for use with Pocket databases.
+ *
+ * OPFS provides high-performance file-based storage with excellent
+ * support for large datasets and SQLite-based storage backends.
+ *
+ * @param options - Optional configuration for the adapter
+ * @returns A new OPFSAdapter instance
+ *
+ * @example Basic usage with worker
+ * ```typescript
+ * import { Database } from '@pocket/core';
+ * import { createOPFSStorage } from '@pocket/storage-opfs';
+ *
+ * const db = await Database.create({
+ *   name: 'my-app',
+ *   storage: createOPFSStorage({
+ *     workerUrl: '/workers/opfs-worker.js',
+ *     useWorker: true
+ *   })
+ * });
+ * ```
+ *
+ * @example Checking availability
+ * ```typescript
+ * const storage = createOPFSStorage();
+ * if (!storage.isAvailable()) {
+ *   // Fall back to IndexedDB
+ *   const fallback = createIndexedDBStorage();
+ * }
+ * ```
+ *
+ * @see {@link OPFSAdapter} for the adapter class
+ * @see {@link OPFSAdapterOptions} for configuration options
  */
 export function createOPFSStorage(options?: OPFSAdapterOptions): OPFSAdapter {
   return new OPFSAdapter(options);
