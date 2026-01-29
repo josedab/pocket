@@ -1,23 +1,100 @@
+/**
+ * React Suspense-compatible hooks for Pocket queries.
+ *
+ * These hooks integrate with React's Suspense feature to provide a declarative
+ * loading experience. Instead of checking `isLoading` states, components simply
+ * suspend while data is being fetched.
+ *
+ * ## How Suspense Queries Work
+ *
+ * 1. Component calls `useSuspenseQuery`
+ * 2. If data is cached, return immediately
+ * 3. If loading, throw the promise (React catches this)
+ * 4. React shows the nearest Suspense fallback
+ * 5. When promise resolves, React re-renders with data
+ *
+ * ## Caching
+ *
+ * Suspense queries use a global cache keyed by collection name and dependencies.
+ * Use {@link clearSuspenseCache} or {@link useInvalidateQuery} to clear cache.
+ *
+ * @module hooks/use-suspense-query
+ *
+ * @example
+ * ```tsx
+ * import { Suspense } from 'react';
+ * import { useSuspenseQuery } from '@pocket/react';
+ *
+ * function UserList() {
+ *   // This suspends until data is ready - no isLoading check needed!
+ *   const users = useSuspenseQuery<User>('users');
+ *   return <ul>{users.map(u => <li key={u._id}>{u.name}</li>)}</ul>;
+ * }
+ *
+ * // Wrap with Suspense boundary
+ * function App() {
+ *   return (
+ *     <Suspense fallback={<Spinner />}>
+ *       <UserList />
+ *     </Suspense>
+ *   );
+ * }
+ * ```
+ *
+ * @see {@link useSuspenseQuery} - Main suspense query hook
+ * @see {@link usePrefetchQuery} - Prefetch data before rendering
+ * @see {@link useInvalidateQuery} - Invalidate cached data
+ */
+
 import type { Collection, Document, QueryBuilder } from '@pocket/core';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useCollection } from '../context/provider.js';
 
 /**
- * Promise cache for Suspense
+ * Internal cache for pending promises (thrown for Suspense).
+ * @internal
  */
 const promiseCache = new Map<string, Promise<unknown>>();
+
+/**
+ * Internal cache for resolved query results.
+ * @internal
+ */
 const resultCache = new Map<string, unknown>();
+
+/**
+ * Internal cache for query errors.
+ * @internal
+ */
 const errorCache = new Map<string, Error>();
 
 /**
- * Generate a cache key from collection name and query deps
+ * Generate a cache key from collection name and query deps.
+ * @internal
  */
 function getCacheKey(collectionName: string, deps: unknown[]): string {
   return `${collectionName}:${JSON.stringify(deps)}`;
 }
 
 /**
- * Clear cached data for a specific key
+ * Clear the Suspense query cache.
+ *
+ * Call this to force queries to refetch data. Useful after mutations
+ * that affect query results.
+ *
+ * @param key - Optional specific cache key to clear. If omitted, clears all cache.
+ *
+ * @example Clear all cache
+ * ```typescript
+ * clearSuspenseCache();
+ * ```
+ *
+ * @example Clear specific key (advanced)
+ * ```typescript
+ * clearSuspenseCache('users:[]');
+ * ```
+ *
+ * @see {@link useInvalidateQuery} for a hook-based approach
  */
 export function clearSuspenseCache(key?: string): void {
   if (key) {
@@ -32,7 +109,7 @@ export function clearSuspenseCache(key?: string): void {
 }
 
 /**
- * Suspense query options
+ * Configuration options for {@link useSuspenseQuery}.
  */
 export interface UseSuspenseQueryOptions {
   /** Custom cache key (defaults to collection + deps hash) */

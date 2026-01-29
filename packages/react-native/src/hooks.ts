@@ -1,3 +1,70 @@
+/**
+ * React Native hooks for Pocket database operations.
+ *
+ * This module provides hooks optimized for React Native applications,
+ * with support for reactive updates, loading states, and error handling.
+ *
+ * ## Available Hooks
+ *
+ * | Hook | Purpose |
+ * |------|---------|
+ * | {@link useCollection} | Access a collection directly |
+ * | {@link useDocument} | Fetch and observe a single document |
+ * | {@link useQuery} | Query multiple documents with filters |
+ * | {@link useMutation} | Insert, update, and delete documents |
+ * | {@link useCount} | Count documents with optional filter |
+ * | {@link useAll} | Observe all documents in a collection |
+ *
+ * ## Usage Pattern
+ *
+ * All data hooks return an object with:
+ * - `data` - The fetched data
+ * - `isLoading` - Loading state
+ * - `error` - Error if the operation failed
+ *
+ * Mutation hooks return functions for each operation type.
+ *
+ * @module hooks
+ *
+ * @example Complete CRUD example
+ * ```tsx
+ * function TodoScreen() {
+ *   // Query all incomplete todos
+ *   const { data: todos, isLoading } = useQuery<Todo>(
+ *     'todos',
+ *     { completed: false },
+ *     { sortBy: 'createdAt', sortDirection: 'desc' }
+ *   );
+ *
+ *   // Mutations
+ *   const { insert, update, remove } = useMutation<Todo>('todos');
+ *
+ *   const addTodo = async (title: string) => {
+ *     await insert({ title, completed: false, createdAt: Date.now() });
+ *   };
+ *
+ *   const toggleTodo = async (id: string, completed: boolean) => {
+ *     await update(id, { completed: !completed });
+ *   };
+ *
+ *   if (isLoading) return <ActivityIndicator />;
+ *
+ *   return (
+ *     <View>
+ *       {todos.map(todo => (
+ *         <TouchableOpacity
+ *           key={todo._id}
+ *           onPress={() => toggleTodo(todo._id, todo.completed)}
+ *         >
+ *           <Text>{todo.title}</Text>
+ *         </TouchableOpacity>
+ *       ))}
+ *     </View>
+ *   );
+ * }
+ * ```
+ */
+
 import type { Collection, Document } from '@pocket/core';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { usePocket } from './context.js';
@@ -10,7 +77,28 @@ import type {
 } from './types.js';
 
 /**
- * Hook to get a collection
+ * Hook to get a collection directly.
+ *
+ * Use this when you need direct access to the collection API
+ * for advanced operations not covered by other hooks.
+ *
+ * @typeParam T - The document type
+ * @param name - The collection name
+ * @returns The collection instance, or null if Pocket is not ready
+ *
+ * @example
+ * ```tsx
+ * function AdvancedComponent() {
+ *   const todos = useCollection<Todo>('todos');
+ *
+ *   const bulkInsert = async (items: Todo[]) => {
+ *     if (!todos) return;
+ *     await todos.bulkInsert(items);
+ *   };
+ *
+ *   return <Button onPress={() => bulkInsert(items)} title="Import" />;
+ * }
+ * ```
  */
 export function useCollection<T extends Document>(name: string): Collection<T> | null {
   const { collection, isReady } = usePocket();
@@ -20,7 +108,44 @@ export function useCollection<T extends Document>(name: string): Collection<T> |
 }
 
 /**
- * Hook to fetch a single document by ID
+ * Hook to fetch and observe a single document by ID.
+ *
+ * Automatically subscribes to changes and re-renders when the document
+ * is updated. Returns update and remove functions for mutations.
+ *
+ * @typeParam T - The document type
+ * @param collectionName - The collection to query
+ * @param id - The document ID to fetch (or null/undefined to skip)
+ * @param options - Optional configuration
+ * @returns Object with data, loading state, error, and mutation functions
+ *
+ * @example Basic usage
+ * ```tsx
+ * function TodoDetail({ todoId }: { todoId: string }) {
+ *   const { data: todo, isLoading, update, remove } = useDocument<Todo>('todos', todoId);
+ *
+ *   if (isLoading) return <ActivityIndicator />;
+ *   if (!todo) return <Text>Not found</Text>;
+ *
+ *   return (
+ *     <View>
+ *       <Text>{todo.title}</Text>
+ *       <Button
+ *         title="Toggle"
+ *         onPress={() => update({ completed: !todo.completed })}
+ *       />
+ *       <Button title="Delete" onPress={remove} />
+ *     </View>
+ *   );
+ * }
+ * ```
+ *
+ * @example Skip fetching conditionally
+ * ```tsx
+ * const { data } = useDocument<Todo>('todos', selectedId, {
+ *   skip: !selectedId // Don't fetch until an ID is selected
+ * });
+ * ```
  */
 export function useDocument<T extends Document>(
   collectionName: string,
@@ -128,7 +253,41 @@ export function useDocument<T extends Document>(
 }
 
 /**
- * Hook to query documents
+ * Hook to query documents with filtering, sorting, and pagination.
+ *
+ * Automatically re-executes the query when the collection changes,
+ * providing reactive updates to your UI.
+ *
+ * @typeParam T - The document type
+ * @param collectionName - The collection to query
+ * @param filter - Optional filter to apply
+ * @param options - Sorting, pagination, and other options
+ * @returns Object with data array, count, loading state, and error
+ *
+ * @example Query with filter
+ * ```tsx
+ * function IncompleteTodos() {
+ *   const { data: todos, isLoading, isEmpty } = useQuery<Todo>(
+ *     'todos',
+ *     { completed: false }
+ *   );
+ *
+ *   if (isLoading) return <ActivityIndicator />;
+ *   if (isEmpty) return <Text>All done!</Text>;
+ *
+ *   return <FlatList data={todos} renderItem={...} />;
+ * }
+ * ```
+ *
+ * @example With sorting and pagination
+ * ```tsx
+ * const { data, refetch } = useQuery<Todo>('todos', undefined, {
+ *   sortBy: 'createdAt',
+ *   sortDirection: 'desc',
+ *   limit: 20,
+ *   skip: page * 20
+ * });
+ * ```
  */
 export function useQuery<T extends Document>(
   collectionName: string,
@@ -218,7 +377,52 @@ export function useQuery<T extends Document>(
 }
 
 /**
- * Hook for mutations (insert, update, delete)
+ * Hook for document mutations (insert, update, delete).
+ *
+ * Returns functions for each mutation type along with loading
+ * and error state. All mutations are async and return the result.
+ *
+ * @typeParam T - The document type
+ * @param collectionName - The collection to mutate
+ * @returns Object with insert, update, remove functions and state
+ *
+ * @example Basic CRUD operations
+ * ```tsx
+ * function TodoForm() {
+ *   const { insert, update, remove, isMutating, error } = useMutation<Todo>('todos');
+ *   const [title, setTitle] = useState('');
+ *
+ *   const handleAdd = async () => {
+ *     try {
+ *       await insert({ title, completed: false });
+ *       setTitle('');
+ *     } catch (err) {
+ *       Alert.alert('Error', 'Failed to add todo');
+ *     }
+ *   };
+ *
+ *   return (
+ *     <View>
+ *       <TextInput value={title} onChangeText={setTitle} />
+ *       <Button
+ *         title={isMutating ? 'Adding...' : 'Add'}
+ *         onPress={handleAdd}
+ *         disabled={isMutating}
+ *       />
+ *       {error && <Text style={{ color: 'red' }}>{error.message}</Text>}
+ *     </View>
+ *   );
+ * }
+ * ```
+ *
+ * @example Updating a document
+ * ```tsx
+ * const { update } = useMutation<Todo>('todos');
+ *
+ * // Partial updates - only specified fields are changed
+ * await update(todo._id, { completed: true });
+ * await update(todo._id, { title: 'New title', priority: 'high' });
+ * ```
  */
 export function useMutation<T extends Document>(collectionName: string): UseMutationResult<T> {
   const { collection: getCollection, isReady } = usePocket();
@@ -318,7 +522,33 @@ export function useMutation<T extends Document>(collectionName: string): UseMuta
 }
 
 /**
- * Hook to count documents
+ * Hook to count documents in a collection.
+ *
+ * Automatically updates when documents are added or removed.
+ * Useful for showing counts in badges or headers.
+ *
+ * @typeParam T - The document type
+ * @param collectionName - The collection to count
+ * @param filter - Optional filter to apply
+ * @returns Object with count, loading state, and error
+ *
+ * @example Show unread count
+ * ```tsx
+ * function NotificationBadge() {
+ *   const { count, isLoading } = useCount<Notification>(
+ *     'notifications',
+ *     { read: false }
+ *   );
+ *
+ *   if (isLoading || count === 0) return null;
+ *
+ *   return (
+ *     <View style={styles.badge}>
+ *       <Text style={styles.badgeText}>{count}</Text>
+ *     </View>
+ *   );
+ * }
+ * ```
  */
 export function useCount<T extends Document>(
   collectionName: string,
@@ -371,7 +601,32 @@ export function useCount<T extends Document>(
 }
 
 /**
- * Hook to observe all documents in a collection
+ * Hook to observe all documents in a collection.
+ *
+ * Similar to useQuery without filters. Automatically updates
+ * when any document in the collection changes.
+ *
+ * @typeParam T - The document type
+ * @param collectionName - The collection to observe
+ * @returns Object with data array, loading state, and error
+ *
+ * @example Simple list
+ * ```tsx
+ * function CategoryList() {
+ *   const { data: categories, isLoading, error } = useAll<Category>('categories');
+ *
+ *   if (isLoading) return <ActivityIndicator />;
+ *   if (error) return <Text>Error: {error.message}</Text>;
+ *
+ *   return (
+ *     <ScrollView>
+ *       {categories.map(cat => (
+ *         <Text key={cat._id}>{cat.name}</Text>
+ *       ))}
+ *     </ScrollView>
+ *   );
+ * }
+ * ```
  */
 // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-parameters
 export function useAll<T extends Document>(
