@@ -410,15 +410,51 @@ type PackageInfo = {
   size: string;
 };
 
-const packages: PackageInfo[] = [
-  { name: 'pocket', description: 'All-in-one package', size: '-' },
-  { name: '@pocket/core', description: 'Core database engine', size: '~25KB' },
-  { name: '@pocket/react', description: 'React hooks', size: '~8KB' },
-  { name: '@pocket/sync', description: 'Sync engine', size: '~12KB' },
-  { name: '@pocket/storage-indexeddb', description: 'IndexedDB adapter', size: '~5KB' },
-  { name: '@pocket/storage-opfs', description: 'OPFS adapter', size: '~8KB' },
-  { name: '@pocket/storage-memory', description: 'In-memory adapter', size: '~3KB' },
+type PackageCategory = {
+  title: string;
+  packages: PackageInfo[];
+};
+
+const packageCategories: PackageCategory[] = [
+  {
+    title: 'Core',
+    packages: [
+      { name: 'pocket', description: 'All-in-one package', size: '-' },
+      { name: '@pocket/core', description: 'Core database engine', size: '~25KB' },
+      { name: '@pocket/sync', description: 'Sync engine', size: '~12KB' },
+    ],
+  },
+  {
+    title: 'Framework SDKs',
+    packages: [
+      { name: '@pocket/react', description: 'React hooks', size: '~8KB' },
+      { name: '@pocket/vue', description: 'Vue 3 composables', size: '~6KB' },
+      { name: '@pocket/angular', description: 'Angular signals', size: '~7KB' },
+      { name: '@pocket/svelte', description: 'Svelte stores', size: '~5KB' },
+      { name: '@pocket/solid', description: 'Solid.js primitives', size: '~5KB' },
+    ],
+  },
+  {
+    title: 'Mobile & Desktop',
+    packages: [
+      { name: '@pocket/expo', description: 'Expo / React Native', size: '~6KB' },
+      { name: '@pocket/electron', description: 'Electron apps', size: '~8KB' },
+      { name: '@pocket/tauri', description: 'Tauri apps', size: '~5KB' },
+    ],
+  },
+  {
+    title: 'Storage Adapters',
+    packages: [
+      { name: '@pocket/storage-indexeddb', description: 'IndexedDB (browser)', size: '~5KB' },
+      { name: '@pocket/storage-opfs', description: 'OPFS (browser)', size: '~8KB' },
+      { name: '@pocket/storage-sqlite', description: 'SQLite (Node.js)', size: '~6KB' },
+      { name: '@pocket/storage-edge', description: 'Cloudflare D1', size: '~5KB' },
+    ],
+  },
 ];
+
+// Flatten for backward compatibility
+const packages: PackageInfo[] = packageCategories.flatMap((cat) => cat.packages);
 
 function Community() {
   return (
@@ -521,26 +557,36 @@ function Packages() {
           <Heading as="h2">Modular by Design</Heading>
           <p>Install what you need. Tree-shake what you don't.</p>
         </div>
-        <table className={styles.packagesTable}>
-          <thead>
-            <tr>
-              <th>Package</th>
-              <th>Description</th>
-              <th>Size</th>
-            </tr>
-          </thead>
-          <tbody>
-            {packages.map((pkg) => (
-              <tr key={pkg.name}>
-                <td>
-                  <code>{pkg.name}</code>
-                </td>
-                <td>{pkg.description}</td>
-                <td>{pkg.size}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+        <div className={styles.packageCategories}>
+          {packageCategories.map((category) => (
+            <div key={category.title} className={styles.packageCategory}>
+              <h3>{category.title}</h3>
+              <table className={styles.packagesTable}>
+                <thead>
+                  <tr>
+                    <th>Package</th>
+                    <th>Description</th>
+                    <th>Size</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {category.packages.map((pkg) => (
+                    <tr key={pkg.name}>
+                      <td>
+                        <code>{pkg.name}</code>
+                      </td>
+                      <td>{pkg.description}</td>
+                      <td>{pkg.size}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          ))}
+        </div>
+        <p className={styles.packagesNote}>
+          <Link to="/docs/intro#packages">View all 30+ packages</Link>
+        </p>
       </div>
     </section>
   );
