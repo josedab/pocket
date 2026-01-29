@@ -1,9 +1,24 @@
+/**
+ * React hooks for performing database mutations (insert, update, delete).
+ *
+ * These hooks provide a React-friendly API for modifying Pocket collections
+ * with automatic loading state management and error handling.
+ *
+ * @module hooks/use-mutation
+ * @see {@link useMutation} - Basic mutation hook
+ * @see {@link useOptimisticMutation} - Mutation hook with optimistic updates
+ */
+
 import type { Document, DocumentUpdate, NewDocument } from '@pocket/core';
 import { useCallback, useRef, useState } from 'react';
 import { useCollection } from '../context/provider.js';
 
 /**
- * Mutation result
+ * Result returned by mutation hooks.
+ *
+ * Contains mutation functions for CRUD operations, plus loading and error state.
+ *
+ * @typeParam T - The document type being mutated
  */
 export interface MutationResult<T extends Document> {
   /** Insert a new document */
@@ -27,7 +42,7 @@ export interface MutationResult<T extends Document> {
 }
 
 /**
- * Mutation options
+ * Configuration options for mutation hooks.
  */
 export interface UseMutationOptions {
   /** Callback on successful mutation */
@@ -37,7 +52,55 @@ export interface UseMutationOptions {
 }
 
 /**
- * Hook for document mutations (insert, update, delete)
+ * React hook for performing database mutations (CRUD operations).
+ *
+ * Provides functions for insert, update, upsert, and delete operations
+ * with automatic loading state and error handling.
+ *
+ * @typeParam T - The document type being mutated
+ * @param collectionName - The name of the collection to mutate
+ * @param options - Optional callbacks for success/error handling
+ * @returns A {@link MutationResult} with mutation functions and state
+ *
+ * @example
+ * ```tsx
+ * function TodoForm() {
+ *   const { insert, isLoading, error } = useMutation<Todo>('todos', {
+ *     onSuccess: () => console.log('Todo created!'),
+ *     onError: (err) => console.error('Failed:', err.message),
+ *   });
+ *
+ *   const handleSubmit = async (title: string) => {
+ *     await insert({ title, completed: false });
+ *   };
+ *
+ *   return (
+ *     <form onSubmit={...}>
+ *       <input disabled={isLoading} />
+ *       {error && <span>{error.message}</span>}
+ *     </form>
+ *   );
+ * }
+ *
+ * // Update and delete
+ * function TodoItem({ todo }: { todo: Todo }) {
+ *   const { update, remove } = useMutation<Todo>('todos');
+ *
+ *   return (
+ *     <div>
+ *       <input
+ *         type="checkbox"
+ *         checked={todo.completed}
+ *         onChange={() => update(todo._id, { completed: !todo.completed })}
+ *       />
+ *       <button onClick={() => remove(todo._id)}>Delete</button>
+ *     </div>
+ *   );
+ * }
+ * ```
+ *
+ * @see {@link useOptimisticMutation} for optimistic UI updates
+ * @see {@link useLiveQuery} for reading data with live updates
  */
 export function useMutation<T extends Document>(
   collectionName: string,
@@ -149,7 +212,11 @@ export function useMutation<T extends Document>(
 }
 
 /**
- * Simplified mutation hook with optimistic updates
+ * Options for optimistic mutation hooks.
+ *
+ * Extends {@link UseMutationOptions} with optimistic update configuration.
+ *
+ * @typeParam T - The document type being mutated
  */
 export interface OptimisticMutationOptions<T extends Document> extends UseMutationOptions {
   /** Function to update local data optimistically */
@@ -160,18 +227,80 @@ export interface OptimisticMutationOptions<T extends Document> extends UseMutati
   setCurrentData?: (data: T[]) => void;
 }
 
+/**
+ * Discriminated union representing the type of optimistic mutation.
+ *
+ * @typeParam T - The document type being mutated
+ */
 export type OptimisticMutation<T extends Document> =
   | { type: 'insert'; doc: T }
   | { type: 'update'; id: string; changes: DocumentUpdate<T> }
   | { type: 'delete'; id: string };
 
 /**
- * Hook for mutations with optimistic updates
+ * React hook for mutations with optimistic UI updates.
+ *
+ * Applies changes to local state immediately before the database operation
+ * completes, providing a snappier user experience. Automatically rolls back
+ * if the operation fails.
+ *
+ * @typeParam T - The document type being mutated
+ * @param collectionName - The name of the collection to mutate
+ * @param options - Configuration including the optimistic update function
+ * @returns A {@link MutationResult} plus a `rollback` function
+ *
+ * @example
+ * ```tsx
+ * function OptimisticTodoList() {
+ *   const { data, setData } = useLiveQuery<Todo>('todos');
+ *
+ *   const { insert, update, remove, rollback } = useOptimisticMutation<Todo>(
+ *     'todos',
+ *     {
+ *       currentData: data,
+ *       setCurrentData: setData,
+ *       optimisticUpdate: (data, mutation) => {
+ *         switch (mutation.type) {
+ *           case 'insert':
+ *             return [...data, mutation.doc];
+ *           case 'update':
+ *             return data.map((d) =>
+ *               d._id === mutation.id ? { ...d, ...mutation.changes } : d
+ *             );
+ *           case 'delete':
+ *             return data.filter((d) => d._id !== mutation.id);
+ *         }
+ *       },
+ *       onError: () => {
+ *         // Manual rollback if needed (automatic on error)
+ *         toast.error('Operation failed, rolling back...');
+ *       },
+ *     }
+ *   );
+ *
+ *   // Clicking instantly updates the UI, even before the DB confirms
+ *   return (
+ *     <ul>
+ *       {data.map((todo) => (
+ *         <li key={todo._id}>
+ *           <input
+ *             type="checkbox"
+ *             checked={todo.completed}
+ *             onChange={() => update(todo._id, { completed: !todo.completed })}
+ *           />
+ *           {todo.title}
+ *         </li>
+ *       ))}
+ *     </ul>
+ *   );
+ * }
+ * ```
  */
 export function useOptimisticMutation<T extends Document>(
   collectionName: string,
   options: OptimisticMutationOptions<T> = {}
 ): MutationResult<T> & {
+  /** Manually rollback the last optimistic update */
   rollback: () => void;
 } {
   const { optimisticUpdate, currentData, setCurrentData, ...mutationOptions } = options;
