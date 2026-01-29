@@ -1,20 +1,87 @@
+/**
+ * Rollback management for reverting failed optimistic updates.
+ *
+ * When sync fails, optimistic updates need to be reverted to maintain
+ * data consistency. The RollbackManager handles this by restoring
+ * documents to their previous states.
+ *
+ * ## Rollback Operations by Change Type
+ *
+ * | Original Operation | Rollback Action |
+ * |--------------------|-----------------|
+ * | Insert | Delete the document |
+ * | Update | Restore previous version |
+ * | Delete | Restore the document |
+ *
+ * ## Rollback Order
+ *
+ * Updates are rolled back in reverse chronological order (newest first)
+ * to maintain consistency when multiple changes affect the same document.
+ *
+ * @module sync/rollback
+ *
+ * @see {@link RollbackManager} for the main rollback class
+ * @see {@link OptimisticUpdateManager} for managing pending changes
+ */
+
 import type { Collection, Document } from '@pocket/core';
 import type { OptimisticUpdate, OptimisticUpdateManager } from './optimistic.js';
 
 /**
- * Rollback result
+ * Result of a rollback operation.
+ *
+ * Contains lists of successfully rolled back updates, failed rollbacks,
+ * and any errors encountered during the process.
  */
 export interface RollbackResult {
-  /** IDs of rolled back updates */
+  /** IDs of updates that were successfully rolled back */
   rolledBack: string[];
-  /** IDs that failed to rollback */
+  /** IDs of updates that could not be rolled back */
   failed: string[];
-  /** Errors encountered */
+  /** Errors encountered during rollback (one per failed update) */
   errors: Error[];
 }
 
 /**
- * Rollback manager for reverting optimistic updates
+ * Manages rollback of optimistic updates when sync fails.
+ *
+ * The RollbackManager works with the {@link OptimisticUpdateManager} to
+ * revert local changes that couldn't be synced to the server. This maintains
+ * consistency between local state and server state.
+ *
+ * @example Rolling back a failed sync
+ * ```typescript
+ * const rollbackManager = createRollbackManager(
+ *   optimisticManager,
+ *   (name) => database.collection(name)
+ * );
+ *
+ * // Rollback a specific update
+ * const success = await rollbackManager.rollback(updateId);
+ *
+ * // Rollback all failed updates (exceeded retry limit)
+ * const result = await rollbackManager.rollbackFailed();
+ * console.log(`Rolled back ${result.rolledBack.length} updates`);
+ * ```
+ *
+ * @example Rolling back changes for a document
+ * ```typescript
+ * // User wants to discard local changes
+ * const result = await rollbackManager.rollbackDocument('todos', 'todo-123');
+ * if (result.failed.length > 0) {
+ *   console.error('Some changes could not be reverted');
+ * }
+ * ```
+ *
+ * @example Emergency rollback of all pending changes
+ * ```typescript
+ * // Rollback everything (e.g., user logs out)
+ * const result = await rollbackManager.rollbackAll();
+ * console.log(`Reverted ${result.rolledBack.length} local changes`);
+ * ```
+ *
+ * @see {@link RollbackResult} for the result structure
+ * @see {@link OptimisticUpdateManager} for managing pending changes
  */
 export class RollbackManager {
   private readonly optimisticManager: OptimisticUpdateManager;
