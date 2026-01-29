@@ -9,6 +9,7 @@ const sidebars: SidebarsConfig = {
       label: 'Core Concepts',
       collapsed: false,
       items: [
+        'concepts/architecture-overview',
         'concepts/local-first',
         'concepts/database-model',
         'concepts/reactive-queries',
@@ -90,6 +91,7 @@ const sidebars: SidebarsConfig = {
     'faq',
     'comparison',
     'changelog',
+    'roadmap',
     'contributing',
   ],
 };
