@@ -10,10 +10,10 @@ import type { Document } from '@pocket/core';
 import { Observable, Subject, shareReplay, startWith, switchMap } from 'rxjs';
 import type { PocketAPI } from '../preload/index.js';
 
-// Augment the Window interface to include pocket
+// Re-declare Window.pocket for the renderer context (non-optional, matching preload)
 declare global {
   interface Window {
-    pocket?: PocketAPI;
+    pocket: PocketAPI;
   }
 }
 
