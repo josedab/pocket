@@ -233,13 +233,26 @@ export type LogLevel = 'debug' | 'info' | 'warn' | 'error';
 
 /**
  * Default server configuration
+ *
+ * @security CORS Configuration
+ * The `corsOrigins` defaults to an empty array for security. You MUST explicitly
+ * configure allowed origins in production. Using '*' (wildcard) is discouraged
+ * as it allows any origin to connect to your sync server.
+ *
+ * @example
+ * ```ts
+ * // Configure specific allowed origins
+ * const server = createSyncServer({
+ *   corsOrigins: ['https://myapp.com', 'https://staging.myapp.com']
+ * });
+ * ```
  */
 export const DEFAULT_SERVER_CONFIG: Required<Omit<SyncServerConfig, 'validateAuth' | 'storage'>> = {
   port: 8080,
   host: '0.0.0.0',
   path: '/sync',
   requireAuth: false,
-  corsOrigins: '*',
+  corsOrigins: [] as string[], // Must be explicitly configured for security
   heartbeatInterval: 30000,
   clientTimeout: 60000,
   maxMessageSize: 1024 * 1024, // 1MB
