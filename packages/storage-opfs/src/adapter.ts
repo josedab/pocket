@@ -81,7 +81,7 @@ import type {
   StorageQuery,
   StorageStats,
 } from '@pocket/core';
-import { QueryExecutor, matchesFilter } from '@pocket/core';
+import { matchesFilter, QueryExecutor, StorageError } from '@pocket/core';
 import { type Observable, Subject } from 'rxjs';
 import type { WorkerRequest, WorkerResponse } from './worker.js';
 
@@ -483,8 +483,10 @@ export class OPFSAdapter implements StorageAdapter {
    */
   async workerRequest<T>(request: WorkerRequest): Promise<T | null> {
     if (!this.worker) {
-      // Fallback to direct access (not implemented in this example)
-      throw new Error('OPFS worker not initialized');
+      throw new StorageError('POCKET_S303', 'OPFS worker not initialized', {
+        adapter: 'opfs',
+        operation: 'workerRequest',
+      });
     }
 
     return new Promise((resolve, reject) => {

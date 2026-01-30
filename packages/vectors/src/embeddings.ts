@@ -1,3 +1,4 @@
+import { PocketError } from '@pocket/core';
 import type { EmbeddingFunction, Vector } from './types.js';
 
 /**
@@ -82,7 +83,11 @@ export function createOpenAIEmbedding(config: OpenAIEmbeddingConfig): EmbeddingF
 
     if (!response.ok) {
       const error = await response.text();
-      throw new Error(`OpenAI API error: ${error}`);
+      throw PocketError.fromCode('POCKET_C500', {
+        message: `OpenAI API error: ${error}`,
+        provider: 'openai',
+        statusCode: response.status,
+      });
     }
 
     const data = (await response.json()) as {
@@ -107,7 +112,11 @@ export function createOpenAIEmbedding(config: OpenAIEmbeddingConfig): EmbeddingF
 
     if (!response.ok) {
       const error = await response.text();
-      throw new Error(`OpenAI API error: ${error}`);
+      throw PocketError.fromCode('POCKET_C500', {
+        message: `OpenAI API error: ${error}`,
+        provider: 'openai',
+        statusCode: response.status,
+      });
     }
 
     const data = (await response.json()) as {
@@ -189,7 +198,11 @@ export function createCohereEmbedding(config: CohereEmbeddingConfig): EmbeddingF
 
     if (!response.ok) {
       const error = await response.text();
-      throw new Error(`Cohere API error: ${error}`);
+      throw PocketError.fromCode('POCKET_C500', {
+        message: `Cohere API error: ${error}`,
+        provider: 'cohere',
+        statusCode: response.status,
+      });
     }
 
     const data = (await response.json()) as {
@@ -215,7 +228,11 @@ export function createCohereEmbedding(config: CohereEmbeddingConfig): EmbeddingF
 
     if (!response.ok) {
       const error = await response.text();
-      throw new Error(`Cohere API error: ${error}`);
+      throw PocketError.fromCode('POCKET_C500', {
+        message: `Cohere API error: ${error}`,
+        provider: 'cohere',
+        statusCode: response.status,
+      });
     }
 
     const data = (await response.json()) as {
@@ -316,7 +333,11 @@ export function createOllamaEmbedding(config: OllamaEmbeddingConfig = {}): Embed
 
     if (!response.ok) {
       const error = await response.text();
-      throw new Error(`Ollama API error: ${error}`);
+      throw PocketError.fromCode('POCKET_C500', {
+        message: `Ollama API error: ${error}`,
+        provider: 'ollama',
+        statusCode: response.status,
+      });
     }
 
     const data = (await response.json()) as {

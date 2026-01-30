@@ -1,3 +1,4 @@
+import { PocketError } from '@pocket/core';
 import { BehaviorSubject, Subject, type Observable } from 'rxjs';
 import { distanceToScore } from './distance.js';
 import { createFlatIndex, FlatIndex } from './index-flat.js';
@@ -123,7 +124,10 @@ export class VectorStore {
     if (typeof vectorOrText === 'string') {
       // Auto-embed text
       if (!this.embeddingFn) {
-        throw new Error('Embedding function required for text input');
+        throw PocketError.fromCode('POCKET_V100', {
+          message: 'Embedding function required for text input',
+          operation: 'add',
+        });
       }
       text = vectorOrText;
       vector = await this.getOrCreateEmbedding(text);
@@ -133,9 +137,11 @@ export class VectorStore {
 
     // Validate dimensions
     if (vector.length !== this.dimensions) {
-      throw new Error(
-        `Vector dimensions mismatch: expected ${this.dimensions}, got ${vector.length}`
-      );
+      throw PocketError.fromCode('POCKET_V102', {
+        message: `Vector dimensions mismatch: expected ${this.dimensions}, got ${vector.length}`,
+        expected: this.dimensions,
+        actual: vector.length,
+      });
     }
 
     const now = Date.now();
@@ -374,20 +380,28 @@ export class VectorStore {
 
     if (options.text) {
       if (!this.embeddingFn) {
-        throw new Error('Embedding function required for text search');
+        throw PocketError.fromCode('POCKET_V100', {
+          message: 'Embedding function required for text search',
+          operation: 'search',
+        });
       }
       queryVector = await this.getOrCreateEmbedding(options.text);
     } else if (options.vector) {
       queryVector = options.vector;
     } else {
-      throw new Error('Either text or vector must be provided');
+      throw PocketError.fromCode('POCKET_V100', {
+        message: 'Either text or vector must be provided',
+        operation: 'search',
+      });
     }
 
     // Validate dimensions
     if (queryVector.length !== this.dimensions) {
-      throw new Error(
-        `Query vector dimensions mismatch: expected ${this.dimensions}, got ${queryVector.length}`
-      );
+      throw PocketError.fromCode('POCKET_V102', {
+        message: `Query vector dimensions mismatch: expected ${this.dimensions}, got ${queryVector.length}`,
+        expected: this.dimensions,
+        actual: queryVector.length,
+      });
     }
 
     const limit = options.limit ?? 10;
@@ -472,7 +486,10 @@ export class VectorStore {
   ): Promise<VectorSearchResult[]> {
     const entry = this.entries.get(id);
     if (!entry) {
-      throw new Error(`Vector not found: ${id}`);
+      throw PocketError.fromCode('POCKET_D401', {
+        message: `Vector not found: ${id}`,
+        id,
+      });
     }
 
     const results = await this.search({
@@ -501,7 +518,10 @@ export class VectorStore {
 
     // Generate embedding
     if (!this.embeddingFn) {
-      throw new Error('Embedding function not configured');
+      throw PocketError.fromCode('POCKET_V100', {
+        message: 'Embedding function not configured',
+        operation: 'getOrCreateEmbedding',
+      });
     }
 
     const vector = await this.embeddingFn.embed(text);
@@ -666,7 +686,11 @@ export class VectorStore {
     for (const entry of entries) {
       try {
         if (entry.vector.length !== this.dimensions) {
-          throw new Error(`Dimensions mismatch: expected ${this.dimensions}`);
+          throw PocketError.fromCode('POCKET_V102', {
+            message: `Dimensions mismatch: expected ${this.dimensions}`,
+            expected: this.dimensions,
+            actual: entry.vector.length,
+          });
         }
 
         this.entries.set(entry.id, entry);

@@ -1,3 +1,4 @@
+import { StorageError } from '../errors/pocket-error.js';
 import type { CollectionConfig, DatabaseConfig } from '../schema/schema.js';
 import type { Document } from '../types/document.js';
 import { generateId } from '../types/document.js';
@@ -152,8 +153,10 @@ export class Database {
 
     // Check if storage is available
     if (!this.storage.isAvailable()) {
-      throw new Error(
-        `Storage adapter "${this.storage.name}" is not available in this environment`
+      throw new StorageError(
+        'POCKET_S301',
+        `Storage adapter "${this.storage.name}" is not available in this environment`,
+        { adapter: this.storage.name }
       );
     }
 
@@ -398,10 +401,14 @@ export class Database {
    */
   private ensureOpen(): void {
     if (!this.isInitialized) {
-      throw new Error('Database not initialized. Call Database.create() first.');
+      throw new StorageError(
+        'POCKET_S303',
+        'Database not initialized. Call Database.create() first.',
+        { database: this.name }
+      );
     }
     if (this.isClosed) {
-      throw new Error('Database has been closed.');
+      throw new StorageError('POCKET_S300', 'Database has been closed.', { database: this.name });
     }
   }
 }

@@ -1,5 +1,6 @@
 import { BehaviorSubject, Observable, Subject } from 'rxjs';
 import { filter, map } from 'rxjs/operators';
+import { DocumentDeletedError, DocumentNotFoundError } from '../errors/pocket-error.js';
 import { LiveQuery, type LiveQueryOptions } from '../observable/live-query.js';
 import { QueryBuilder } from '../query/query-builder.js';
 import { Schema, type CollectionConfig, type ValidationResult } from '../schema/schema.js';
@@ -296,10 +297,10 @@ export class Collection<T extends Document = Document> {
   async update(id: string, changes: DocumentUpdate<T>): Promise<T> {
     const existing = await this.store.get(id);
     if (!existing) {
-      throw new Error(`Document with id "${id}" not found`);
+      throw new DocumentNotFoundError(this.name, id);
     }
     if (existing._deleted) {
-      throw new Error(`Document with id "${id}" has been deleted`);
+      throw new DocumentDeletedError(this.name, id);
     }
 
     const updated = prepareDocumentUpdate(existing, changes, this.nodeId);

@@ -1,4 +1,5 @@
 import type { ChangeEvent, Collection, Document } from '@pocket/core';
+import { DocumentNotFoundError, StorageError } from '@pocket/core';
 import { BehaviorSubject, type Observable, type Subscription } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { DocumentEncryptor } from './document-encryptor.js';
@@ -95,12 +96,14 @@ export class EncryptedCollection<T extends Document = Document> {
   async exportCurrentKey(): Promise<string> {
     const keyId = this.encryptor.getCurrentKeyId();
     if (!keyId) {
-      throw new Error('No encryption key set');
+      throw new StorageError('POCKET_S300', 'No encryption key set', {
+        operation: 'exportCurrentKey',
+      });
     }
 
     const key = this.keyManager.getKey(keyId);
     if (!key) {
-      throw new Error('Key not found');
+      throw new StorageError('POCKET_S300', 'Key not found', { keyId });
     }
 
     return this.keyManager.exportKey(key);
@@ -197,7 +200,7 @@ export class EncryptedCollection<T extends Document = Document> {
     // Get and decrypt the current document
     const current = await this.get(id);
     if (!current) {
-      throw new Error(`Document not found: ${id}`);
+      throw new DocumentNotFoundError('encrypted-collection', id);
     }
 
     // Merge changes
@@ -354,8 +357,10 @@ export class EncryptedCollection<T extends Document = Document> {
    */
   private ensureInitialized(): void {
     if (!this.state$.getValue().initialized) {
-      throw new Error(
-        'Encryption not initialized. Call initializeWithPassword() or initializeWithKey() first.'
+      throw new StorageError(
+        'POCKET_S303',
+        'Encryption not initialized. Call initializeWithPassword() or initializeWithKey() first.',
+        { operation: 'ensureInitialized' }
       );
     }
   }
