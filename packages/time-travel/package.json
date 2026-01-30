@@ -2,6 +2,19 @@
   "name": "@pocket/time-travel",
   "version": "0.1.0",
   "description": "Time-travel debugging for Pocket - inspect and replay database state at any point in history",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/pocket-db/pocket",
+    "directory": "packages/time-travel"
+  },
+  "homepage": "https://pocket-db.dev",
+  "bugs": {
+    "url": "https://github.com/pocket-db/pocket/issues"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
   "type": "module",
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",

@@ -15,9 +15,16 @@
   "author": "Pocket Contributors",
   "repository": {
     "type": "git",
-    "url": "https://github.com/pocket-db/pocket"
+    "url": "https://github.com/pocket-db/pocket",
+    "directory": "packages/pocket"
   },
   "homepage": "https://pocket-db.dev",
+  "bugs": {
+    "url": "https://github.com/pocket-db/pocket/issues"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
   "type": "module",
   "exports": {
     ".": {

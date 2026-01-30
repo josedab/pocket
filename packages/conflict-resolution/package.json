@@ -2,6 +2,19 @@
   "name": "@pocket/conflict-resolution",
   "version": "0.1.0",
   "description": "Conflict resolution UI components and utilities for Pocket",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/pocket-db/pocket",
+    "directory": "packages/conflict-resolution"
+  },
+  "homepage": "https://pocket-db.dev",
+  "bugs": {
+    "url": "https://github.com/pocket-db/pocket/issues"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
   "type": "module",
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
