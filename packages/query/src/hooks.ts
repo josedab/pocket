@@ -190,9 +190,8 @@ export function createUseLiveQueryHook(React: ReactHooks) {
     }, []) as () => void;
 
     const loadMore = React.useCallback(() => {
-      // For live queries, we need to update the subscription's query
-      // This is a simplified implementation
-      console.warn('loadMore not fully implemented for live queries');
+      // For live queries, loadMore requires updating the subscription's query
+      // which is not yet fully implemented. This is a no-op placeholder.
     }, []) as () => void;
 
     const clearEvents = React.useCallback(() => {

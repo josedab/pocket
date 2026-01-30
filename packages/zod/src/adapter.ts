@@ -298,8 +298,9 @@ export function zodSchema<T extends Document>(
       ? (doc: T) => {
           const result = schema.safeParse(doc);
           if (!result.success) {
-            console.warn('Document failed validation on read:', result.error);
-            return doc; // Return original on read failure
+            // Return original document on read validation failure
+            // This can happen with legacy data or schema changes
+            return doc;
           }
           return result.data;
         }

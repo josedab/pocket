@@ -156,9 +156,7 @@ export async function resolveRelations<T extends Document>(
     const relation = context.getRelation(collectionName, option.path);
 
     if (!relation) {
-      console.warn(
-        `No relation defined for path "${option.path}" on collection "${collectionName}"`
-      );
+      // Skip unknown relations - the path may not have a defined relation
       continue;
     }
 
