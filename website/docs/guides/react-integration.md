@@ -477,6 +477,22 @@ mutate({ title: 'Test' }); // OK
 mutate({ name: 'Test' }); // Error: 'name' doesn't exist
 ```
 
+## Try It Online
+
+Experiment with Pocket React hooks in interactive sandboxes:
+
+| Example | Description |
+|---------|-------------|
+| [Basic Hooks](https://stackblitz.com/edit/pocket-react-hooks?file=src%2FApp.tsx) | useLiveQuery, useMutation basics |
+| [Todo App](https://stackblitz.com/edit/pocket-todo-app?file=src%2FApp.tsx) | Complete todo application |
+| [Search & Filter](https://stackblitz.com/edit/pocket-search-filter?file=src%2FApp.tsx) | Debounced search with filtering |
+| [Pagination](https://stackblitz.com/edit/pocket-pagination?file=src%2FApp.tsx) | Cursor and offset pagination |
+| [Sync Status](https://stackblitz.com/edit/pocket-sync-status?file=src%2FApp.tsx) | Monitoring sync with useSyncStatus |
+
+:::tip
+Open these in a new tab to edit and experiment with the code.
+:::
+
 ## Next Steps
 
 - [Offline-First App Guide](/docs/guides/offline-first-app) - Build a complete offline app

@@ -179,6 +179,21 @@ function TodoList() {
 }
 ```
 
+## Try It Online
+
+Experiment with Pocket without any setup:
+
+| Example | Platform | Description |
+|---------|----------|-------------|
+| [Todo App](https://stackblitz.com/edit/pocket-todo-app?file=src%2FApp.tsx) | StackBlitz | Complete todo app with React |
+| [Basic CRUD](https://codesandbox.io/p/sandbox/pocket-basic-crud) | CodeSandbox | Simple CRUD operations |
+| [Live Queries](https://stackblitz.com/edit/pocket-live-queries?file=src%2FApp.tsx) | StackBlitz | Reactive query examples |
+| [Sync Example](https://stackblitz.com/edit/pocket-sync-demo?file=src%2FApp.tsx) | StackBlitz | Client-server sync demo |
+
+:::tip
+The [Playground](/docs/playground) page lets you experiment with Pocket directly in the browser without any external tools.
+:::
+
 ## Next Steps
 
 - **[Core Concepts](/docs/concepts/local-first)** - Understand how Pocket works
