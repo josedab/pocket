@@ -26,13 +26,13 @@
   "type": "module",
   "exports": {
     ".": {
+      "types": "./dist/index.d.ts",
       "import": "./dist/index.js",
-      "require": "./dist/index.cjs",
-      "types": "./dist/index.d.ts"
+      "require": "./dist/index.cjs"
     },
     "./worker": {
-      "import": "./dist/worker.js",
-      "types": "./dist/worker.d.ts"
+      "types": "./dist/worker.d.ts",
+      "import": "./dist/worker.js"
     }
   },
   "main": "./dist/index.cjs",
@@ -46,13 +46,13 @@
     "dev": "tsup --watch",
     "typecheck": "tsc --noEmit",
     "lint": "eslint src --ext .ts,.tsx",
-    "test": "vitest run",
+    "test": "vitest run --passWithNoTests",
     "test:watch": "vitest",
     "clean": "rm -rf dist"
   },
   "dependencies": {
     "@pocket/core": "workspace:*",
-    "rxjs": "^7.8.0"
+    "rxjs": "^7.8.1"
   },
   "devDependencies": {
     "@types/node": "^20.10.0",

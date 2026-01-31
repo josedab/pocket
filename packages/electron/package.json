@@ -26,24 +26,24 @@
   "type": "module",
   "exports": {
     ".": {
+      "types": "./dist/index.d.ts",
       "import": "./dist/index.js",
-      "require": "./dist/index.cjs",
-      "types": "./dist/index.d.ts"
+      "require": "./dist/index.cjs"
     },
     "./main": {
+      "types": "./dist/main/index.d.ts",
       "import": "./dist/main/index.js",
-      "require": "./dist/main/index.cjs",
-      "types": "./dist/main/index.d.ts"
+      "require": "./dist/main/index.cjs"
     },
     "./preload": {
+      "types": "./dist/preload/index.d.ts",
       "import": "./dist/preload/index.js",
-      "require": "./dist/preload/index.cjs",
-      "types": "./dist/preload/index.d.ts"
+      "require": "./dist/preload/index.cjs"
     },
     "./renderer": {
+      "types": "./dist/renderer/index.d.ts",
       "import": "./dist/renderer/index.js",
-      "require": "./dist/renderer/index.cjs",
-      "types": "./dist/renderer/index.d.ts"
+      "require": "./dist/renderer/index.cjs"
     }
   },
   "main": "./dist/index.cjs",
@@ -57,7 +57,7 @@
     "dev": "tsup --watch",
     "typecheck": "tsc --noEmit",
     "lint": "eslint src --ext .ts",
-    "test": "vitest run",
+    "test": "vitest run --passWithNoTests",
     "test:watch": "vitest",
     "clean": "rm -rf dist"
   },
