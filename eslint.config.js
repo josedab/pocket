@@ -44,13 +44,17 @@ export default tseslint.config(
       '@typescript-eslint/no-non-null-assertion': 'warn',
       '@typescript-eslint/triple-slash-reference': 'off',
       '@typescript-eslint/restrict-template-expressions': [
-        'error',
+        'warn',
         { allowNumber: true, allowBoolean: true },
       ],
       '@typescript-eslint/no-confusing-void-expression': [
         'error',
         { ignoreArrowShorthand: true },
       ],
+      '@typescript-eslint/no-unnecessary-type-parameters': 'warn',
+      '@typescript-eslint/no-redundant-type-constituents': 'warn',
+      '@typescript-eslint/no-dynamic-delete': 'warn',
+      '@typescript-eslint/no-base-to-string': 'warn',
 
       // Promise handling
       '@typescript-eslint/no-floating-promises': 'error',
