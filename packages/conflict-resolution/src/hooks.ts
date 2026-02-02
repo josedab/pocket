@@ -145,7 +145,7 @@ export function createUseConflictsHook(React: ReactHooks) {
       [manager]
     ) as (conflictId: string) => void;
 
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-parameters
+     
     const customResolve = React.useCallback(
       <T extends Document>(
         conflictId: string,
