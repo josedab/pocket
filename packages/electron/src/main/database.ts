@@ -216,13 +216,13 @@ export class MainProcessDatabase {
 
         if (query.filter) {
           for (const [key, value] of Object.entries(query.filter)) {
-            queryBuilder = queryBuilder.where(key).equals(value as Document[keyof Document]);
+            queryBuilder = queryBuilder.where(key as keyof Document & string).equals(value as Document[keyof Document]);
           }
         }
 
         if (query.sort) {
           for (const { field, direction } of query.sort) {
-            queryBuilder = queryBuilder.sort(field, direction);
+            queryBuilder = queryBuilder.sort(field as keyof Document & string, direction);
           }
         }
 
@@ -252,8 +252,7 @@ export class MainProcessDatabase {
         if (filter) {
           let queryBuilder = collection.find();
           for (const [key, value] of Object.entries(filter)) {
-            queryBuilder = queryBuilder.where(key).equals(value as Document[keyof Document]);
-          }
+            queryBuilder = queryBuilder.where(key as keyof Document & string).equals(value as Document[keyof Document]);          }
           const results = await queryBuilder.exec();
           return results.length;
         }
