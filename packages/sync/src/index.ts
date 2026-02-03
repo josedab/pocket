@@ -92,3 +92,15 @@ export * from './rollback.js';
 export * from './selective/index.js';
 export * from './sync-engine.js';
 export * from './transport/index.js';
+
+// Adaptive Sync
+export {
+  AdaptiveSyncManager,
+  createAdaptiveSyncManager,
+  type AdaptiveSettings,
+  type AdaptiveSyncConfig,
+  type AdaptiveSyncStats,
+  type NetworkQuality,
+  type SyncProfile,
+  type SyncPriorityItem,
+} from './adaptive-sync.js';
