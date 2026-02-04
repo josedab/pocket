@@ -42,3 +42,35 @@ export {
   createUsePageTrackingHook,
   createUseSyncStatusHook,
 } from './hooks.js';
+
+// Aggregation Engine
+export {
+  AggregationEngine,
+  createAggregationEngine,
+  type AggregationConfig,
+  type AggregationSummary,
+  type MetricDefinition,
+  type MetricResult,
+  type RetentionCohort,
+} from './aggregation-engine.js';
+
+export type {
+  AnalyticsEvent as AggregationAnalyticsEvent,
+  FunnelStep as AggregationFunnelStep,
+  FunnelResult as AggregationFunnelResult,
+} from './aggregation-engine.js';
+
+// Dashboard Data Provider
+export {
+  DashboardDataProvider,
+  createDashboardDataProvider,
+  type AnalyticsDataSource,
+  type AnalyticsDashboardEvent,
+  type DashboardDataProviderConfig,
+  type DashboardFunnelStep,
+  type DashboardRetentionCohort,
+  type DashboardSummary,
+  type DateRange,
+  type EventSummary,
+  type TimeSeriesPoint,
+} from './dashboard.js';
