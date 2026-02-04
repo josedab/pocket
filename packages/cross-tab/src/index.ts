@@ -93,6 +93,24 @@ export { CrossTabSync, createCrossTabSync } from './cross-tab-sync.js';
 // Distributed Lock
 export { DistributedLockManager, createDistributedLockManager } from './distributed-lock.js';
 
+// Connection Pool
+export {
+  ConnectionPool,
+  createConnectionPool,
+  type ConnectionPoolConfig,
+  type ConnectionPoolStats,
+  type ConnectionPoolStatus,
+} from './connection-pool.js';
+
+// Query Deduplicator
+export {
+  QueryDeduplicator,
+  createQueryDeduplicator,
+  type CachedQuery,
+  type DeduplicatorStats,
+  type QueryDeduplicatorConfig,
+} from './query-deduplicator.js';
+
 // Hooks
 export type {
   ReactHooks,
@@ -109,3 +127,12 @@ export {
   createUseLeaderHook,
   createUseTabsHook,
 } from './hooks.js';
+
+// Heartbeat Monitor
+export {
+  HeartbeatMonitor,
+  createHeartbeatMonitor,
+  type HeartbeatMonitorConfig,
+  type HeartbeatMessage,
+  type HeartbeatStatus,
+} from './heartbeat.js';
