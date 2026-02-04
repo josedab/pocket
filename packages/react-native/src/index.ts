@@ -100,3 +100,12 @@ export * from './context.js';
 
 // Hooks
 export * from './hooks.js';
+
+// Native SQLite storage
+export * from './native-storage.js';
+
+// Background sync
+export * from './background-sync.js';
+
+// Battery-aware sync
+export * from './battery-aware-sync.js';
