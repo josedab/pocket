@@ -12,3 +12,15 @@ export * from './ai-assistant.js';
 
 // Hooks
 export * from './hooks.js';
+
+// Smart Query Engine
+export * from './smart-query.js';
+
+// Query Suggestion Engine
+export * from './suggestions.js';
+
+// Index Advisor
+export * from './index-advisor.js';
+
+// Semantic Search & Autocomplete
+export * from './semantic-search.js';
