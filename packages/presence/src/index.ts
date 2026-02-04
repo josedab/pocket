@@ -72,6 +72,11 @@ export type { CursorHooks, TrackedCursor } from './cursor-tracker.js';
 
 export { CursorTracker, createCursorTracker, createUseCursorsHook } from './cursor-tracker.js';
 
+// Typing Indicator
+export type { TypingIndicatorConfig, TypingUser } from './typing-indicator.js';
+
+export { TypingIndicator, createTypingIndicator } from './typing-indicator.js';
+
 // Transports
 export {
   BroadcastChannelTransport,
