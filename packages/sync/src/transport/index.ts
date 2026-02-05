@@ -45,3 +45,6 @@
 export * from './http.js';
 export * from './types.js';
 export * from './websocket.js';
+export * from './webrtc.js';
+export * from './lan-discovery.js';
+export * from './mesh-coordinator.js';
