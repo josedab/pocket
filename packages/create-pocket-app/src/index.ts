@@ -14,6 +14,7 @@
 import { execSync } from 'node:child_process';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
+import { getExpoTemplate } from './templates/expo.js';
 
 /**
  * CLI version
@@ -91,6 +92,16 @@ const TEMPLATES: Record<string, TemplateConfig> = {
       '@sveltejs/vite-plugin-svelte': '^3.0.0',
     },
   },
+  'expo': (() => {
+    const t = getExpoTemplate();
+    return {
+      name: t.name,
+      description: t.description,
+      framework: t.framework,
+      dependencies: t.dependencies,
+      devDependencies: t.devDependencies,
+    };
+  })(),
 };
 
 /**
@@ -99,7 +110,7 @@ const TEMPLATES: Record<string, TemplateConfig> = {
 interface TemplateConfig {
   name: string;
   description: string;
-  framework: 'react' | 'vue' | 'svelte' | 'solid';
+  framework: 'react' | 'vue' | 'svelte' | 'solid' | 'react-native';
   dependencies: Record<string, string>;
   devDependencies: Record<string, string>;
 }
