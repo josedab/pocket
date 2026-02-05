@@ -78,7 +78,7 @@ graph TB
 
 ## Package Structure
 
-Pocket is organized as a monorepo with 24 specialized packages:
+Pocket is organized as a monorepo with 44 specialized packages:
 
 ```mermaid
 graph TD

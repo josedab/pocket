@@ -17,9 +17,12 @@ This guide covers advanced development topics for contributors working on Pocket
 ### Prerequisites
 
 ```bash
-# Required
+# Required (recommended: Node 20 — see .nvmrc)
 node --version  # >= 18.0.0
 pnpm --version  # >= 8.12.0
+
+# If using nvm, switch to the recommended version:
+nvm use
 
 # Recommended tools
 code --version  # VS Code with extensions
@@ -81,8 +84,8 @@ pocket/
 │   └── ...
 ├── examples/          # Example applications
 ├── test/              # Integration tests
-├── docs/              # VitePress documentation
-├── website/           # Docusaurus documentation
+├── docs/              # VitePress API docs (auto-generated)
+├── website/           # Docusaurus documentation site (canonical)
 └── benchmarks/        # Performance benchmarks
 ```
 
@@ -153,9 +156,9 @@ Minimal `package.json`:
   "type": "module",
   "exports": {
     ".": {
+      "types": "./dist/index.d.ts",
       "import": "./dist/index.js",
-      "require": "./dist/index.cjs",
-      "types": "./dist/index.d.ts"
+      "require": "./dist/index.cjs"
     }
   },
   "main": "./dist/index.cjs",
@@ -195,7 +198,7 @@ test/                          # Integration tests
 ### Running Tests
 
 ```bash
-# All tests
+# All tests (via turbo — runs per-package)
 pnpm test
 
 # Watch mode
@@ -212,7 +215,18 @@ pnpm test:integration
 
 # With verbose output
 pnpm test -- --reporter=verbose
+
+# Check which packages have no tests
+pnpm test:audit
 ```
+
+> **Note:** Running `vitest run` directly at the repository root (instead of `pnpm test`) 
+> may run out of memory with 44 packages. If you encounter OOM errors, increase the
+> Node.js heap size:
+>
+> ```bash
+> NODE_OPTIONS="--max-old-space-size=8192" pnpm test:coverage
+> ```
 
 ### Writing Unit Tests
 
@@ -382,17 +396,22 @@ log('Syncing %d documents', docs.length);
 
 ```typescript
 // DevTools integration
-import { attachDevTools } from '@pocket/devtools';
+import { initDevTools } from '@pocket/devtools';
 
-const db = await Database.create({ ... });
-attachDevTools(db);
+const db = await createDatabase({ ... });
+initDevTools(db);
 
-// Now available in browser console:
-// window.__POCKET_DEVTOOLS__.inspect()
-// window.__POCKET_DEVTOOLS__.query('todos')
+// Now available via the DevTools bridge inspector
 ```
 
 ### Common Issues
+
+**Out of memory when running tests at root:**
+```bash
+# The monorepo has 44 packages — running vitest directly at root may OOM.
+# Use turbo (pnpm test) or increase heap size:
+NODE_OPTIONS="--max-old-space-size=8192" pnpm test:coverage
+```
 
 **Tests hang or timeout:**
 ```bash
@@ -626,9 +645,13 @@ pnpm audit
 # Generate TypeDoc output
 pnpm docs:api
 
-# Preview documentation locally
+# Preview the documentation site locally (Docusaurus — canonical docs)
 pnpm docs:dev
 ```
+
+> **Note:** The `website/` directory contains the canonical Docusaurus documentation site.
+> The `docs/` directory contains VitePress-based API reference pages that are auto-generated.
+> When writing or updating user-facing documentation, edit files under `website/docs/`.
 
 ## Code Style Reference
 

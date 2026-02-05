@@ -31,7 +31,7 @@ npm install pocket
 ### Basic Usage
 
 ```typescript
-import { Database, createIndexedDBStorage } from 'pocket';
+import { createDatabase, createIndexedDBStorage } from 'pocket';
 
 // Define your document type
 interface Todo {
@@ -42,7 +42,7 @@ interface Todo {
 }
 
 // Create a database
-const db = await Database.create({
+const db = await createDatabase({
   name: 'my-app',
   storage: createIndexedDBStorage(),
 });
@@ -126,16 +126,104 @@ function TodoList() {
 
 ## Packages
 
+### Core
+
 | Package | Description | Size |
 |---------|-------------|------|
 | [`pocket`](./packages/pocket) | All-in-one package with core + React + storage adapters | - |
 | [`@pocket/core`](./packages/core) | Core database engine | ~25KB |
-| [`@pocket/react`](./packages/react) | React hooks and components | ~8KB |
 | [`@pocket/sync`](./packages/sync) | Sync engine for client-server sync | ~12KB |
+| [`@pocket/server`](./packages/server) | Server-side sync endpoint | - |
+
+### Frontend Integration
+
+| Package | Description |
+|---------|-------------|
+| [`@pocket/react`](./packages/react) | React hooks and components |
+| [`@pocket/angular`](./packages/angular) | Angular integration |
+| [`@pocket/vue`](./packages/vue) | Vue integration |
+| [`@pocket/svelte`](./packages/svelte) | Svelte integration |
+| [`@pocket/solid`](./packages/solid) | Solid.js integration |
+
+### Storage Adapters
+
+| Package | Description | Size |
+|---------|-------------|------|
 | [`@pocket/storage-indexeddb`](./packages/storage-indexeddb) | IndexedDB storage adapter | ~5KB |
 | [`@pocket/storage-opfs`](./packages/storage-opfs) | OPFS storage adapter | ~8KB |
 | [`@pocket/storage-memory`](./packages/storage-memory) | In-memory storage adapter | ~3KB |
-| [`@pocket/server`](./packages/server) | Server-side sync endpoint | - |
+| [`@pocket/storage-sqlite`](./packages/storage-sqlite) | SQLite storage adapter | - |
+
+### Extensions
+
+| Package | Description |
+|---------|-------------|
+| [`@pocket/ai`](./packages/ai) | LLM integration with RAG pipeline |
+| [`@pocket/crdt`](./packages/crdt) | Conflict-free replicated data types |
+| [`@pocket/encryption`](./packages/encryption) | End-to-end encryption |
+| [`@pocket/analytics`](./packages/analytics) | Offline-first analytics |
+| [`@pocket/devtools`](./packages/devtools) | Developer tools and debugging |
+
+> See [ARCHITECTURE.md](./ARCHITECTURE.md) for the full package dependency graph.
+>
+> **Package Maturity Levels:** 🟢 Stable (tested, documented) · 🟡 Beta (functional, limited tests) · 🔵 Experimental (API may change)
+
+<details>
+<summary><strong>Full Package Status Matrix</strong> (49 packages)</summary>
+
+| Package | Status | Tests | Category |
+|---------|--------|-------|----------|
+| `@pocket/core` | 🟢 Stable | 6 | Core |
+| `@pocket/react` | 🟢 Stable | 5 | Framework |
+| `@pocket/sync` | 🟡 Beta | 3 | Core |
+| `@pocket/server` | 🟡 Beta | 2 | Core |
+| `@pocket/storage-indexeddb` | 🟡 Beta | 2 | Storage |
+| `@pocket/storage-memory` | 🟡 Beta | 1 | Storage |
+| `@pocket/storage-opfs` | 🟡 Beta | 1 | Storage |
+| `@pocket/storage-sqlite` | 🔵 Experimental | 0 | Storage |
+| `@pocket/storage-edge` | 🟡 Beta | 2 | Storage |
+| `@pocket/storage-wa-sqlite` | 🟡 Beta | 1 | Storage |
+| `@pocket/storage-expo-sqlite` | 🟡 Beta | 1 | Storage |
+| `@pocket/cloud` | 🟡 Beta | 4 | Cloud |
+| `@pocket/sync-server` | 🟡 Beta | 3 | Core |
+| `@pocket/ai` | 🟡 Beta | 3 | Extension |
+| `@pocket/codegen` | 🟡 Beta | 3 | Tooling |
+| `@pocket/studio` | 🟡 Beta | 3 | Tooling |
+| `@pocket/encryption` | 🟡 Beta | 1 | Extension |
+| `@pocket/graphql` | 🟡 Beta | 1 | Extension |
+| `@pocket/collaboration` | 🟡 Beta | 1 | Extension |
+| `@pocket/crdt` | 🟡 Beta | 2 | Extension |
+| `@pocket/analytics` | 🟡 Beta | 2 | Extension |
+| `@pocket/plugin-sdk` | 🟡 Beta | 1 | Extension |
+| `@pocket/time-travel` | 🔵 Experimental | 0 | Extension |
+| `@pocket/migration` | 🔵 Experimental | 0 | Tooling |
+| `@pocket/query-builder` | 🔵 Experimental | 0 | Extension |
+| `@pocket/angular` | 🔵 Experimental | 0 | Framework |
+| `@pocket/vue` | 🔵 Experimental | 0 | Framework |
+| `@pocket/svelte` | 🔵 Experimental | 0 | Framework |
+| `@pocket/solid` | 🔵 Experimental | 0 | Framework |
+| `@pocket/react-native` | 🟡 Beta | 1 | Framework |
+| `@pocket/electron` | 🔵 Experimental | 0 | Platform |
+| `@pocket/expo` | 🔵 Experimental | 0 | Platform |
+| `@pocket/tauri` | 🔵 Experimental | 0 | Platform |
+| `@pocket/cli` | 🔵 Experimental | 0 | Tooling |
+| `@pocket/devtools` | 🔵 Experimental | 0 | Tooling |
+| `@pocket/auth` | 🟡 Beta | 1 | Extension |
+| `@pocket/permissions` | 🔵 Experimental | 0 | Extension |
+| `@pocket/forms` | 🔵 Experimental | 0 | Extension |
+| `@pocket/vectors` | 🔵 Experimental | 0 | Extension |
+| `@pocket/views` | 🟡 Beta | 1 | Extension |
+| `@pocket/subscriptions` | 🟡 Beta | 1 | Extension |
+| `@pocket/presence` | 🟡 Beta | 1 | Extension |
+| `@pocket/cross-tab` | 🟡 Beta | 1 | Extension |
+| `@pocket/opentelemetry` | 🟡 Beta | 1 | Extension |
+| `@pocket/conflict-resolution` | 🔵 Experimental | 0 | Extension |
+| `@pocket/zod` | 🔵 Experimental | 0 | Extension |
+| `@pocket/query` | 🔵 Experimental | 0 | Extension |
+| `@pocket/create-pocket-app` | 🔵 Experimental | 0 | Tooling |
+| `pocket` | 🔵 Experimental | 0 | Meta |
+
+</details>
 
 ## Examples
 
