@@ -86,3 +86,11 @@ export {
 } from './transports/index.js';
 
 export type { WebSocketTransportConfig } from './transports/index.js';
+
+// Collaboration
+export { CollaborationSession, createCollaborationSession } from './collaboration-session.js';
+export { SelectionTracker, createSelectionTracker } from './selection-tracker.js';
+export { AwarenessProtocol, createAwarenessProtocol } from './awareness.js';
+// React Hooks
+export type { UseCollaborationReturn, UsePresenceReturn, UseCursorsReturn } from './react-hooks.js';
+export { createUseCollaboration, createUsePresenceHook, createUseCollaborationCursorsHook } from './react-hooks.js';
