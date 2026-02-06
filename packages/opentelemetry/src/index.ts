@@ -59,3 +59,23 @@ export {
   recordSyncMetrics,
   type PocketMetrics,
 } from './metrics.js';
+
+// Replay Debugger
+export {
+  ReplayDebugger,
+  createReplayDebugger,
+  type ReplayDebuggerConfig,
+  type ReplayEvent,
+  type ReplaySnapshot,
+  type ReplayTimeline,
+} from './replay-debugger.js';
+
+// Metrics Dashboard
+export {
+  MetricsDashboard,
+  createMetricsDashboard,
+  type DashboardConfig,
+  type DashboardSummary,
+  type MetricPoint,
+  type MetricSeries,
+} from './metrics-dashboard.js';
