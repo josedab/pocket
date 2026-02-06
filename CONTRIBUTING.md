@@ -108,7 +108,22 @@ pnpm format:check
 pnpm format
 ```
 
-### 5. Create a Changeset
+### 5. Validate Your Changes
+
+Before pushing, run the full CI suite locally to catch issues early:
+
+```bash
+pnpm validate
+```
+
+This runs build → lint → typecheck → test in sequence. It's the same checks CI will run, saving you iteration time.
+
+> ⚠️ **Memory Warning**: Running all tests at the root may require extra memory. If you hit OOM errors:
+> ```bash
+> NODE_OPTIONS="--max-old-space-size=8192" pnpm validate
+> ```
+
+### 6. Create a Changeset
 
 If your change affects any published packages, create a changeset:
 
@@ -118,7 +133,18 @@ pnpm changeset
 
 Follow the prompts to describe your changes. This helps generate changelogs and version bumps.
 
-### 6. Submit a Pull Request
+**Changeset examples:**
+
+| Change Type | Version Bump | Example Description |
+|-------------|-------------|---------------------|
+| Bug fix | `patch` | Fix IndexedDB query performance for large collections |
+| New feature | `minor` | Add cursor-based pagination to query builder |
+| Breaking change | `major` | Rename `createDb` to `createDatabase` |
+
+✅ Good: "Fix race condition in sync engine when reconnecting"
+❌ Bad: "Fixed stuff"
+
+### 7. Submit a Pull Request
 
 1. Push your branch to your fork
 2. Open a pull request against the `main` branch
