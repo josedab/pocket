@@ -71,3 +71,40 @@ export type {
   CustomResolverFn,
 } from './conflict-resolver.js';
 export { CollabConflictResolver, createConflictResolver } from './conflict-resolver.js';
+
+// Commenting System
+export type {
+  Comment,
+  CommentEvent,
+  CommentEventType,
+  CommentReaction,
+  CommentStatus,
+  CommentThread,
+  CommentingConfig,
+  CreateThreadInput,
+  Mention,
+  ReplyInput,
+} from './commenting.js';
+export { CommentingSystem, createCommentingSystem } from './commenting.js';
+
+// Permissions Manager
+export type {
+  PermissionChangeEvent,
+  PermissionEntry,
+  PermissionRole,
+  PermissionScope,
+  PermissionsConfig,
+} from './permissions.js';
+export { PermissionsManager, createPermissionsManager } from './permissions.js';
+
+// Cursor Overlay
+export type {
+  CursorEvent,
+  CursorEventType,
+  CursorOverlayConfig,
+  CursorPosition,
+  RemoteCursor,
+  RemoteCursorInput,
+  SelectionRange,
+} from './cursor-overlay.js';
+export { CursorOverlay, createCursorOverlay } from './cursor-overlay.js';
