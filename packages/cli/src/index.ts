@@ -74,6 +74,39 @@ export {
   type DeployResult,
 } from './commands/deploy.js';
 
+// Enhanced Deploy
+export {
+  deploy,
+  detectFramework,
+  generateDeployConfig,
+  createPreview,
+  listPreviews,
+  getPreview,
+  deletePreview,
+  cleanupPreviews,
+  comparePreviews,
+  recordDeployment,
+  getDeploymentHistory,
+  rollback,
+  clearDeploymentHistory,
+  type FrameworkType,
+  type EnhancedDeployOptions,
+  type EnhancedDeployResult,
+  type DeployTarget,
+  type ConfigGeneratorOptions,
+  type GeneratedFile,
+  type ConfigGeneratorResult,
+  type PreviewOptions,
+  type PreviewDeployment,
+  type PreviewComparison,
+  type PreviewDiff,
+  type RecordDeploymentOptions,
+  type DeploymentRecord,
+  type RollbackOptions,
+  type RollbackResult,
+  type DeploymentDiff,
+} from './commands/deploy/index.js';
+
 // Convenience namespace for migrate commands
 export const migrate = {
   create: async (name: string) => {
