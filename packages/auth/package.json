@@ -59,6 +59,8 @@
     "jwt",
     "passkey",
     "webauthn",
-    "oauth"
+    "oauth",
+    "database",
+    "local-first"
   ]
 }

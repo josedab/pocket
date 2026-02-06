@@ -4,6 +4,8 @@
   "description": "In-memory storage adapter for Pocket database (testing/development)",
   "keywords": [
     "pocket",
+    "database",
+    "local-first",
     "storage",
     "memory",
     "testing"

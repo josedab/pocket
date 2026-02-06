@@ -58,6 +58,7 @@
     "conflict-resolution",
     "merge",
     "sync",
-    "local-first"
+    "local-first",
+    "database"
   ]
 }

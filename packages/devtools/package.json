@@ -6,7 +6,9 @@
     "pocket",
     "devtools",
     "debugging",
-    "browser-extension"
+    "browser-extension",
+    "database",
+    "local-first"
   ],
   "license": "MIT",
   "author": "Pocket Contributors",

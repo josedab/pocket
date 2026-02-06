@@ -102,6 +102,8 @@
     "deno",
     "vercel",
     "bun",
-    "workers"
+    "workers",
+    "database",
+    "local-first"
   ]
 }

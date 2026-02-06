@@ -58,6 +58,7 @@
     "offline-first",
     "telemetry",
     "events",
-    "local-first"
+    "local-first",
+    "database"
   ]
 }

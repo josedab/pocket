@@ -6,7 +6,9 @@
     "pocket",
     "server",
     "sync",
-    "websocket"
+    "websocket",
+    "database",
+    "local-first"
   ],
   "license": "MIT",
   "author": "Pocket Contributors",

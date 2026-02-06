@@ -58,6 +58,8 @@
     "multiplayer",
     "crdt",
     "presence",
-    "real-time"
+    "real-time",
+    "database",
+    "local-first"
   ]
 }

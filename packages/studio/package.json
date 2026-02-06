@@ -55,10 +55,11 @@
   },
   "keywords": [
     "pocket",
+    "database",
+    "local-first",
     "studio",
     "devtools",
     "inspector",
-    "database",
     "gui"
   ]
 }

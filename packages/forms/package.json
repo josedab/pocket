@@ -59,6 +59,7 @@
     "schema",
     "validation",
     "auto-generate",
-    "local-first"
+    "local-first",
+    "database"
   ]
 }

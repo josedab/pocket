@@ -57,6 +57,8 @@
     "plugin",
     "sdk",
     "marketplace",
-    "ecosystem"
+    "ecosystem",
+    "database",
+    "local-first"
   ]
 }

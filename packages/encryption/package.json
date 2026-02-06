@@ -57,6 +57,8 @@
     "encryption",
     "e2e",
     "aes",
-    "crypto"
+    "crypto",
+    "database",
+    "local-first"
   ]
 }

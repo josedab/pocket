@@ -59,6 +59,8 @@
     "codegen",
     "code-generation",
     "schema",
-    "typescript"
+    "typescript",
+    "database",
+    "local-first"
   ]
 }

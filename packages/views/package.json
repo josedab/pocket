@@ -57,6 +57,8 @@
     "views",
     "materialized",
     "incremental",
-    "query"
+    "query",
+    "database",
+    "local-first"
   ]
 }

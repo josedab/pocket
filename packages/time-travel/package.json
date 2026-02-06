@@ -58,6 +58,7 @@
     "debugging",
     "state-history",
     "replay",
-    "local-first"
+    "local-first",
+    "database"
   ]
 }

@@ -4,6 +4,8 @@
   "description": "IndexedDB storage adapter for Pocket database",
   "keywords": [
     "pocket",
+    "database",
+    "local-first",
     "storage",
     "indexeddb",
     "browser"

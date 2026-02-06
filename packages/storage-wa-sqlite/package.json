@@ -8,7 +8,9 @@
     "sqlite",
     "wasm",
     "webassembly",
-    "sql.js"
+    "sql.js",
+    "database",
+    "local-first"
   ],
   "license": "MIT",
   "author": "Pocket Contributors",
