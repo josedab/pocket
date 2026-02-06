@@ -185,3 +185,70 @@ export {
   type RegionRouterConfig,
   type RegionEndpoint,
 } from './region-router.js';
+
+// Billing
+export {
+  BillingManager,
+  createBillingManager,
+  TIER_PRICING,
+  type BillingConfig,
+  type BillingEvent,
+  type BillingEventType,
+  type BillingInterval,
+  type CreateSubscriptionInput,
+  type Invoice,
+  type InvoiceLineItem,
+  type InvoiceStatus,
+  type PaymentMethod,
+  type PaymentMethodType,
+  type AddPaymentMethodInput,
+  type Subscription,
+  type SubscriptionStatus,
+  type UsageRecord,
+  type UsageSummary as BillingUsageSummary,
+} from './billing.js';
+
+// Webhook Handler
+export {
+  WebhookHandler,
+  createWebhookHandler,
+  verifyWebhookSignature,
+  type WebhookEndpoint,
+  type WebhookEvent,
+  type WebhookEventCategory,
+  type WebhookEventType,
+  type WebhookHandlerConfig,
+  type RegisterEndpointInput,
+  type DeliveryRecord,
+  type DeliveryStatus,
+} from './webhook-handler.js';
+
+// Quick Connect
+export {
+  connectToCloud,
+  type QuickConnectConfig,
+  type CloudConnection,
+  type CloudConnectionEvent,
+  type CloudUsageSnapshot,
+} from './quick-connect.js';
+
+// Auth Service
+export {
+  AuthService,
+  createAuthService,
+  ROLE_PERMISSIONS,
+  type AuthServiceConfig,
+  type AuthEvent,
+  type AuthEventType,
+  type OAuthProvider,
+  type OAuthProviderConfig,
+  type OAuthProfile,
+  type OAuthResult,
+  type Permission,
+  type Session,
+  type SessionStatus,
+  type TokenPair,
+  type TokenPayload,
+  type TokenValidation,
+  type UserRole,
+} from './auth-service.js';
