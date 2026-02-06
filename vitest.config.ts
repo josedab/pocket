@@ -2,6 +2,30 @@ import { defineConfig } from 'vitest/config';
 
 export default defineConfig({
   test: {
+    pool: 'forks',
+    poolOptions: {
+      forks: {
+        maxForks: 4,
+        minForks: 1,
+      },
+    },
+    coverage: {
+      provider: 'v8',
+      reporter: ['text', 'json-summary', 'html'],
+      include: ['packages/*/src/**/*.ts'],
+      exclude: [
+        'packages/*/src/**/*.test.ts',
+        'packages/*/src/**/*.test.tsx',
+        'packages/*/src/__tests__/**',
+        'packages/*/src/index.ts',
+      ],
+      thresholds: {
+        branches: 50,
+        functions: 50,
+        lines: 50,
+        statements: 50,
+      },
+    },
     projects: [
       {
         test: {
