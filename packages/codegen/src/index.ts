@@ -44,15 +44,15 @@ export type {
 } from './types.js';
 
 // Schema Parser
-export { createSchemaParser, SchemaParser } from './schema-parser.js';
+export { SchemaParser, createSchemaParser } from './schema-parser.js';
 export type { SchemaValidationError, SchemaValidationResult } from './schema-parser.js';
 
 // Generators
-export { TypeGenerator } from './generators/type-generator.js';
 export { HookGenerator } from './generators/hook-generator.js';
-export { ValidationGenerator } from './generators/validation-generator.js';
 export { MigrationGenerator } from './generators/migration-generator.js';
 export type { SchemaChange } from './generators/migration-generator.js';
+export { TypeGenerator } from './generators/type-generator.js';
+export { ValidationGenerator } from './generators/validation-generator.js';
 
 // CRUD Generator
 export { CRUDGenerator } from './generators/crud-generator.js';
@@ -67,15 +67,23 @@ export { APIGenerator, createAPIGenerator } from './generators/api-generator.js'
 export { ReactGenerator, createReactGenerator } from './generators/react-generator.js';
 
 // AI Schema Generator
-export { AISchemaGenerator, createAISchemaGenerator, SCHEMA_TEMPLATES } from './ai-schema-generator.js';
+export {
+  AISchemaGenerator,
+  SCHEMA_TEMPLATES,
+  createAISchemaGenerator,
+} from './ai-schema-generator.js';
 export type {
   AISchemaGeneratorConfig,
   SchemaGenerationRequest,
   SchemaGenerationResult,
 } from './ai-schema-generator.js';
 
+// Full-Stack Generator
+export { FullStackGenerator, createFullStackGenerator } from './generators/fullstack-generator.js';
+export type { FullStackGeneratorConfig } from './generators/fullstack-generator.js';
+
 // Main Code Generator
 export { CodeGenerator, createCodeGenerator } from './codegen.js';
 
 // CLI
-export { runCLI, parseArgs, type CLIOptions } from './cli.js';
+export { parseArgs, runCLI, type CLIOptions } from './cli.js';
