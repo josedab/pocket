@@ -141,30 +141,30 @@ export {
 export {
   ProjectManager,
   createProjectManager,
-  type ProjectEnvironment,
   type DeploymentRecord,
-  type ProjectTeamMember,
   type ManagedProject,
+  type ProjectEnvironment,
+  type ProjectTeamMember,
 } from './project-manager.js';
 
 // Usage Analytics
 export {
   UsageAnalytics,
   createUsageAnalytics,
+  type UsageAlert,
   type UsageDataPoint,
   type UsageSummary,
-  type UsageAlert,
 } from './usage-analytics.js';
 
 // Rate Limiter
 export {
   RateLimiter,
+  TIER_RATE_LIMITS,
   TieredRateLimiter,
   createRateLimiter,
   createTieredRateLimiter,
-  TIER_RATE_LIMITS,
-  type RateLimiterConfig,
   type RateLimitResult,
+  type RateLimiterConfig,
   type RateLimiterStatus,
 } from './rate-limiter.js';
 
@@ -182,30 +182,30 @@ export {
 export {
   RegionRouter,
   createRegionRouter,
-  type RegionRouterConfig,
   type RegionEndpoint,
+  type RegionRouterConfig,
 } from './region-router.js';
 
 // Billing
 export {
   BillingManager,
-  createBillingManager,
   TIER_PRICING,
+  createBillingManager,
+  type AddPaymentMethodInput,
   type BillingConfig,
   type BillingEvent,
   type BillingEventType,
   type BillingInterval,
+  type UsageSummary as BillingUsageSummary,
   type CreateSubscriptionInput,
   type Invoice,
   type InvoiceLineItem,
   type InvoiceStatus,
   type PaymentMethod,
   type PaymentMethodType,
-  type AddPaymentMethodInput,
   type Subscription,
   type SubscriptionStatus,
   type UsageRecord,
-  type UsageSummary as BillingUsageSummary,
 } from './billing.js';
 
 // Webhook Handler
@@ -213,36 +213,36 @@ export {
   WebhookHandler,
   createWebhookHandler,
   verifyWebhookSignature,
+  type DeliveryRecord,
+  type DeliveryStatus,
+  type RegisterEndpointInput,
   type WebhookEndpoint,
   type WebhookEvent,
   type WebhookEventCategory,
   type WebhookEventType,
   type WebhookHandlerConfig,
-  type RegisterEndpointInput,
-  type DeliveryRecord,
-  type DeliveryStatus,
 } from './webhook-handler.js';
 
 // Quick Connect
 export {
   connectToCloud,
-  type QuickConnectConfig,
   type CloudConnection,
   type CloudConnectionEvent,
   type CloudUsageSnapshot,
+  type QuickConnectConfig,
 } from './quick-connect.js';
 
 // Auth Service
 export {
   AuthService,
-  createAuthService,
   ROLE_PERMISSIONS,
-  type AuthServiceConfig,
+  createAuthService,
   type AuthEvent,
   type AuthEventType,
+  type AuthServiceConfig,
+  type OAuthProfile,
   type OAuthProvider,
   type OAuthProviderConfig,
-  type OAuthProfile,
   type OAuthResult,
   type Permission,
   type Session,
@@ -252,3 +252,15 @@ export {
   type TokenValidation,
   type UserRole,
 } from './auth-service.js';
+
+// Auto-Provisioning Pipeline
+export {
+  AutoProvisionPipeline,
+  createAutoProvisionPipeline,
+  type AutoProvisionConfig,
+  type ProvisionPipelineResult,
+  type ProvisionProgress,
+  type ProvisionStep,
+  type ProvisionStepName,
+  type ProvisionStepStatus,
+} from './auto-provision.js';
