@@ -140,3 +140,45 @@ export {
   type DataPage,
   type FieldStats,
 } from './data-explorer.js';
+
+// AI Query Builder
+export {
+  AIQueryBuilder,
+  createAIQueryBuilder,
+  type AIQueryBuilderConfig,
+  type AIQueryFieldInfo,
+  type AIQueryHistoryEntry,
+  type AutoCompleteSuggestion,
+  type ParsedQuery,
+  type PerformanceEstimate,
+} from './ai-query-builder.js';
+
+// Visual Timeline
+export {
+  VisualTimeline,
+  createVisualTimeline,
+  type DocumentLifecycle,
+  type TimelineBucket,
+  type TimelineChange,
+  type TimelineDiff,
+  type TimelineGroup,
+  type TimelineInteractionEvent,
+  type TimelineRange,
+  type VisualTimelineConfig,
+} from './visual-timeline.js';
+
+// Import/Export Manager
+export {
+  ImportExportManager,
+  createImportExportManager,
+  type ExportFormat,
+  type ExportOptions,
+  type FieldMapping,
+  type ImportExportManagerConfig,
+  type ImportExportProgress,
+  type ImportFormat,
+  type ImportOptions,
+  type ImportResult,
+  type ImportSchemaField,
+  type ImportValidationError,
+} from './import-export-manager.js';
