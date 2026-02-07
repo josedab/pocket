@@ -16,3 +16,15 @@ export * from './vector-collection.js';
 
 // Embedding providers
 export * from './embeddings.js';
+
+// Vector quantization
+export * from './quantization.js';
+
+// Batch operations
+export * from './batch-operations.js';
+
+// Filtered search
+export * from './filtered-search.js';
+
+// Index monitoring
+export * from './index-monitor.js';
