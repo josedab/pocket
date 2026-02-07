@@ -1,0 +1,64 @@
+{
+  "name": "@pocket/rls",
+  "version": "0.1.0",
+  "description": "Multi-tenancy and row-level security for Pocket - enforce data access policies and tenant isolation",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/pocket-db/pocket",
+    "directory": "packages/rls"
+  },
+  "homepage": "https://pocket-db.dev",
+  "bugs": {
+    "url": "https://github.com/pocket-db/pocket/issues"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "require": {
+        "types": "./dist/index.cts",
+        "default": "./dist/index.cjs"
+      }
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint src/",
+    "test": "vitest run --passWithNoTests",
+    "test:watch": "vitest"
+  },
+  "dependencies": {
+    "@pocket/core": "workspace:*",
+    "rxjs": "^7.8.1"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.0",
+    "tsup": "^8.0.0",
+    "typescript": "^5.3.0",
+    "vitest": "^3.0.0"
+  },
+  "keywords": [
+    "pocket",
+    "rls",
+    "row-level-security",
+    "multi-tenancy",
+    "access-control",
+    "local-first",
+    "database"
+  ]
+}
