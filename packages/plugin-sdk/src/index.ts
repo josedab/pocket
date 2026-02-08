@@ -30,8 +30,8 @@
 
 // Types
 export type {
-  PluginManifest,
   PluginCategory,
+  PluginManifest,
   PluginTestResult,
   PluginValidationResult,
   RegistryConfig,
@@ -48,8 +48,8 @@ export {
   createPluginTestHarness,
   type MockCollection,
   type MockDatabaseConfig,
-  type PluginInstallFn,
   type PluginHookRegistry,
+  type PluginInstallFn,
 } from './test-harness.js';
 
 // Registry Client
@@ -59,11 +59,11 @@ export { RegistryClient, createRegistryClient } from './registry-client.js';
 export {
   HookSystem,
   createHookSystem,
+  type HookContext,
+  type HookHandler,
   type HookName,
   type HookPriority,
   type HookRegistration,
-  type HookHandler,
-  type HookContext,
   type HookResult,
 } from './hook-system.js';
 
@@ -71,10 +71,10 @@ export {
 export {
   PluginLifecycleManager,
   createLifecycleManager,
-  type PluginStatus,
   type PluginInstance,
   type PluginLifecycleHooks,
   type PluginRegistration,
+  type PluginStatus,
 } from './lifecycle-manager.js';
 
 // Marketplace Client
@@ -86,3 +86,17 @@ export {
   type MarketplaceSearchOptions,
   type MarketplaceSearchResult,
 } from './marketplace-client.js';
+
+// Plugin Scaffold
+export {
+  PluginScaffold,
+  createPluginScaffold,
+  type CompatibilityResult,
+  type GeneratedFile,
+  type PublishProgress,
+  type PublishResult,
+  type PublishStage,
+  type QualityInput,
+  type QualityScore,
+  type ScaffoldOptions,
+} from './plugin-scaffold.js';
