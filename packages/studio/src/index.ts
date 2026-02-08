@@ -79,10 +79,7 @@ export { SyncInspector, createSyncInspector } from './sync-inspector.js';
 export type { SyncEngineLike } from './sync-inspector.js';
 
 // Performance Profiler
-export {
-  PerformanceProfiler,
-  createPerformanceProfiler,
-} from './performance-profiler.js';
+export { PerformanceProfiler, createPerformanceProfiler } from './performance-profiler.js';
 export type { OperationStats } from './performance-profiler.js';
 
 // Studio Server
@@ -92,8 +89,8 @@ export { StudioServer, createStudioServer } from './studio-server.js';
 export {
   QueryPlayground,
   createQueryPlayground,
-  type QueryHistoryEntry,
   type QueryExplainResult,
+  type QueryHistoryEntry,
   type QueryPlaygroundConfig,
   type SavedQuery,
 } from './query-playground.js';
@@ -182,3 +179,15 @@ export {
   type ImportSchemaField,
   type ImportValidationError,
 } from './import-export-manager.js';
+
+// Dashboard Controller
+export {
+  DashboardController,
+  createDashboardController,
+  type DashboardCommand,
+  type DashboardConfig,
+  type DashboardNotification,
+  type DashboardPanel,
+  type DashboardState,
+  type DashboardStats,
+} from './dashboard-controller.js';

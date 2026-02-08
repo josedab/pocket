@@ -1,10 +1,5 @@
-import { describe, it, expect, beforeEach, afterEach } from 'vitest';
-import { firstValueFrom } from 'rxjs';
-import { take } from 'rxjs/operators';
-import {
-  ImportExportManager,
-  createImportExportManager,
-} from '../import-export-manager.js';
+import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+import { ImportExportManager, createImportExportManager } from '../import-export-manager.js';
 
 describe('ImportExportManager', () => {
   let manager: ImportExportManager;
@@ -167,9 +162,7 @@ describe('ImportExportManager', () => {
           format: 'json',
           data: '[{"age":30}]',
           collection: 'users',
-          schema: [
-            { name: 'name', type: 'string', required: true },
-          ],
+          schema: [{ name: 'name', type: 'string', required: true }],
         });
 
         expect(result.importedCount).toBe(0);
@@ -252,7 +245,10 @@ describe('ImportExportManager', () => {
 
       sub.unsubscribe();
       expect(progressValues.length).toBeGreaterThan(0);
-      const last = progressValues[progressValues.length - 1] as { percent: number; operation: string };
+      const last = progressValues[progressValues.length - 1] as {
+        percent: number;
+        operation: string;
+      };
       expect(last.percent).toBe(100);
       expect(last.operation).toBe('import');
     });
@@ -261,7 +257,11 @@ describe('ImportExportManager', () => {
   describe('destroy', () => {
     it('should complete streams on destroy', () => {
       let completed = false;
-      manager.getProgress().subscribe({ complete: () => { completed = true; } });
+      manager.getProgress().subscribe({
+        complete: () => {
+          completed = true;
+        },
+      });
       manager.destroy();
       expect(completed).toBe(true);
     });
@@ -294,9 +294,9 @@ describe('ImportExportManager', () => {
       const m = createImportExportManager({ maxImportSize: 2 });
       const data = JSON.stringify([{ a: 1 }, { b: 2 }, { c: 3 }]);
 
-      await expect(
-        m.importData({ format: 'json', data, collection: 'test' }),
-      ).rejects.toThrow('exceeds maximum');
+      await expect(m.importData({ format: 'json', data, collection: 'test' })).rejects.toThrow(
+        'exceeds maximum'
+      );
 
       m.destroy();
     });
