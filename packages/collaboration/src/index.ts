@@ -56,23 +56,24 @@ export {
 } from './memory-transport.js';
 
 // WebSocket Transport (production)
-export type { WebSocketConnectionState, WebSocketTransportConfig } from './websocket-transport.js';
 export { WebSocketTransport, createWebSocketTransport } from './websocket-transport.js';
+export type { WebSocketConnectionState, WebSocketTransportConfig } from './websocket-transport.js';
 
 // Awareness Protocol
-export type { AwarenessConfig, AwarenessState } from './awareness.js';
 export { AwarenessProtocol, createAwarenessProtocol } from './awareness.js';
+export type { AwarenessConfig, AwarenessState } from './awareness.js';
 
 // Conflict Resolution
+export { CollabConflictResolver, createConflictResolver } from './conflict-resolver.js';
 export type {
   ConflictInfo,
   ConflictResolution,
   ConflictStrategy,
   CustomResolverFn,
 } from './conflict-resolver.js';
-export { CollabConflictResolver, createConflictResolver } from './conflict-resolver.js';
 
 // Commenting System
+export { CommentingSystem, createCommentingSystem } from './commenting.js';
 export type {
   Comment,
   CommentEvent,
@@ -85,9 +86,9 @@ export type {
   Mention,
   ReplyInput,
 } from './commenting.js';
-export { CommentingSystem, createCommentingSystem } from './commenting.js';
 
 // Permissions Manager
+export { PermissionsManager, createPermissionsManager } from './permissions.js';
 export type {
   PermissionChangeEvent,
   PermissionEntry,
@@ -95,9 +96,19 @@ export type {
   PermissionScope,
   PermissionsConfig,
 } from './permissions.js';
-export { PermissionsManager, createPermissionsManager } from './permissions.js';
+
+// CRDT Document
+export { CRDTDocument, createCRDTDocument } from './crdt-document.js';
+export type {
+  CRDTDocumentConfig,
+  CRDTDocumentState,
+  CRDTOperation,
+  CRDTOperationType,
+  CRDTSnapshot,
+} from './crdt-document.js';
 
 // Cursor Overlay
+export { CursorOverlay, createCursorOverlay } from './cursor-overlay.js';
 export type {
   CursorEvent,
   CursorEventType,
@@ -107,4 +118,3 @@ export type {
   RemoteCursorInput,
   SelectionRange,
 } from './cursor-overlay.js';
-export { CursorOverlay, createCursorOverlay } from './cursor-overlay.js';
