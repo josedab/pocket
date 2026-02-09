@@ -78,3 +78,27 @@ export type {
 } from './hooks.js';
 
 export { createUseHistoryHook, createUseTimeTravelHook } from './hooks.js';
+
+// Persistent History
+export type {
+  HistoryFilter,
+  HistorySnapshot,
+  HistoryStorageAdapter,
+  PersistentHistoryConfig,
+  PersistentHistoryEntry,
+} from './persistent-history.js';
+
+export {
+  MemoryHistoryStorage,
+  PersistentHistory,
+  createPersistentHistory,
+} from './persistent-history.js';
+
+// Audit Export
+export type {
+  AuditExportConfig,
+  AuditReport,
+  AuditSummary,
+} from './audit-export.js';
+
+export { AuditExporter, createAuditExporter } from './audit-export.js';
