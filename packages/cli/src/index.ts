@@ -65,6 +65,14 @@ export { down as migrateDown, type MigrateDownOptions } from './commands/migrate
 export { status as migrateStatus, type MigrateStatusOptions } from './commands/migrate/status.js';
 export { up as migrateUp, type MigrateUpOptions } from './commands/migrate/up.js';
 export { studio, type StudioOptions } from './commands/studio.js';
+export {
+  DeployCommand,
+  createDeployCommand,
+  type DeployOptions,
+  type DeployProvider,
+  type DeployFile,
+  type DeployResult,
+} from './commands/deploy.js';
 
 // Convenience namespace for migrate commands
 export const migrate = {
