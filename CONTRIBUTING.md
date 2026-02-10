@@ -6,8 +6,10 @@ Please note that this project is released with a [Code of Conduct](./CODE_OF_CON
 
 ## Prerequisites
 
-- **Node.js** 18.0.0 or later
+- **Node.js** 18.0.0 or later (recommended: Node 20, as specified in `.nvmrc`)
 - **pnpm** 8.12.0 or later
+
+> **Tip:** If you use [nvm](https://github.com/nvm-sh/nvm), run `nvm use` in the project root to automatically switch to the recommended Node version.
 
 ## Development Setup
 
@@ -40,7 +42,7 @@ Please note that this project is released with a [Code of Conduct](./CODE_OF_CON
 
 ```
 pocket/
-├── packages/
+├── packages/              # 44 publishable packages
 │   ├── core/              # Core database engine
 │   ├── react/             # React hooks and components
 │   ├── sync/              # Sync engine
@@ -48,10 +50,13 @@ pocket/
 │   ├── storage-indexeddb/ # IndexedDB storage adapter
 │   ├── storage-memory/    # In-memory storage adapter
 │   ├── storage-opfs/      # OPFS storage adapter
-│   └── pocket/            # All-in-one package
+│   ├── pocket/            # All-in-one package
+│   └── ...                # See ARCHITECTURE.md for full list
 ├── examples/
 │   ├── todo-app/          # Todo example app
 │   └── notes-app/         # Notes example app
+├── website/               # Docusaurus documentation site (canonical)
+├── docs/                  # VitePress API docs (auto-generated)
 └── test/                  # Integration tests
 ```
 

@@ -26,13 +26,15 @@ yarn add pocket
 ### 1. Create a Database
 
 ```typescript
-import { Database, createIndexedDBStorage } from 'pocket';
+import { createDatabase, createIndexedDBStorage } from 'pocket';
 
-const db = await Database.create({
+const db = await createDatabase({
   name: 'my-app',
   storage: createIndexedDBStorage(),
 });
 ```
+
+> You can also use the class-based API: `Database.create(options)`. Both are equivalent.
 
 ### 2. Define Your Data
 
@@ -90,7 +92,7 @@ subscription.unsubscribe();
 Here's a working todo list in about 30 lines:
 
 ```typescript
-import { Database, createIndexedDBStorage } from 'pocket';
+import { createDatabase, createIndexedDBStorage } from 'pocket';
 
 interface Todo {
   _id: string;
@@ -101,7 +103,7 @@ interface Todo {
 
 async function main() {
   // Create database
-  const db = await Database.create({
+  const db = await createDatabase({
     name: 'todo-app',
     storage: createIndexedDBStorage(),
   });
