@@ -26,6 +26,7 @@
     "format": "prettier --write \"packages/**/*.{ts,tsx,json}\"",
     "format:check": "prettier --check \"packages/**/*.{ts,tsx,json}\"",
     "typecheck": "turbo run typecheck",
+    "validate": "turbo run build && pnpm lint && turbo run typecheck && turbo run test --continue",
     "clean": "turbo run clean && rm -rf node_modules",
     "size-limit": "size-limit",
     "changeset": "changeset",
@@ -36,6 +37,7 @@
     "docs:dev": "pnpm --filter @pocket/docs dev",
     "docs:build": "pnpm --filter @pocket/docs build",
     "docs:preview": "pnpm --filter @pocket/docs preview",
+    "test:audit": "bash scripts/check-test-coverage.sh",
     "bench": "pnpm --filter @pocket/benchmarks bench",
     "prepare": "husky"
   },

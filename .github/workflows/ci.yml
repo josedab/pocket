@@ -96,6 +96,17 @@ jobs:
       - name: Format check
         run: pnpm format:check
 
+  test-audit:
+    name: Test Coverage Audit
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Check for untested packages
+        run: bash scripts/check-test-coverage.sh
+        continue-on-error: true
+
   coverage:
     name: Test Coverage
     runs-on: ubuntu-latest
