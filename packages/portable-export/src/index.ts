@@ -1,5 +1,5 @@
 // Types
-export * from './types.js';
+export type * from './types.js';
 
 // Exporters
 export { createJsonExporter } from './json-exporter.js';
@@ -25,3 +25,31 @@ export type { IntegrityChecker } from './integrity.js';
 // Export Manager
 export { createExportManager } from './export-manager.js';
 export type { ExportManager } from './export-manager.js';
+
+// Encrypted Backup
+export { createEncryptedBackup } from './encrypted-backup.js';
+export type {
+  EncryptedBackup,
+  EncryptedBackupConfig,
+  EncryptedPayload,
+} from './encrypted-backup.js';
+
+// Competitor Import
+export { createCompetitorImporter } from './competitor-import.js';
+export type {
+  CompetitorFormat,
+  CompetitorImportResult,
+  CompetitorImporter,
+} from './competitor-import.js';
+
+// Streaming Export
+export { createStreamingExporter } from './streaming-export.js';
+export type {
+  StreamingExportConfig,
+  StreamingExportProgress,
+  StreamingExporter,
+} from './streaming-export.js';
+
+// Format Detection
+export { createFormatDetector } from './format-detector.js';
+export type { DetectedFormat, FormatDetector } from './format-detector.js';
