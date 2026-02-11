@@ -59,3 +59,16 @@ export { TimeSeriesStore, createTimeSeriesStore } from './time-series-store.js';
 
 // Compression
 export { GorillaCompressor, createGorillaCompressor } from './compression.js';
+
+// Columnar Store
+export {
+  ColumnarStore,
+  createColumnarStore,
+  type AggregationBucket,
+  type AggregationRequest,
+  type AggregationResult,
+  type ColumnarPoint,
+  type ColumnarStoreConfig,
+  type ColumnarStoreStats,
+  type PartitionInfo,
+} from './columnar-store.js';
