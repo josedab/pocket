@@ -82,6 +82,14 @@ export type {
 export { FullStackGenerator, createFullStackGenerator } from './generators/fullstack-generator.js';
 export type { FullStackGeneratorConfig } from './generators/fullstack-generator.js';
 
+// Zod Generator
+export { createZodGenerator } from './generators/zod-generator.js';
+export type { FieldDef, SchemaDefinition, ZodGeneratorHandle } from './generators/zod-generator.js';
+
+// Watch Mode
+export { createWatchMode } from './watch-mode.js';
+export type { WatchEvent, WatchFs, WatchModeConfig, WatchModeHandle } from './watch-mode.js';
+
 // Main Code Generator
 export { CodeGenerator, createCodeGenerator } from './codegen.js';
 
