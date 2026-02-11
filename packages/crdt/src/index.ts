@@ -31,3 +31,15 @@ export {
   type SelectionRange,
   type UndoEntry,
 } from './collaboration-manager.js';
+
+// CRDT-Sync Bridge
+export { createCRDTSyncBridge } from './crdt-sync-bridge.js';
+export type {
+  CRDTMergeStrategy,
+  CRDTSyncBridge,
+  CRDTSyncBridgeConfig,
+  CRDTSyncBridgeStats,
+  CRDTSyncOperation,
+  GCResult,
+  SyncOperationBatch,
+} from './crdt-sync-bridge.js';
