@@ -1,4 +1,6 @@
 #!/usr/bin/env sh
+# Pre-commit hook: runs lint-staged + typecheck on changed packages.
+# To skip: git commit --no-verify
 
 pnpm lint-staged
 

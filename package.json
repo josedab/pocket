@@ -43,6 +43,7 @@
     "audit:metadata": "node scripts/audit-package-metadata.mjs",
     "status": "node scripts/package-status.mjs",
     "health": "node scripts/health-check.mjs",
+    "quickstart": "pnpm install && pnpm build && echo '\n✅ Setup complete! Run: pnpm test'",
     "prepare": "husky"
   },
   "lint-staged": {
