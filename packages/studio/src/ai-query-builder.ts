@@ -419,7 +419,7 @@ export class AIQueryBuilder {
     }
 
     // Try to extract from "from <collection>" or "in <collection>"
-    const fromMatch = lower.match(/(?:from|in)\s+(\w+)/);
+    const fromMatch = /(?:from|in)\s+(\w+)/.exec(lower);
     if (fromMatch) {
       const candidate = fromMatch[1]!;
       for (const name of this.schemas.keys()) {
@@ -449,7 +449,7 @@ export class AIQueryBuilder {
           // Shift match indices: the named groups start at index 1 of the
           // operator pattern, which is now later in the combined regex.
           // Re-run the operator pattern on the substring for clean extraction.
-          const subMatch = input.slice(match.index!).match(pattern);
+          const subMatch = input.slice(match.index).match(pattern);
           if (subMatch) {
             const value = extract(subMatch);
             if (operator === '$eq') {
@@ -500,7 +500,7 @@ export class AIQueryBuilder {
   }
 
   private detectLimit(input: string): number | undefined {
-    const match = input.match(LIMIT_PATTERN);
+    const match = LIMIT_PATTERN.exec(input);
     if (match) return Number(match[1]);
     return undefined;
   }

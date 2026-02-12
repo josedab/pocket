@@ -37,9 +37,9 @@ export function createSchemaParser(): SchemaParser {
       const trimmed = line.trim();
       if (!trimmed || trimmed.startsWith('#')) continue;
 
-      const topMatch = trimmed.match(/^(\w+):\s*(.+)?$/);
+      const topMatch = /^(\w+):\s*(.+)?$/.exec(trimmed);
       if (topMatch) {
-        const key = topMatch[1] as string;
+        const key = topMatch[1]!;
         const value = topMatch[2]?.trim();
         if (value) {
           result[key] = value;

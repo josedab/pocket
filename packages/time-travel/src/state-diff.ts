@@ -342,7 +342,7 @@ export class StateDiffEngine {
         const docDiff = this.diff(bDoc, aDoc);
         if (docDiff.changes.length > 0) {
           result[col] ??= {};
-          result[col]![id] = docDiff;
+          result[col][id] = docDiff;
         }
       }
     }

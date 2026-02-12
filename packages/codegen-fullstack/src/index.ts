@@ -50,7 +50,7 @@ export function createCodeGenerator(config: GeneratorConfig) {
 
   return {
     generate(schema: Parameters<typeof parser.parse>[0]): GeneratorResult {
-      const parsed = typeof schema === 'string' || (typeof schema === 'object' && !('collections' in (schema as object)))
+      const parsed = typeof schema === 'string' || (typeof schema === 'object' && !('collections' in (schema)))
         ? parser.parse(schema)
         : parser.parse(schema);
 

@@ -128,17 +128,17 @@ export class AuthDirectiveHandler {
 
       const now = Date.now();
       const expiresAt =
-        typeof payload['exp'] === 'number' ? payload['exp'] * 1000 : now + 3_600_000;
+        typeof payload.exp === 'number' ? payload.exp * 1000 : now + 3_600_000;
 
       if (expiresAt < now) {
         throw new Error('Auth directive: token has expired');
       }
 
       return {
-        userId: String(payload['sub'] ?? payload['userId'] ?? ''),
-        roles: (Array.isArray(payload['roles']) ? payload['roles'] : ['viewer']) as UserRole[],
+        userId: String(payload.sub ?? payload.userId ?? ''),
+        roles: (Array.isArray(payload.roles) ? payload.roles : ['viewer']) as UserRole[],
         issuedAt:
-          typeof payload['iat'] === 'number' ? payload['iat'] * 1000 : now,
+          typeof payload.iat === 'number' ? payload.iat * 1000 : now,
         expiresAt,
       };
     } catch (err) {
@@ -259,7 +259,7 @@ export class AuthDirectiveHandler {
     }
 
     const requiredRoles = (
-      Array.isArray(args?.['roles']) ? args['roles'] : []
+      Array.isArray(args?.roles) ? args.roles : []
     ) as UserRole[];
 
     try {
@@ -278,9 +278,9 @@ export class AuthDirectiveHandler {
     args?: Record<string, unknown>,
   ): MiddlewareResult {
     const max =
-      typeof args?.['max'] === 'number' ? args['max'] : undefined;
+      typeof args?.max === 'number' ? args.max : undefined;
     const windowMs =
-      typeof args?.['window'] === 'number' ? args['window'] : undefined;
+      typeof args?.window === 'number' ? args.window : undefined;
     const key = `${context.user?.userId ?? 'anon'}:${context.fieldName}`;
 
     if (!this.checkRateLimit(key, max, windowMs)) {

@@ -25,7 +25,7 @@
  */
 
 import type { AggregateClause, FilterCondition, QueryPlan } from './types.js';
-import { VisualQueryModel } from './visual-query-model.js';
+import { type VisualQueryModel } from './visual-query-model.js';
 
 /**
  * Options for the code generator.
@@ -179,7 +179,7 @@ export class QueryCodeGenerator {
     if (plan.where) {
       for (const condition of plan.where.conditions) {
         if ('field' in condition) {
-          const fc = condition as FilterCondition;
+          const fc = condition;
           const val = typeof fc.value === 'string' ? `'${fc.value}'` : JSON.stringify(fc.value);
           lines.push(`  .where('${fc.field}', '${fc.operator}', ${val})`);
         }

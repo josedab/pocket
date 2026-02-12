@@ -154,29 +154,29 @@ function generateJsonSchema(schema: InferredSchema, name: string): string {
     switch (field.type) {
       case 'string':
       case 'date':
-        result['type'] = 'string';
-        if (field.semanticType === 'email') result['format'] = 'email';
-        if (field.semanticType === 'url') result['format'] = 'uri';
-        if (field.semanticType === 'uuid') result['format'] = 'uuid';
-        if (field.type === 'date') result['format'] = 'date-time';
-        if (field.enumValues) result['enum'] = field.enumValues;
-        if (field.pattern) result['pattern'] = field.pattern;
+        result.type = 'string';
+        if (field.semanticType === 'email') result.format = 'email';
+        if (field.semanticType === 'url') result.format = 'uri';
+        if (field.semanticType === 'uuid') result.format = 'uuid';
+        if (field.type === 'date') result.format = 'date-time';
+        if (field.enumValues) result.enum = field.enumValues;
+        if (field.pattern) result.pattern = field.pattern;
         break;
       case 'number':
-        result['type'] = 'number';
+        result.type = 'number';
         break;
       case 'boolean':
-        result['type'] = 'boolean';
+        result.type = 'boolean';
         break;
       case 'array':
-        result['type'] = 'array';
+        result.type = 'array';
         if (field.items && field.items.fields.size > 0) {
           const itemField = field.items.fields.values().next().value;
-          if (itemField) result['items'] = fieldToJsonSchema(itemField);
+          if (itemField) result.items = fieldToJsonSchema(itemField);
         }
         break;
       case 'object':
-        result['type'] = 'object';
+        result.type = 'object';
         if (field.properties && field.properties.size > 0) {
           const props: Record<string, unknown> = {};
           const required: string[] = [];
@@ -184,12 +184,12 @@ function generateJsonSchema(schema: InferredSchema, name: string): string {
             props[n] = fieldToJsonSchema(p);
             if (p.required) required.push(n);
           }
-          result['properties'] = props;
-          if (required.length > 0) result['required'] = required;
+          result.properties = props;
+          if (required.length > 0) result.required = required;
         }
         break;
       case 'null':
-        result['type'] = 'null';
+        result.type = 'null';
         break;
       default:
         break;

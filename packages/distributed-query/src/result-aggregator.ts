@@ -120,7 +120,7 @@ export class ResultAggregator {
     for (const item of data) {
       const key = String((item as Record<string, unknown>)[groupBy] ?? '_null');
       groups[key] ??= [];
-      groups[key]!.push(item);
+      groups[key].push(item);
     }
 
     return groups;

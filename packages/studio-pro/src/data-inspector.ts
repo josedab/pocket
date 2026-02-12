@@ -106,7 +106,7 @@ export function createDataInspector(
     documents: Record<string, unknown>[],
     id: string,
   ): Record<string, unknown> | null {
-    return documents.find((doc) => doc['_id'] === id) ?? null;
+    return documents.find((doc) => doc._id === id) ?? null;
   }
 
   function getCollectionStats(

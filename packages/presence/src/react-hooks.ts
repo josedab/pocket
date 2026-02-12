@@ -27,7 +27,6 @@
  * ```
  */
 
-import type { Observable } from 'rxjs';
 import type { CollaborationSession, CursorUpdate, Participant, SelectionUpdate } from './collaboration-session.js';
 
 /**
@@ -101,21 +100,21 @@ export function createUseCollaboration(session: CollaborationSession) {
     const [isConnected, setIsConnected] = React.useState(false);
 
     React.useEffect(() => {
-      const subs: Array<{ unsubscribe: () => void }> = [];
+      const subs: { unsubscribe: () => void }[] = [];
 
       subs.push(
-        (session.participants$ as Observable<Participant[]>).subscribe((p) => {
+        (session.participants$).subscribe((p) => {
           setParticipants(p);
           setIsConnected(session.isConnected());
         })
       );
 
       subs.push(
-        (session.cursors$ as Observable<Map<string, CursorUpdate>>).subscribe(setCursors)
+        (session.cursors$).subscribe(setCursors)
       );
 
       subs.push(
-        (session.selections$ as Observable<Map<string, SelectionUpdate>>).subscribe(setSelections)
+        (session.selections$).subscribe(setSelections)
       );
 
       return () => {
@@ -151,7 +150,7 @@ export function createUsePresenceHook() {
     const sessionRef = React.useRef(session);
 
     React.useEffect(() => {
-      const sub = (sessionRef.current.participants$ as Observable<Participant[]>).subscribe((p) => {
+      const sub = (sessionRef.current.participants$).subscribe((p) => {
         setUsers(p);
         setIsConnected(sessionRef.current.isConnected());
       });
@@ -183,7 +182,7 @@ export function createUseCollaborationCursorsHook() {
     const sessionRef = React.useRef(session);
 
     React.useEffect(() => {
-      const sub = (sessionRef.current.cursors$ as Observable<Map<string, CursorUpdate>>).subscribe(setCursors);
+      const sub = (sessionRef.current.cursors$).subscribe(setCursors);
 
       return () => sub.unsubscribe();
     }, [sessionRef.current]);

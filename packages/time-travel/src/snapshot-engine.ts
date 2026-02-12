@@ -162,13 +162,13 @@ function computeDelta(
 
       if (!bDoc && aDoc) {
         added[col] ??= {};
-        added[col]![id] = aDoc;
+        added[col][id] = aDoc;
       } else if (bDoc && !aDoc) {
         removed[col] ??= {};
-        removed[col]![id] = bDoc;
+        removed[col][id] = bDoc;
       } else if (bDoc && aDoc && JSON.stringify(bDoc) !== JSON.stringify(aDoc)) {
         modified[col] ??= {};
-        modified[col]![id] = aDoc;
+        modified[col][id] = aDoc;
       }
     }
   }
@@ -187,7 +187,7 @@ function applyDelta(
   for (const [col, docs] of Object.entries(delta.added)) {
     result[col] ??= {};
     for (const [id, doc] of Object.entries(docs)) {
-      result[col]![id] = doc;
+      result[col][id] = doc;
     }
   }
 
@@ -195,7 +195,7 @@ function applyDelta(
   for (const [col, docs] of Object.entries(delta.modified)) {
     result[col] ??= {};
     for (const [id, doc] of Object.entries(docs)) {
-      result[col]![id] = doc;
+      result[col][id] = doc;
     }
   }
 
@@ -203,9 +203,9 @@ function applyDelta(
   for (const [col, docs] of Object.entries(delta.removed)) {
     if (!result[col]) continue;
     for (const id of Object.keys(docs)) {
-      Reflect.deleteProperty(result[col]!, id);
+      Reflect.deleteProperty(result[col], id);
     }
-    if (Object.keys(result[col]!).length === 0) {
+    if (Object.keys(result[col]).length === 0) {
       Reflect.deleteProperty(result, col);
     }
   }
