@@ -73,7 +73,7 @@ export class VectorStore {
 
   // Observables
   private readonly changes$ = new Subject<VectorChangeEvent>();
-  private readonly stats$ = new BehaviorSubject<VectorStoreStats>(this.computeStats());
+  private readonly stats$: BehaviorSubject<VectorStoreStats>;
 
   constructor(config: VectorStoreConfig) {
     this.name = config.name;
@@ -90,6 +90,8 @@ export class VectorStore {
     } else {
       this.index = createFlatIndex(this.name, this.metric);
     }
+
+    this.stats$ = new BehaviorSubject<VectorStoreStats>(this.computeStats());
   }
 
   /**
