@@ -102,3 +102,42 @@ export type {
 } from './audit-export.js';
 
 export { AuditExporter, createAuditExporter } from './audit-export.js';
+
+// Snapshot Engine
+export type {
+  EngineSnapshot,
+  RetentionPolicy,
+  SnapshotComparison,
+  SnapshotDelta,
+  SnapshotEngineConfig,
+  SnapshotEngineEvent,
+  SnapshotEngineEventType,
+  SnapshotEngineState,
+} from './snapshot-engine.js';
+
+export { SnapshotEngine, createSnapshotEngine } from './snapshot-engine.js';
+
+// Undo/Redo Manager
+export type {
+  UndoableOperation,
+  UndoEntry,
+  UndoRedoConfig,
+  UndoRedoEvent,
+  UndoRedoEventType,
+  UndoRedoState,
+} from './undo-redo.js';
+
+export { UndoRedoManager, createUndoRedoManager } from './undo-redo.js';
+
+// State Diff Engine
+export type {
+  FieldChange,
+  FieldChangeKind,
+  StateDiff,
+  StateDiffConfig,
+  StateDiffEvent,
+  StateDiffEventType,
+  DiffStrategy,
+} from './state-diff.js';
+
+export { StateDiffEngine, createStateDiffEngine } from './state-diff.js';
