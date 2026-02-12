@@ -12,7 +12,7 @@ import type { AgentContext, Tool, ToolResult } from './types.js';
  */
 export interface DatabaseAdapter {
   /** List available collection names */
-  getCollectionNames(): ReadonlyArray<string>;
+  getCollectionNames(): readonly string[];
   /** Query documents from a collection */
   query(collection: string, filter?: Record<string, unknown>): Promise<unknown[]>;
   /** Get a single document by ID */
@@ -42,13 +42,13 @@ function createQueryTool(db: DatabaseAdapter): Tool {
     ],
     async execute(args: Record<string, unknown>, _context: AgentContext): Promise<ToolResult> {
       try {
-        const collection = args['collection'] as string;
+        const collection = args.collection as string;
         if (!collection) return createResult(false, null, 'Collection name is required');
 
-        const filter = args['filter'] as Record<string, unknown> | undefined;
+        const filter = args.filter as Record<string, unknown> | undefined;
         let results = await db.query(collection, filter);
 
-        const limit = args['limit'] as number | undefined;
+        const limit = args.limit as number | undefined;
         if (limit && limit > 0) {
           results = results.slice(0, limit);
         }
@@ -71,7 +71,7 @@ function createGetDocumentTool(db: DatabaseAdapter): Tool {
     ],
     async execute(args: Record<string, unknown>): Promise<ToolResult> {
       try {
-        const doc = await db.get(args['collection'] as string, args['id'] as string);
+        const doc = await db.get(args.collection as string, args.id as string);
         return doc
           ? createResult(true, doc)
           : createResult(false, null, 'Document not found');
@@ -93,8 +93,8 @@ function createInsertTool(db: DatabaseAdapter): Tool {
     async execute(args: Record<string, unknown>): Promise<ToolResult> {
       try {
         const result = await db.insert(
-          args['collection'] as string,
-          args['document'] as Record<string, unknown>,
+          args.collection as string,
+          args.document as Record<string, unknown>,
         );
         return createResult(true, result);
       } catch (err) {
@@ -115,8 +115,8 @@ function createCountTool(db: DatabaseAdapter): Tool {
     async execute(args: Record<string, unknown>): Promise<ToolResult> {
       try {
         const count = await db.count(
-          args['collection'] as string,
-          args['filter'] as Record<string, unknown> | undefined,
+          args.collection as string,
+          args.filter as Record<string, unknown> | undefined,
         );
         return createResult(true, { count });
       } catch (err) {
@@ -151,7 +151,7 @@ function createSummarizeTool(db: DatabaseAdapter): Tool {
     ],
     async execute(args: Record<string, unknown>): Promise<ToolResult> {
       try {
-        const collection = args['collection'] as string;
+        const collection = args.collection as string;
         const count = await db.count(collection);
         const sample = await db.query(collection);
         const sampleDocs = sample.slice(0, 3);
@@ -176,7 +176,7 @@ function createSummarizeTool(db: DatabaseAdapter): Tool {
  * const agent = createAgent({ tools, provider: myLLM });
  * ```
  */
-export function createDatabaseTools(db: DatabaseAdapter): ReadonlyArray<Tool> {
+export function createDatabaseTools(db: DatabaseAdapter): readonly Tool[] {
   return [
     createQueryTool(db),
     createGetDocumentTool(db),

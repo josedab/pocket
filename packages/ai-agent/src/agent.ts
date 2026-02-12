@@ -5,7 +5,7 @@
  * tool execution, and streaming support.
  */
 
-import { Observable, Subject } from 'rxjs';
+import { type Observable, Subject } from 'rxjs';
 import type {
   Agent,
   AgentConfig,
@@ -235,7 +235,7 @@ export function createAgent(config: AgentConfig): Agent {
     return subject.asObservable();
   }
 
-  function getHistory(): ReadonlyArray<ConversationMessage> {
+  function getHistory(): readonly ConversationMessage[] {
     return memory.getMessages();
   }
 

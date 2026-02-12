@@ -17,9 +17,9 @@ export interface ToolRegistry {
   /** Get a tool by name */
   get(name: string): Tool | undefined;
   /** Get all registered tools */
-  getAll(): ReadonlyArray<Tool>;
+  getAll(): readonly Tool[];
   /** Generate LLM-compatible schemas for all tools */
-  getSchemas(): ReadonlyArray<ToolSchema>;
+  getSchemas(): readonly ToolSchema[];
   /** Check if a tool is registered */
   has(name: string): boolean;
 }
@@ -58,7 +58,7 @@ function toToolSchema(tool: Tool): ToolSchema {
  * const schemas = registry.getSchemas();
  * ```
  */
-export function createToolRegistry(initialTools: ReadonlyArray<Tool> = []): ToolRegistry {
+export function createToolRegistry(initialTools: readonly Tool[] = []): ToolRegistry {
   const tools = new Map<string, Tool>();
 
   for (const tool of initialTools) {
