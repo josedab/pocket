@@ -110,13 +110,13 @@ export function createAutomergeSyncAdapter(
   function applyRemoteChanges(
     collectionName: string,
     documentId: string,
-    changes: ReadonlyArray<CrdtChange>,
+    changes: readonly CrdtChange[],
   ): MergeResult {
     const doc = getDocument(collectionName, documentId);
     return doc.applyChanges(changes);
   }
 
-  function getDocumentIds(collectionName: string): ReadonlyArray<string> {
+  function getDocumentIds(collectionName: string): readonly string[] {
     const collection = documents.get(collectionName);
     return collection ? [...collection.keys()] : [];
   }

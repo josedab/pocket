@@ -50,7 +50,7 @@ export function createSyncSession(
     peers.delete(peerId);
   }
 
-  function getPeerStates(): ReadonlyArray<PeerState> {
+  function getPeerStates(): readonly PeerState[] {
     return [...peers.values()];
   }
 
@@ -132,7 +132,7 @@ export function createSyncSession(
  */
 export function mergeSyncMessages(
   document: CrdtDocument,
-  messages: ReadonlyArray<CrdtSyncMessage>,
-): ReadonlyArray<MergeResult> {
+  messages: readonly CrdtSyncMessage[],
+): readonly MergeResult[] {
   return messages.map((msg) => document.receiveSyncMessage(msg));
 }
