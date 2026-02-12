@@ -1,0 +1,68 @@
+/**
+ * @pocket/distributed-query - Distributed query execution for Pocket
+ *
+ * @example
+ * ```typescript
+ * import { createDistributedQueryEngine } from '@pocket/distributed-query';
+ *
+ * // Create an engine with custom configuration
+ * const engine = createDistributedQueryEngine({
+ *   maxFanout: 5,
+ *   timeoutMs: 10_000,
+ *   retryAttempts: 3,
+ * }, 'node-local');
+ *
+ * // Register peer nodes
+ * engine.registerNode({
+ *   id: 'node-1',
+ *   status: 'active',
+ *   lastSeen: Date.now(),
+ *   capabilities: ['aggregation'],
+ *   dataRanges: [{ collection: 'orders' }],
+ * });
+ *
+ * // Execute a distributed query
+ * const result = engine.execute({
+ *   id: 'q-1',
+ *   collection: 'orders',
+ *   filter: { status: 'completed' },
+ *   aggregation: { function: 'sum', field: 'total' },
+ *   limit: 100,
+ * });
+ *
+ * console.log(result.data);
+ * console.log(result.aggregationResult);
+ * console.log(engine.getStats());
+ * ```
+ */
+
+// Types
+export type {
+  AggregationSpec,
+  DataRange,
+  DistributedQuery,
+  DistributedQueryConfig,
+  NodeInfo,
+  NodeMessage,
+  QueryResult,
+  SubQuery,
+} from './types.js';
+
+export { DEFAULT_DISTRIBUTED_CONFIG } from './types.js';
+
+// Node Registry
+export { NodeRegistry, createNodeRegistry } from './node-registry.js';
+
+// Query Decomposer
+export { QueryDecomposer, createQueryDecomposer } from './query-decomposer.js';
+
+// Result Aggregator
+export { ResultAggregator, createResultAggregator } from './result-aggregator.js';
+
+// Distributed Query Engine
+export type { EngineStats } from './distributed-query-engine.js';
+
+export {
+  DistributedQueryEngine,
+  createDistributedQueryEngine,
+} from './distributed-query-engine.js';
