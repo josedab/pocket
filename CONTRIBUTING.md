@@ -38,6 +38,20 @@ Please note that this project is released with a [Code of Conduct](./CODE_OF_CON
    pnpm test
    ```
 
+5. **Verify your setup**
+
+   Run the full validation suite to confirm everything works:
+
+   ```bash
+   pnpm validate
+   ```
+
+   This runs build → lint → typecheck → test in sequence (~3–5 minutes).
+
+   ✅ If `pnpm validate` passes, you're ready to contribute!
+
+   > **Note:** You may see warnings like "no output files found" from test tasks — these are normal for packages that use `--passWithNoTests` and can be safely ignored.
+
 ## Project Structure
 
 ```
@@ -178,6 +192,7 @@ Follow the prompts to describe your changes. This helps generate changelogs and 
 
 | Script | Description |
 |--------|-------------|
+| `pnpm quickstart` | One-command setup (install + build) |
 | `pnpm build` | Build all packages |
 | `pnpm dev` | Build in watch mode |
 | `pnpm test` | Run tests |
