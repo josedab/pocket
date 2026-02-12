@@ -30,9 +30,9 @@ export {
 export {
   KeyExchangeManager,
   createKeyExchangeManager,
+  type KeyExchangeEvent,
   type PairedDevice,
   type PairingRequest,
-  type KeyExchangeEvent,
 } from './key-exchange.js';
 
 // Encrypted Index
@@ -47,8 +47,8 @@ export {
 export {
   KeyBackup,
   createKeyBackup,
-  type KeyBackupConfig,
   type EncryptedBackup,
+  type KeyBackupConfig,
   type RecoveryOptions,
 } from './key-backup.js';
 
@@ -56,7 +56,19 @@ export {
 export {
   GroupEncryption,
   createGroupEncryption,
-  type GroupMember,
   type EncryptedGroupKey,
   type GroupEncryptionConfig,
+  type GroupMember,
 } from './group-encryption.js';
+
+// Encrypted Sync Pipeline
+export {
+  EncryptedSyncPipeline,
+  createEncryptedSyncPipeline,
+  type DerivedKeyInfo,
+  type EncryptedPayload,
+  type EncryptedSyncConfig,
+  type EncryptedSyncStats,
+  type KeyDerivationConfig,
+  type KeyRotationEvent,
+} from './encrypted-sync-pipeline.js';
