@@ -107,6 +107,20 @@ export {
   type DeploymentDiff,
 } from './commands/deploy/index.js';
 
+// AI Assistant
+export { AIAssistant, createAIAssistant } from './commands/ai-assistant.js';
+export type {
+  AIAssistantConfig,
+  AIProvider,
+  FieldAnalysis,
+  IndexRecommendation,
+  MigrationOperation,
+  MigrationSuggestion,
+  QuerySuggestion,
+  RelationshipSuggestion,
+  SchemaAnalysis,
+} from './commands/ai-assistant.js';
+
 // Convenience namespace for migrate commands
 export const migrate = {
   create: async (name: string) => {
