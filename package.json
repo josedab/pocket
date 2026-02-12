@@ -34,11 +34,15 @@
     "release": "turbo run build && changeset publish",
     "docs": "typedoc",
     "docs:api": "typedoc",
-    "docs:dev": "pnpm --filter @pocket/docs dev",
-    "docs:build": "pnpm --filter @pocket/docs build",
-    "docs:preview": "pnpm --filter @pocket/docs preview",
+    "docs:dev": "pnpm --filter website dev",
+    "docs:build": "pnpm --filter website build",
+    "docs:preview": "pnpm --filter website preview",
     "test:audit": "bash scripts/check-test-coverage.sh",
+    "create-package": "node scripts/create-package.mjs",
     "bench": "pnpm --filter @pocket/benchmarks bench",
+    "audit:metadata": "node scripts/audit-package-metadata.mjs",
+    "status": "node scripts/package-status.mjs",
+    "health": "node scripts/health-check.mjs",
     "prepare": "husky"
   },
   "lint-staged": {
