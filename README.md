@@ -169,7 +169,7 @@ function TodoList() {
 > **Package Maturity Levels:** 🟢 Stable (tested, documented) · 🟡 Beta (functional, limited tests) · 🔵 Experimental (API may change)
 
 <details>
-<summary><strong>Full Package Status Matrix</strong> (49 packages)</summary>
+<summary><strong>Full Package Status Matrix</strong> (49+ packages)</summary>
 
 | Package | Status | Tests | Category |
 |---------|--------|-------|----------|
@@ -184,20 +184,25 @@ function TodoList() {
 | `@pocket/storage-edge` | 🟡 Beta | 2 | Storage |
 | `@pocket/storage-wa-sqlite` | 🟡 Beta | 1 | Storage |
 | `@pocket/storage-expo-sqlite` | 🟡 Beta | 1 | Storage |
-| `@pocket/cloud` | 🟡 Beta | 4 | Cloud |
+| `@pocket/cloud` | 🟡 Beta | 8 | Cloud |
 | `@pocket/sync-server` | 🟡 Beta | 3 | Core |
 | `@pocket/ai` | 🟡 Beta | 3 | Extension |
 | `@pocket/codegen` | 🟡 Beta | 3 | Tooling |
-| `@pocket/studio` | 🟡 Beta | 3 | Tooling |
-| `@pocket/encryption` | 🟡 Beta | 1 | Extension |
-| `@pocket/graphql` | 🟡 Beta | 1 | Extension |
-| `@pocket/collaboration` | 🟡 Beta | 1 | Extension |
+| `@pocket/studio` | 🟡 Beta | 6 | Tooling |
+| `@pocket/encryption` | 🟡 Beta | 2 | Extension |
+| `@pocket/graphql` | 🟡 Beta | 2 | Extension |
+| `@pocket/graphql-gateway` | 🟡 Beta | 6 | Extension |
+| `@pocket/collaboration` | 🟡 Beta | 5 | Extension |
 | `@pocket/crdt` | 🟡 Beta | 2 | Extension |
 | `@pocket/analytics` | 🟡 Beta | 2 | Extension |
-| `@pocket/plugin-sdk` | 🟡 Beta | 1 | Extension |
-| `@pocket/time-travel` | 🔵 Experimental | 0 | Extension |
-| `@pocket/migration` | 🔵 Experimental | 0 | Tooling |
-| `@pocket/query-builder` | 🔵 Experimental | 0 | Extension |
+| `@pocket/plugin-sdk` | 🟡 Beta | 2 | Extension |
+| `@pocket/time-travel` | 🟡 Beta | 4 | Extension |
+| `@pocket/migration` | 🟡 Beta | 1 | Tooling |
+| `@pocket/query-builder` | 🟡 Beta | 4 | Extension |
+| `@pocket/schema-inference` | 🟡 Beta | 4 | Tooling |
+| `@pocket/vectors` | 🟡 Beta | 3 | Extension |
+| `@pocket/mobile` | 🟡 Beta | 5 | Platform |
+| `@pocket/sync-blockchain` | 🔵 Experimental | 4 | Extension |
 | `@pocket/angular` | 🔵 Experimental | 0 | Framework |
 | `@pocket/vue` | 🔵 Experimental | 0 | Framework |
 | `@pocket/svelte` | 🔵 Experimental | 0 | Framework |
@@ -206,15 +211,14 @@ function TodoList() {
 | `@pocket/electron` | 🔵 Experimental | 0 | Platform |
 | `@pocket/expo` | 🔵 Experimental | 0 | Platform |
 | `@pocket/tauri` | 🔵 Experimental | 0 | Platform |
-| `@pocket/cli` | 🔵 Experimental | 0 | Tooling |
+| `@pocket/cli` | 🟡 Beta | 4 | Tooling |
 | `@pocket/devtools` | 🔵 Experimental | 0 | Tooling |
 | `@pocket/auth` | 🟡 Beta | 1 | Extension |
 | `@pocket/permissions` | 🔵 Experimental | 0 | Extension |
 | `@pocket/forms` | 🔵 Experimental | 0 | Extension |
-| `@pocket/vectors` | 🔵 Experimental | 0 | Extension |
 | `@pocket/views` | 🟡 Beta | 1 | Extension |
 | `@pocket/subscriptions` | 🟡 Beta | 1 | Extension |
-| `@pocket/presence` | 🟡 Beta | 1 | Extension |
+| `@pocket/presence` | 🟡 Beta | 4 | Extension |
 | `@pocket/cross-tab` | 🟡 Beta | 1 | Extension |
 | `@pocket/opentelemetry` | 🟡 Beta | 1 | Extension |
 | `@pocket/conflict-resolution` | 🔵 Experimental | 0 | Extension |
@@ -232,22 +236,30 @@ function TodoList() {
 
 ## Development
 
+| Command | Description |
+|---------|-------------|
+| `pnpm install` | Install all dependencies |
+| `pnpm build` | Build all packages |
+| `pnpm test` | Run all tests (via Turbo, per-package) |
+| `pnpm validate` | Full CI check (build + lint + typecheck + test) |
+| `pnpm typecheck` | Type-check all packages |
+| `pnpm lint` | Lint all packages |
+| `pnpm lint:fix` | Auto-fix lint issues |
+| `pnpm format` | Format all files with Prettier |
+| `pnpm test:watch` | Run tests in watch mode |
+| `pnpm docs:dev` | Start documentation site locally |
+
+To work on a single package:
+
 ```bash
-# Install dependencies
-pnpm install
+# Build one package
+npx turbo run build --filter=@pocket/core
 
-# Build all packages
-pnpm build
-
-# Run tests
-pnpm test
-
-# Type checking
-pnpm typecheck
-
-# Run tests in watch mode
-pnpm test:watch
+# Test one package
+npx vitest run --project unit packages/core/src/__tests__/
 ```
+
+See [DEVELOPMENT.md](./DEVELOPMENT.md) for advanced topics and [CONTRIBUTING.md](./CONTRIBUTING.md) for contribution guidelines.
 
 ## Community
 
