@@ -4,6 +4,8 @@
   "description": "Sync engine for Pocket database",
   "keywords": [
     "pocket",
+    "database",
+    "local-first",
     "sync",
     "offline-first",
     "replication"

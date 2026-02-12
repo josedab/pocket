@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "description": "Core database engine for Pocket local-first database",
   "keywords": [
+    "pocket",
     "database",
     "local-first",
     "offline-first",

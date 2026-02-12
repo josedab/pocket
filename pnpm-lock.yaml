@@ -248,6 +248,28 @@ importers:
         specifier: ^3.0.0
         version: 3.2.4(@types/node@20.19.30)(happy-dom@12.10.3)(jsdom@27.4.0)
 
+  packages/ai-agent:
+    dependencies:
+      '@pocket/core':
+        specifier: workspace:*
+        version: link:../core
+      rxjs:
+        specifier: ^7.8.1
+        version: 7.8.2
+    devDependencies:
+      '@types/node':
+        specifier: ^20.10.0
+        version: 20.19.30
+      tsup:
+        specifier: ^8.0.0
+        version: 8.5.1(typescript@5.6.3)
+      typescript:
+        specifier: ^5.3.0
+        version: 5.6.3
+      vitest:
+        specifier: ^3.0.0
+        version: 3.2.4(@types/node@20.19.30)(happy-dom@12.10.3)(jsdom@27.4.0)
+
   packages/analytics:
     dependencies:
       '@pocket/core':
@@ -304,7 +326,51 @@ importers:
         specifier: ^3.0.0
         version: 3.2.4(@types/node@20.19.30)(happy-dom@12.10.3)(jsdom@27.4.0)
 
+  packages/audit-trail:
+    dependencies:
+      '@pocket/core':
+        specifier: workspace:*
+        version: link:../core
+      rxjs:
+        specifier: ^7.8.1
+        version: 7.8.2
+    devDependencies:
+      '@types/node':
+        specifier: ^20.10.0
+        version: 20.19.30
+      tsup:
+        specifier: ^8.0.0
+        version: 8.5.1(typescript@5.6.3)
+      typescript:
+        specifier: ^5.3.0
+        version: 5.6.3
+      vitest:
+        specifier: ^3.0.0
+        version: 3.2.4(@types/node@20.19.30)(happy-dom@12.10.3)(jsdom@27.4.0)
+
   packages/auth:
+    dependencies:
+      '@pocket/core':
+        specifier: workspace:*
+        version: link:../core
+      rxjs:
+        specifier: ^7.8.1
+        version: 7.8.2
+    devDependencies:
+      '@types/node':
+        specifier: ^20.10.0
+        version: 20.19.30
+      tsup:
+        specifier: ^8.0.0
+        version: 8.5.1(typescript@5.6.3)
+      typescript:
+        specifier: ^5.3.0
+        version: 5.6.3
+      vitest:
+        specifier: ^3.0.0
+        version: 3.2.4(@types/node@20.19.30)(happy-dom@12.10.3)(jsdom@27.4.0)
+
+  packages/automerge:
     dependencies:
       '@pocket/core':
         specifier: workspace:*
@@ -375,6 +441,28 @@ importers:
       '@pocket/core':
         specifier: workspace:*
         version: link:../core
+    devDependencies:
+      '@types/node':
+        specifier: ^20.10.0
+        version: 20.19.30
+      tsup:
+        specifier: ^8.0.0
+        version: 8.5.1(typescript@5.6.3)
+      typescript:
+        specifier: ^5.3.0
+        version: 5.6.3
+      vitest:
+        specifier: ^3.0.0
+        version: 3.2.4(@types/node@20.19.30)(happy-dom@12.10.3)(jsdom@27.4.0)
+
+  packages/codegen-fullstack:
+    dependencies:
+      '@pocket/core':
+        specifier: workspace:*
+        version: link:../core
+      rxjs:
+        specifier: ^7.8.1
+        version: 7.8.2
     devDependencies:
       '@types/node':
         specifier: ^20.10.0
@@ -536,6 +624,28 @@ importers:
         specifier: ^3.0.0
         version: 3.2.4(@types/node@20.19.30)(happy-dom@12.10.3)(jsdom@27.4.0)
 
+  packages/distributed-query:
+    dependencies:
+      '@pocket/core':
+        specifier: workspace:*
+        version: link:../core
+      rxjs:
+        specifier: ^7.8.1
+        version: 7.8.2
+    devDependencies:
+      '@types/node':
+        specifier: ^20.10.0
+        version: 20.19.30
+      tsup:
+        specifier: ^8.0.0
+        version: 8.5.1(typescript@5.6.3)
+      typescript:
+        specifier: ^5.3.0
+        version: 5.6.3
+      vitest:
+        specifier: ^3.0.0
+        version: 3.2.4(@types/node@20.19.30)(happy-dom@12.10.3)(jsdom@27.4.0)
+
   packages/electron:
     dependencies:
       '@pocket/core':
@@ -670,7 +780,73 @@ importers:
         specifier: ^3.0.0
         version: 3.2.4(@types/node@20.19.30)(happy-dom@12.10.3)(jsdom@27.4.0)
 
+  packages/graphql-gateway:
+    dependencies:
+      '@pocket/core':
+        specifier: workspace:*
+        version: link:../core
+      rxjs:
+        specifier: ^7.8.1
+        version: 7.8.2
+    devDependencies:
+      '@types/node':
+        specifier: ^20.10.0
+        version: 20.19.30
+      tsup:
+        specifier: ^8.0.0
+        version: 8.5.1(typescript@5.6.3)
+      typescript:
+        specifier: ^5.3.0
+        version: 5.6.3
+      vitest:
+        specifier: ^3.0.0
+        version: 3.2.4(@types/node@20.19.30)(happy-dom@12.10.3)(jsdom@27.4.0)
+
+  packages/incremental-views:
+    dependencies:
+      '@pocket/core':
+        specifier: workspace:*
+        version: link:../core
+      rxjs:
+        specifier: ^7.8.1
+        version: 7.8.2
+    devDependencies:
+      '@types/node':
+        specifier: ^20.10.0
+        version: 20.19.30
+      tsup:
+        specifier: ^8.0.0
+        version: 8.5.1(typescript@5.6.3)
+      typescript:
+        specifier: ^5.3.0
+        version: 5.6.3
+      vitest:
+        specifier: ^3.0.0
+        version: 3.2.4(@types/node@20.19.30)(happy-dom@12.10.3)(jsdom@27.4.0)
+
   packages/migration:
+    dependencies:
+      '@pocket/core':
+        specifier: workspace:*
+        version: link:../core
+      rxjs:
+        specifier: ^7.8.1
+        version: 7.8.2
+    devDependencies:
+      '@types/node':
+        specifier: ^20.10.0
+        version: 20.19.30
+      tsup:
+        specifier: ^8.0.0
+        version: 8.5.1(typescript@5.6.3)
+      typescript:
+        specifier: ^5.3.0
+        version: 5.6.3
+      vitest:
+        specifier: ^3.0.0
+        version: 3.2.4(@types/node@20.19.30)(happy-dom@12.10.3)(jsdom@27.4.0)
+
+  packages/mobile:
     dependencies:
       '@pocket/core':
         specifier: workspace:*
@@ -794,6 +970,94 @@ importers:
       typescript:
         specifier: ^5.3.0
         version: 5.9.3
+      vitest:
+        specifier: ^3.0.0
+        version: 3.2.4(@types/node@20.19.30)(happy-dom@12.10.3)(jsdom@27.4.0)
+
+  packages/pocketql:
+    dependencies:
+      '@pocket/core':
+        specifier: workspace:*
+        version: link:../core
+      rxjs:
+        specifier: ^7.8.1
+        version: 7.8.2
+    devDependencies:
+      '@types/node':
+        specifier: ^20.10.0
+        version: 20.19.30
+      tsup:
+        specifier: ^8.0.0
+        version: 8.5.1(typescript@5.6.3)
+      typescript:
+        specifier: ^5.3.0
+        version: 5.6.3
+      vitest:
+        specifier: ^3.0.0
+        version: 3.2.4(@types/node@20.19.30)(happy-dom@12.10.3)(jsdom@27.4.0)
+
+  packages/polyglot:
+    dependencies:
+      '@pocket/core':
+        specifier: workspace:*
+        version: link:../core
+      rxjs:
+        specifier: ^7.8.1
+        version: 7.8.2
+    devDependencies:
+      '@types/node':
+        specifier: ^20.10.0
+        version: 20.19.30
+      tsup:
+        specifier: ^8.0.0
+        version: 8.5.1(typescript@5.6.3)
+      typescript:
+        specifier: ^5.3.0
+        version: 5.6.3
+      vitest:
+        specifier: ^3.0.0
+        version: 3.2.4(@types/node@20.19.30)(happy-dom@12.10.3)(jsdom@27.4.0)
+
+  packages/portable-export:
+    dependencies:
+      '@pocket/core':
+        specifier: workspace:*
+        version: link:../core
+      rxjs:
+        specifier: ^7.8.1
+        version: 7.8.2
+    devDependencies:
+      '@types/node':
+        specifier: ^20.10.0
+        version: 20.19.30
+      tsup:
+        specifier: ^8.0.0
+        version: 8.5.1(typescript@5.6.3)
+      typescript:
+        specifier: ^5.3.0
+        version: 5.6.3
+      vitest:
+        specifier: ^3.0.0
+        version: 3.2.4(@types/node@20.19.30)(happy-dom@12.10.3)(jsdom@27.4.0)
+
+  packages/prefetch:
+    dependencies:
+      '@pocket/core':
+        specifier: workspace:*
+        version: link:../core
+      rxjs:
+        specifier: ^7.8.1
+        version: 7.8.2
+    devDependencies:
+      '@types/node':
+        specifier: ^20.10.0
+        version: 20.19.30
+      tsup:
+        specifier: ^8.0.0
+        version: 8.5.1(typescript@5.6.3)
+      typescript:
+        specifier: ^5.3.0
+        version: 5.6.3
       vitest:
         specifier: ^3.0.0
         version: 3.2.4(@types/node@20.19.30)(happy-dom@12.10.3)(jsdom@27.4.0)
@@ -935,6 +1199,50 @@ importers:
         specifier: ^3.0.0
         version: 3.2.4(@types/node@20.19.30)(happy-dom@12.10.3)(jsdom@27.4.0)
 
+  packages/rls:
+    dependencies:
+      '@pocket/core':
+        specifier: workspace:*
+        version: link:../core
+      rxjs:
+        specifier: ^7.8.1
+        version: 7.8.2
+    devDependencies:
+      '@types/node':
+        specifier: ^20.10.0
+        version: 20.19.30
+      tsup:
+        specifier: ^8.0.0
+        version: 8.5.1(typescript@5.6.3)
+      typescript:
+        specifier: ^5.3.0
+        version: 5.6.3
+      vitest:
+        specifier: ^3.0.0
+        version: 3.2.4(@types/node@20.19.30)(happy-dom@12.10.3)(jsdom@27.4.0)
+
+  packages/schema-inference:
+    dependencies:
+      '@pocket/core':
+        specifier: workspace:*
+        version: link:../core
+      rxjs:
+        specifier: ^7.8.1
+        version: 7.8.2
+    devDependencies:
+      '@types/node':
+        specifier: ^20.10.0
+        version: 20.19.30
+      tsup:
+        specifier: ^8.0.0
+        version: 8.5.1(typescript@5.6.3)
+      typescript:
+        specifier: ^5.3.0
+        version: 5.6.3
+      vitest:
+        specifier: ^3.0.0
+        version: 3.2.4(@types/node@20.19.30)(happy-dom@12.10.3)(jsdom@27.4.0)
+
   packages/server:
     dependencies:
       '@pocket/core':
@@ -959,6 +1267,28 @@ importers:
       typescript:
         specifier: ^5.3.0
         version: 5.9.3
+      vitest:
+        specifier: ^3.0.0
+        version: 3.2.4(@types/node@20.19.30)(happy-dom@12.10.3)(jsdom@27.4.0)
+
+  packages/shared-worker:
+    dependencies:
+      '@pocket/core':
+        specifier: workspace:*
+        version: link:../core
+      rxjs:
+        specifier: ^7.8.1
+        version: 7.8.2
+    devDependencies:
+      '@types/node':
+        specifier: ^20.10.0
+        version: 20.19.30
+      tsup:
+        specifier: ^8.0.0
+        version: 8.5.1(typescript@5.6.3)
+      typescript:
+        specifier: ^5.3.0
+        version: 5.6.3
       vitest:
         specifier: ^3.0.0
         version: 3.2.4(@types/node@20.19.30)(happy-dom@12.10.3)(jsdom@27.4.0)
@@ -1194,6 +1524,28 @@ importers:
         specifier: ^3.0.0
         version: 3.2.4(@types/node@20.19.30)(happy-dom@12.10.3)(jsdom@27.4.0)
 
+  packages/studio-pro:
+    dependencies:
+      '@pocket/core':
+        specifier: workspace:*
+        version: link:../core
+      rxjs:
+        specifier: ^7.8.1
+        version: 7.8.2
+    devDependencies:
+      '@types/node':
+        specifier: ^20.10.0
+        version: 20.19.30
+      tsup:
+        specifier: ^8.0.0
+        version: 8.5.1(typescript@5.6.3)
+      typescript:
+        specifier: ^5.3.0
+        version: 5.6.3
+      vitest:
+        specifier: ^3.0.0
+        version: 3.2.4(@types/node@20.19.30)(happy-dom@12.10.3)(jsdom@27.4.0)
+
   packages/subscriptions:
     dependencies:
       '@pocket/core':
@@ -1266,6 +1618,28 @@ importers:
         specifier: ^3.0.0
         version: 3.2.4(@types/node@20.19.30)(happy-dom@12.10.3)(jsdom@27.4.0)
 
+  packages/sync-blockchain:
+    dependencies:
+      '@pocket/core':
+        specifier: workspace:*
+        version: link:../core
+      rxjs:
+        specifier: ^7.8.1
+        version: 7.8.2
+    devDependencies:
+      '@types/node':
+        specifier: ^20.10.0
+        version: 20.19.30
+      tsup:
+        specifier: ^8.0.0
+        version: 8.5.1(typescript@5.6.3)
+      typescript:
+        specifier: ^5.3.0
+        version: 5.6.3
+      vitest:
+        specifier: ^3.0.0
+        version: 3.2.4(@types/node@20.19.30)(happy-dom@12.10.3)(jsdom@27.4.0)
+
   packages/sync-server:
     dependencies:
       '@pocket/core':
@@ -1315,6 +1689,50 @@ importers:
       typescript:
         specifier: ^5.3.0
         version: 5.9.3
+      vitest:
+        specifier: ^3.0.0
+        version: 3.2.4(@types/node@20.19.30)(happy-dom@12.10.3)(jsdom@27.4.0)
+
+  packages/testing:
+    dependencies:
+      '@pocket/core':
+        specifier: workspace:*
+        version: link:../core
+      rxjs:
+        specifier: ^7.8.1
+        version: 7.8.2
+    devDependencies:
+      '@types/node':
+        specifier: ^20.10.0
+        version: 20.19.30
+      tsup:
+        specifier: ^8.0.0
+        version: 8.5.1(typescript@5.6.3)
+      typescript:
+        specifier: ^5.3.0
+        version: 5.6.3
+      vitest:
+        specifier: ^3.0.0
+        version: 3.2.4(@types/node@20.19.30)(happy-dom@12.10.3)(jsdom@27.4.0)
+
+  packages/time-series:
+    dependencies:
+      '@pocket/core':
+        specifier: workspace:*
+        version: link:../core
+      rxjs:
+        specifier: ^7.8.1
+        version: 7.8.2
+    devDependencies:
+      '@types/node':
+        specifier: ^20.10.0
+        version: 20.19.30
+      tsup:
+        specifier: ^8.0.0
+        version: 8.5.1(typescript@5.6.3)
+      typescript:
+        specifier: ^5.3.0
+        version: 5.6.3
       vitest:
         specifier: ^3.0.0
         version: 3.2.4(@types/node@20.19.30)(happy-dom@12.10.3)(jsdom@27.4.0)

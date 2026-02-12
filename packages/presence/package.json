@@ -58,6 +58,8 @@
     "multiplayer",
     "cursors",
     "real-time",
-    "collaboration"
+    "collaboration",
+    "database",
+    "local-first"
   ]
 }

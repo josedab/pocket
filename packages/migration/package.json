@@ -8,7 +8,9 @@
     "pouchdb",
     "rxdb",
     "dexie",
-    "firestore"
+    "firestore",
+    "database",
+    "local-first"
   ],
   "license": "MIT",
   "author": "Pocket Contributors",

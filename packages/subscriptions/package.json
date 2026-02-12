@@ -58,6 +58,8 @@
     "query",
     "server-push",
     "websocket",
-    "real-time"
+    "real-time",
+    "database",
+    "local-first"
   ]
 }

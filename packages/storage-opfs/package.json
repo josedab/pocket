@@ -4,6 +4,8 @@
   "description": "OPFS (Origin Private File System) storage adapter for Pocket database",
   "keywords": [
     "pocket",
+    "database",
+    "local-first",
     "storage",
     "opfs",
     "file-system",

@@ -66,6 +66,8 @@
     "expo",
     "sqlite",
     "react-native",
-    "mobile"
+    "mobile",
+    "database",
+    "local-first"
   ]
 }

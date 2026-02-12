@@ -58,6 +58,7 @@
     "sync",
     "broadcast-channel",
     "multi-tab",
-    "local-first"
+    "local-first",
+    "database"
   ]
 }

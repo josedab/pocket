@@ -58,6 +58,7 @@
     "subscriptions",
     "reactive",
     "dsl",
-    "local-first"
+    "local-first",
+    "database"
   ]
 }

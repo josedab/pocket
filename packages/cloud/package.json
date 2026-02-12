@@ -4,6 +4,8 @@
   "description": "Managed cloud sync service for Pocket - one-line sync setup",
   "keywords": [
     "pocket",
+    "database",
+    "local-first",
     "cloud",
     "sync",
     "managed",

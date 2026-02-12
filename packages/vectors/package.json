@@ -8,7 +8,9 @@
     "embeddings",
     "semantic-search",
     "ai",
-    "llm"
+    "llm",
+    "database",
+    "local-first"
   ],
   "license": "MIT",
   "author": "Pocket Contributors",

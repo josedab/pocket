@@ -7,7 +7,9 @@
     "opentelemetry",
     "tracing",
     "observability",
-    "metrics"
+    "metrics",
+    "database",
+    "local-first"
   ],
   "license": "MIT",
   "author": "Pocket Contributors",

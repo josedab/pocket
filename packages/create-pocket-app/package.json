@@ -7,7 +7,8 @@
     "create",
     "cli",
     "scaffolding",
-    "local-first"
+    "local-first",
+    "database"
   ],
   "license": "MIT",
   "author": "Pocket Contributors",

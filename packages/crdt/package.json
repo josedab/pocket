@@ -57,6 +57,8 @@
     "crdt",
     "collaboration",
     "real-time",
-    "conflict-free"
+    "conflict-free",
+    "database",
+    "local-first"
   ]
 }
