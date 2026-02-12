@@ -10,7 +10,7 @@
     "packages/storage-opfs/src/index.ts",
     "packages/storage-memory/src/index.ts"
   ],
-  "out": "docs/api",
+  "out": "website/docs/api",
   "name": "Pocket API Documentation",
   "readme": "README.md",
   "plugin": ["typedoc-plugin-markdown"],
