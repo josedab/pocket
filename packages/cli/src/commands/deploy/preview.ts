@@ -89,7 +89,7 @@ export interface PreviewDiff {
 }
 
 /** In-memory store for previews. */
-const previewStore: Map<string, PreviewDeployment> = new Map();
+const previewStore = new Map<string, PreviewDeployment>();
 
 /**
  * Generate a unique preview identifier.

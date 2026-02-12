@@ -367,7 +367,7 @@ export class MerkleDAG {
     if (fromHash === toHash) return [fromHash];
 
     const visited = new Set<string>();
-    const queue: Array<{ hash: string; path: string[] }> = [
+    const queue: { hash: string; path: string[] }[] = [
       { hash: fromHash, path: [fromHash] },
     ];
 

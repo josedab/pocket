@@ -18,7 +18,7 @@ import { DEFAULT_TIME_SERIES_CONFIG } from './types.js';
  */
 export class TimeSeriesStore {
   private readonly config: TimeSeriesConfig;
-  private readonly buckets: Map<number, TimeSeriesPoint[]> = new Map();
+  private readonly buckets = new Map<number, TimeSeriesPoint[]>();
 
   constructor(config: Partial<TimeSeriesConfig> = {}) {
     this.config = { ...DEFAULT_TIME_SERIES_CONFIG, ...config };
