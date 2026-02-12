@@ -1,6 +1,6 @@
 import { createDatabase, type Database } from '@pocket/core';
-import { IndexedDBAdapter } from '@pocket/storage-indexeddb';
-import { MemoryStorageAdapter } from '@pocket/storage-memory';
+import { createIndexedDBStorage } from '@pocket/storage-indexeddb';
+import { createMemoryStorage } from '@pocket/storage-memory';
 import { SyncEngine, type SyncConfig } from '@pocket/sync';
 import type { Document } from '@pocket/core';
 
@@ -24,13 +24,10 @@ export async function getDatabase(): Promise<Database> {
   // Try IndexedDB first, fall back to memory storage
   let storage;
   try {
-    storage = new IndexedDBAdapter();
-    if (!storage.isAvailable()) {
-      throw new Error('IndexedDB not available');
-    }
+    storage = createIndexedDBStorage();
   } catch {
     console.warn('IndexedDB not available, using memory storage');
-    storage = new MemoryStorageAdapter();
+    storage = createMemoryStorage();
   }
 
   dbInstance = await createDatabase({
