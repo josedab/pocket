@@ -115,3 +115,13 @@ export {
 
 // Query Serializer
 export { QuerySerializer, createQuerySerializer } from './query-serializer.js';
+
+// Visual Query Builder
+export { VisualQueryModel, createVisualQueryModel } from './visual-query-model.js';
+
+// Code Generation
+export { QueryCodeGenerator, createQueryCodeGenerator } from './code-generator.js';
+
+// Query Templates
+export type { QueryTemplate, TemplateParam } from './query-template.js';
+export { QueryTemplateRegistry, createQueryTemplateRegistry } from './query-template.js';
