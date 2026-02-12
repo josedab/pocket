@@ -1,0 +1,84 @@
+{
+  "$schema": "./status-schema.json",
+  "description": "Package maturity classification. Determines documentation requirements and release gates.",
+  "tiers": {
+    "stable": {
+      "description": "Production-ready, fully tested, documented with README",
+      "packages": [
+        "@pocket/core",
+        "@pocket/react",
+        "@pocket/storage-indexeddb",
+        "@pocket/storage-memory",
+        "@pocket/storage-opfs",
+        "@pocket/sync"
+      ]
+    },
+    "beta": {
+      "description": "Feature-complete, has tests, may have API changes",
+      "packages": [
+        "@pocket/ai",
+        "@pocket/analytics",
+        "@pocket/audit-trail",
+        "@pocket/auth",
+        "@pocket/cli",
+        "@pocket/cloud",
+        "@pocket/codegen",
+        "@pocket/collaboration",
+        "@pocket/crdt",
+        "@pocket/cross-tab",
+        "@pocket/distributed-query",
+        "@pocket/encryption",
+        "@pocket/graphql",
+        "@pocket/graphql-gateway",
+        "@pocket/migration",
+        "@pocket/mobile",
+        "@pocket/plugin-sdk",
+        "@pocket/pocket",
+        "@pocket/polyglot",
+        "@pocket/prefetch",
+        "@pocket/presence",
+        "@pocket/query-builder",
+        "@pocket/react-native",
+        "@pocket/rls",
+        "@pocket/schema-inference",
+        "@pocket/server",
+        "@pocket/storage-edge",
+        "@pocket/storage-expo-sqlite",
+        "@pocket/storage-sqlite",
+        "@pocket/storage-wa-sqlite",
+        "@pocket/studio",
+        "@pocket/subscriptions",
+        "@pocket/sync-blockchain",
+        "@pocket/sync-server",
+        "@pocket/time-series",
+        "@pocket/time-travel",
+        "@pocket/vectors",
+        "@pocket/views"
+      ]
+    },
+    "experimental": {
+      "description": "Early stage, API unstable, may lack tests or docs",
+      "packages": [
+        "@pocket/angular",
+        "@pocket/conflict-resolution",
+        "@pocket/create-pocket-app",
+        "@pocket/devtools",
+        "@pocket/electron",
+        "@pocket/expo",
+        "@pocket/forms",
+        "@pocket/opentelemetry",
+        "@pocket/permissions",
+        "@pocket/query",
+        "@pocket/solid",
+        "@pocket/svelte",
+        "@pocket/tauri",
+        "@pocket/vue",
+        "@pocket/zod"
+      ]
+    },
+    "archived": {
+      "description": "No longer actively maintained",
+      "packages": []
+    }
+  }
+}
