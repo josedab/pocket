@@ -79,3 +79,23 @@ export {
   type MetricPoint,
   type MetricSeries,
 } from './metrics-dashboard.js';
+
+// Exporters & Health Checks
+export {
+  MetricExporter,
+  HealthCheckMonitor,
+  createMetricExporter,
+  createHealthCheckMonitor,
+  createPocketHealthChecks,
+} from './exporters.js';
+export type {
+  ExportableMetric,
+  ExportableSpan,
+  ExporterConfig,
+  ExporterType,
+  ExportResult,
+  HealthCheck,
+  HealthCheckConfig,
+  HealthCheckResult,
+  NamedHealthCheck,
+} from './exporters.js';
