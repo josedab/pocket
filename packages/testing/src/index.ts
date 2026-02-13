@@ -41,3 +41,22 @@ export {
   type ScenarioStep,
   type StepResult,
 } from './scenario-runner.js';
+
+// Snapshot Matcher
+export {
+  SnapshotMatcher,
+  createSnapshotMatcher,
+  UUID_NORMALIZER,
+  TIMESTAMP_NORMALIZER,
+  EPOCH_NORMALIZER,
+} from './snapshot-matcher.js';
+export type {
+  CollectionDiff,
+  CollectionSnapshot,
+  DatabaseSnapshot,
+  FieldChange,
+  ModifiedDocument,
+  SnapshotConfig,
+  SnapshotDiff,
+  SnapshotNormalizer,
+} from './snapshot-matcher.js';
