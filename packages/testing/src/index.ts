@@ -1,16 +1,16 @@
 // Types
 export type {
-  NetworkCondition,
-  NetworkSimulatorConfig,
-  NetworkState,
   ConflictScenario,
   ConsistencyCheckResult,
   DataDifference,
+  NetworkCondition,
+  NetworkSimulator,
+  NetworkSimulatorConfig,
+  NetworkState,
   SyncTestHarness,
+  SyncTimeline,
   TestClient,
   TestServer,
-  NetworkSimulator,
-  SyncTimeline,
   TimelineEvent,
 } from './types.js';
 
@@ -28,3 +28,16 @@ export type { ConsistencyChecker } from './consistency-checker.js';
 // Sync Test Harness
 export { createSyncTestHarness } from './sync-test-harness.js';
 export type { SyncTestHarnessController } from './sync-test-harness.js';
+
+// Scenario Runner
+export {
+  LATENCY_PROFILES,
+  ScenarioRunner,
+  createScenarioRunner,
+  type LatencyProfile,
+  type ReplayLog,
+  type ScenarioDefinition,
+  type ScenarioResult,
+  type ScenarioStep,
+  type StepResult,
+} from './scenario-runner.js';
