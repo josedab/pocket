@@ -98,3 +98,17 @@ export {
   AuditChain,
   createAuditChain,
 } from './audit-chain.js';
+
+export {
+  IPFSAdapter,
+  createIPFSAdapter,
+} from './ipfs-adapter.js';
+export type {
+  DAGLink,
+  DAGNode,
+  IPFSAdapterConfig,
+  IPFSAdapterStats,
+  IPFSContent,
+  IPFSEvent,
+  IPFSPinStatus,
+} from './ipfs-adapter.js';
