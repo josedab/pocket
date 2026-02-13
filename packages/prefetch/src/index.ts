@@ -58,3 +58,7 @@ export { PrefetchCache, createPrefetchCache } from './prefetch-cache.js';
 export type { PrefetchCallback } from './prefetch-engine.js';
 
 export { PrefetchEngine, createPrefetchEngine } from './prefetch-engine.js';
+
+// Adaptive Learning Model
+export { AdaptiveLearningModel, createAdaptiveLearningModel } from './adaptive-model.js';
+export type { AdaptiveModelConfig, NavigationContext, SessionStats } from './adaptive-model.js';
