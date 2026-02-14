@@ -26,8 +26,8 @@ export type {
   AgentEvent,
   AgentResponse,
   AgentStep,
-  ConversationMessage,
   ConversationMemory,
+  ConversationMessage,
   LLMProvider,
   LLMResponse,
   StreamChunk,
@@ -40,6 +40,14 @@ export type {
 
 // Core
 export { createAgent } from './agent.js';
-export { createDatabaseTools } from './database-tools.js';
 export { createConversationMemory } from './conversation-memory.js';
+export { createDatabaseTools } from './database-tools.js';
 export { createToolRegistry } from './tool-registry.js';
+
+// Data transformation tools
+export { createDataTransformationTools } from './data-tools.js';
+export type { DataTransformationConfig } from './data-tools.js';
+
+// Execution planner
+export { createExecutionPlanner } from './planner.js';
+export type { ExecutionPlan, ExecutionPlanner, ExecutionStep, PlanSummary } from './planner.js';
