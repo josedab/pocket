@@ -100,3 +100,18 @@ export {
   type QualityScore,
   type ScaffoldOptions,
 } from './plugin-scaffold.js';
+
+// Quality Scorer
+export {
+  createQualityScorer,
+  type PluginAnalysis,
+  type QualityScorer,
+  type ScorerQualityScore,
+} from './quality-scorer.js';
+
+// Plugin Discovery
+export {
+  createPluginDiscovery,
+  type PluginDiscovery,
+  type PluginEntry,
+} from './plugin-discovery.js';
