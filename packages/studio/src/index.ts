@@ -191,3 +191,23 @@ export {
   type DashboardState,
   type DashboardStats,
 } from './dashboard-controller.js';
+
+// Sync Visualizer
+export {
+  SyncVisualizer,
+  createSyncVisualizer,
+  type ConnectionInfo,
+  type SyncEventData,
+  type SyncHealthStatus,
+  type SyncTimelineEntry,
+  type SyncVisualizerConfig,
+} from './sync-visualizer.js';
+
+// Metrics Collector
+export {
+  MetricsCollector,
+  createMetricsCollector,
+  type MetricSummary,
+  type MetricsCollectorConfig,
+  type TimeSeriesPoint,
+} from './metrics-collector.js';
