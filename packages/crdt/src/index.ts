@@ -43,3 +43,28 @@ export type {
   GCResult,
   SyncOperationBatch,
 } from './crdt-sync-bridge.js';
+
+// Rich Text CRDT
+export {
+  RichTextCRDT,
+  createRichTextCRDT,
+  type FormatType,
+  type RichTextConfig,
+  type RichTextSpan,
+  type RichTextState,
+  type TextFormat,
+  type TextOperation,
+  type TextPosition,
+  type TextRange,
+} from './rich-text-crdt.js';
+
+// Collaborative Hooks
+export {
+  createCollaborativeEditSession,
+  createPresenceTracker,
+  type CollaborativeDocState,
+  type CollaborativeEditSession,
+  type CollaborativeHooksConfig,
+  type PresenceState,
+  type PresenceTracker,
+} from './collaborative-hooks.js';
