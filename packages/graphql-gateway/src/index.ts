@@ -95,12 +95,7 @@ export type {
 export { QueryComplexityAnalyzer, createQueryComplexityAnalyzer } from './query-complexity.js';
 
 // DataLoader
-export type {
-  BatchLoadFn,
-  DataLoaderConfig,
-  LoaderOptions,
-  LoaderStats,
-} from './data-loader.js';
+export type { BatchLoadFn, DataLoaderConfig, LoaderOptions, LoaderStats } from './data-loader.js';
 
 export { DataLoaderRegistry, createDataLoaderRegistry } from './data-loader.js';
 
@@ -126,3 +121,29 @@ export type {
   FederationSupergraphConfig,
   ReferenceResolver,
 } from './federation.js';
+
+// SDL Parser
+export type {
+  CollectionConfig,
+  DirectiveDefinition,
+  ParsedEnum,
+  ParsedField,
+  ParsedSDL,
+  ParsedType,
+  PocketDirective,
+  SDLParserConfig,
+  SDLToCollectionResult,
+} from './sdl-parser.js';
+
+export { SDLParser, createSDLParser } from './sdl-parser.js';
+
+// Apollo Cache Adapter
+export type {
+  ApolloCacheConfig,
+  CacheEntry,
+  CacheEvent,
+  CacheQuery,
+  CacheStats,
+} from './apollo-adapter.js';
+
+export { ApolloCacheAdapter, createApolloCacheAdapter } from './apollo-adapter.js';
