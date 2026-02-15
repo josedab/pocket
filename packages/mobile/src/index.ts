@@ -92,3 +92,9 @@ export * from './push-sync.js';
 
 // Offline operation queue
 export * from './offline-queue.js';
+
+// Background sync scheduling
+export * from './background-sync.js';
+
+// App lifecycle management
+export * from './app-lifecycle.js';
