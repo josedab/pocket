@@ -11,11 +11,11 @@ This guide covers advanced development topics for contributors working on Pocket
 ## Table of Contents
 
 - [Development Environment](#development-environment)
-- [Package Development](#package-development) → [Full Guide](docs/guide/creating-packages.md)
-- [Testing Strategies](#testing-strategies) → [Full Guide](docs/guide/testing.md)
-- [Debugging](#debugging) → [Full Guide](docs/guide/debugging.md)
+- [Package Development](#package-development)
+- [Testing Strategies](#testing-strategies) → [Full Guide](website/docs/guides/testing.md)
+- [Debugging](#debugging)
 - [Performance Profiling](#performance-profiling)
-- [Release Process](#release-process) → [Full Guide](docs/guide/release.md)
+- [Release Process](#release-process)
 - [Common Tasks](#common-tasks)
 - [Code Style Reference](#code-style-reference)
 
@@ -82,19 +82,15 @@ SYNC_SERVER_HOST=localhost
 
 The monorepo uses pnpm workspaces with per-package builds via tsup. Use `pnpm --filter @pocket/<name>` to work on individual packages, and `node scripts/create-package.mjs` to scaffold new ones.
 
-📖 **[Full Package Development Guide →](docs/guide/creating-packages.md)**
-
 ## Testing Strategies
 
 Tests are co-located with source files (`*.test.ts`). Integration tests live in the top-level `test/` directory. Use `pnpm test` (turbo-based) to run all tests safely without OOM issues.
 
-📖 **[Full Testing Guide →](docs/guide/testing.md)**
+📖 **[Full Testing Guide →](website/docs/guides/testing.md)**
 
 ## Debugging
 
 Enable debug logging with `DEBUG=pocket:*`, use VS Code launch configurations for breakpoint debugging, and integrate `@pocket/devtools` for browser inspection.
-
-📖 **[Full Debugging Guide →](docs/guide/debugging.md)**
 
 ## Performance Profiling
 
@@ -152,8 +148,6 @@ npx source-map-explorer packages/core/dist/index.js
 ## Release Process
 
 Pocket uses [Changesets](https://github.com/changesets/changesets) for versioning and publishing. Contributors create changesets with `pnpm changeset`; maintainers handle version bumps and npm publishing.
-
-📖 **[Full Release Guide →](docs/guide/release.md)**
 
 ## Common Tasks
 

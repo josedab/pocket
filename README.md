@@ -261,6 +261,19 @@ npx vitest run --project unit packages/core/src/__tests__/
 
 See [DEVELOPMENT.md](./DEVELOPMENT.md) for advanced topics and [CONTRIBUTING.md](./CONTRIBUTING.md) for contribution guidelines.
 
+### Alternative: Task Runner
+
+If you have [Task](https://taskfile.dev) installed, you can use shorthand commands:
+
+```bash
+task setup   # install + build
+task check   # lint + format:check + typecheck + test
+task dev     # watch mode for all packages
+task bench   # run performance benchmarks
+```
+
+See [`Taskfile.yml`](./Taskfile.yml) for the full list of available tasks.
+
 ## Community
 
 - [GitHub Discussions](https://github.com/pocket-db/pocket/discussions) - Ask questions, share ideas, and connect with other users
