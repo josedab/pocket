@@ -53,7 +53,7 @@ export function createConversationMemory(
     }
   }
 
-  function getMessages(_maxTokens?: number): ReadonlyArray<ConversationMessage> {
+  function getMessages(_maxTokens?: number): readonly ConversationMessage[] {
     return [...messages];
   }
 

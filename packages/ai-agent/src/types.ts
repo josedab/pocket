@@ -11,7 +11,7 @@ export interface AgentConfig {
   /** LLM provider for generating responses */
   readonly provider: LLMProvider;
   /** Available tools the agent can call */
-  readonly tools?: ReadonlyArray<Tool>;
+  readonly tools?: readonly Tool[];
   /** System prompt prepended to all conversations */
   readonly systemPrompt?: string;
   /** Maximum number of tool-calling iterations per run */
@@ -31,16 +31,16 @@ export interface LLMProvider {
   /** Provider name */
   readonly name: string;
   /** Generate a completion from messages */
-  complete(messages: ReadonlyArray<ConversationMessage>, options?: LLMOptions): Promise<LLMResponse>;
+  complete(messages: readonly ConversationMessage[], options?: LLMOptions): Promise<LLMResponse>;
   /** Stream a completion (optional) */
-  stream?(messages: ReadonlyArray<ConversationMessage>, options?: LLMOptions): Observable<StreamChunk>;
+  stream?(messages: readonly ConversationMessage[], options?: LLMOptions): Observable<StreamChunk>;
 }
 
 export interface LLMOptions {
   readonly temperature?: number;
   readonly maxTokens?: number;
-  readonly tools?: ReadonlyArray<ToolSchema>;
-  readonly stopSequences?: ReadonlyArray<string>;
+  readonly tools?: readonly ToolSchema[];
+  readonly stopSequences?: readonly string[];
 }
 
 /**
@@ -48,7 +48,7 @@ export interface LLMOptions {
  */
 export interface LLMResponse {
   readonly content: string;
-  readonly toolCalls?: ReadonlyArray<ToolCall>;
+  readonly toolCalls?: readonly ToolCall[];
   readonly finishReason: 'stop' | 'tool_calls' | 'length' | 'error';
   readonly usage?: { readonly promptTokens: number; readonly completionTokens: number };
 }
@@ -69,7 +69,7 @@ export interface StreamChunk {
 export interface ConversationMessage {
   readonly role: 'system' | 'user' | 'assistant' | 'tool';
   readonly content: string;
-  readonly toolCalls?: ReadonlyArray<ToolCall>;
+  readonly toolCalls?: readonly ToolCall[];
   readonly toolCallId?: string;
   readonly name?: string;
 }
@@ -83,7 +83,7 @@ export interface Tool {
   /** Human-readable description */
   readonly description: string;
   /** Parameter schema */
-  readonly parameters: ReadonlyArray<ToolParameter>;
+  readonly parameters: readonly ToolParameter[];
   /** Execute the tool with given arguments */
   execute(args: Record<string, unknown>, context: AgentContext): Promise<ToolResult>;
 }
@@ -108,7 +108,7 @@ export interface ToolSchema {
   readonly parameters: {
     readonly type: 'object';
     readonly properties: Record<string, { type: string; description: string }>;
-    readonly required: ReadonlyArray<string>;
+    readonly required: readonly string[];
   };
 }
 
@@ -135,7 +135,7 @@ export interface ToolResult {
  */
 export interface AgentContext {
   /** Conversation history */
-  readonly messages: ReadonlyArray<ConversationMessage>;
+  readonly messages: readonly ConversationMessage[];
   /** Current iteration number */
   readonly iteration: number;
   /** Agent configuration */
@@ -169,7 +169,7 @@ export interface AgentEvent {
  */
 export interface AgentResponse {
   readonly content: string;
-  readonly steps: ReadonlyArray<AgentStep>;
+  readonly steps: readonly AgentStep[];
   readonly toolCallCount: number;
   readonly iterationCount: number;
   readonly totalTokens?: number;
@@ -182,7 +182,7 @@ export interface ConversationMemory {
   /** Add a message to memory */
   add(message: ConversationMessage): void;
   /** Get messages within the context window */
-  getMessages(maxTokens?: number): ReadonlyArray<ConversationMessage>;
+  getMessages(maxTokens?: number): readonly ConversationMessage[];
   /** Clear all messages */
   clear(): void;
   /** Get total message count */
@@ -198,7 +198,7 @@ export interface Agent {
   /** Run with streaming events */
   run$(message: string): Observable<AgentEvent>;
   /** Get the conversation history */
-  getHistory(): ReadonlyArray<ConversationMessage>;
+  getHistory(): readonly ConversationMessage[];
   /** Reset the agent's conversation state */
   reset(): void;
   /** Destroy and free resources */
