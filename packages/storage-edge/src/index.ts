@@ -32,12 +32,12 @@
 export { BaseKVDocumentStore, type KVListEntry } from './base-kv-store.js';
 
 // Cloudflare Workers KV
-export { CloudflareKVStore } from './cloudflare/cloudflare-store.js';
 export { createCloudflareKVStorage } from './cloudflare/cloudflare-adapter.js';
+export { CloudflareKVStore } from './cloudflare/cloudflare-store.js';
 
 // Cloudflare Durable Objects
-export { DurableObjectStore } from './cloudflare/durable-object-store.js';
 export { createDurableObjectStorage } from './cloudflare/durable-object-adapter.js';
+export { DurableObjectStore } from './cloudflare/durable-object-store.js';
 
 // Legacy D1 adapter
 export { createD1Storage, type D1StorageConfig } from './d1-adapter.js';
@@ -49,39 +49,39 @@ export {
 } from './durable-objects-adapter.js';
 
 // Deno KV
-export { DenoKVStore } from './deno/deno-kv-store.js';
 export { createDenoKVStorage } from './deno/deno-kv-adapter.js';
+export { DenoKVStore } from './deno/deno-kv-store.js';
 
 // Vercel KV
-export { VercelKVStore } from './vercel/vercel-kv-store.js';
 export { createVercelKVStorage } from './vercel/vercel-kv-adapter.js';
+export { VercelKVStore } from './vercel/vercel-kv-store.js';
 
 // Bun SQLite
-export { BunSQLiteStore } from './bun/bun-sqlite-store.js';
 export { createBunSQLiteStorage } from './bun/bun-sqlite-adapter.js';
+export { BunSQLiteStore } from './bun/bun-sqlite-store.js';
 
 // All types
 export type {
-  EdgeStorageConfig,
-  EdgeSerializer,
-  CloudflareKVConfig,
-  CloudflareKVNamespace,
-  CloudflareKVListResult,
-  DurableObjectConfig,
-  DurableObjectStorageAPI,
-  DurableObjectListOptions,
-  DurableObjectTransaction,
-  DenoKVConfig,
-  DenoKv,
-  DenoKvKey,
-  DenoKvEntry,
-  DenoKvListSelector,
-  DenoKvListIterator,
-  VercelKVConfig,
-  VercelKVClient,
   BunSQLiteConfig,
   BunSQLiteDatabase,
   BunSQLiteStatement,
+  CloudflareKVConfig,
+  CloudflareKVListResult,
+  CloudflareKVNamespace,
+  DenoKVConfig,
+  DenoKv,
+  DenoKvEntry,
+  DenoKvKey,
+  DenoKvListIterator,
+  DenoKvListSelector,
+  DurableObjectConfig,
+  DurableObjectListOptions,
+  DurableObjectStorageAPI,
+  DurableObjectTransaction,
+  EdgeSerializer,
+  EdgeStorageConfig,
+  VercelKVClient,
+  VercelKVConfig,
 } from './types.js';
 
 // Edge Sync Server
@@ -98,22 +98,39 @@ export {
 } from './edge-sync-server.js';
 
 // In-Memory Sync Storage (for testing)
-export {
-  InMemorySyncStorage,
-  createInMemorySyncStorage,
-} from './in-memory-sync-storage.js';
+export { InMemorySyncStorage, createInMemorySyncStorage } from './in-memory-sync-storage.js';
 
 // Auto-configuration
 export {
-  detectPlatform,
-  createAutoConfiguredStorage,
-  getRecommendedConfig,
   createAutoConfig,
-  type Platform,
+  createAutoConfiguredStorage,
+  detectPlatform,
+  getRecommendedConfig,
   type AutoConfigOptions,
   type AutoConfigResult,
+  type Platform,
   type PlatformConfig,
 } from './auto-config.js';
+
+// Deployment Manager
+export {
+  createDeploymentManager,
+  type DeploymentConfig,
+  type DeploymentManager,
+  type DeploymentManagerConfig,
+  type DeploymentProvider,
+  type ProviderInfo,
+  type ResourceEstimate,
+  type ValidationResult,
+} from './deployment-manager.js';
+
+// Health Monitor
+export {
+  createEdgeHealthMonitor,
+  type EdgeHealthMonitor,
+  type EndpointHealth,
+  type HealthMonitorConfig,
+} from './health-monitor.js';
 
 // Re-export core types for convenience
 export type { Document, StorageAdapter, StorageConfig } from '@pocket/core';
