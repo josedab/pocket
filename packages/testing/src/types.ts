@@ -57,7 +57,7 @@ export interface TestServer {
   data: Map<string, unknown>;
   applyChange(change: Record<string, unknown>): void;
   getData(): Map<string, unknown>;
-  getChanges(): Array<Record<string, unknown>>;
+  getChanges(): Record<string, unknown>[];
 }
 
 export interface SyncTestHarness {

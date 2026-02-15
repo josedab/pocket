@@ -108,7 +108,7 @@ export interface DeploymentDiff {
 }
 
 /** In-memory deployment history store, keyed by target. */
-const deploymentHistory: Map<string, DeploymentRecord[]> = new Map();
+const deploymentHistory = new Map<string, DeploymentRecord[]>();
 
 let deploymentCounter = 0;
 
@@ -291,7 +291,7 @@ function performSafetyChecks(
     warnings.push('Rollback target has no commit SHA — manual checkout required.');
   }
 
-  if (current && current.version === rollbackTo.version) {
+  if (current?.version === rollbackTo.version) {
     warnings.push('Current and rollback versions are identical.');
   }
 
@@ -359,7 +359,7 @@ export function rollback(options: RollbackOptions): RollbackResult {
   }
 
   // All undefined paths throw above, so rollbackTarget is guaranteed here
-  const target = rollbackTarget as DeploymentRecord;
+  const target = rollbackTarget;
   const current = history[history.length - 1];
   const safetyChecks = options.safetyChecks !== false;
   const warnings = safetyChecks ? performSafetyChecks(current, target) : [];

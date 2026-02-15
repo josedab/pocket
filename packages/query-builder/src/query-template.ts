@@ -55,9 +55,9 @@ export interface QueryTemplate {
   /** Target collection */
   collection: string;
   /** Filter conditions (values may contain `{{paramName}}` placeholders) */
-  filters: Array<{ field: string; operator: string; value: unknown }>;
+  filters: { field: string; operator: string; value: unknown }[];
   /** Sort clauses */
-  sorts: Array<{ field: string; direction: SortDirection }>;
+  sorts: { field: string; direction: SortDirection }[];
   /** Template parameters */
   params: TemplateParam[];
 }
@@ -82,7 +82,7 @@ export interface QueryTemplate {
  */
 export class QueryTemplateRegistry {
   /** @internal */
-  private _templates: Map<string, QueryTemplate> = new Map();
+  private _templates = new Map<string, QueryTemplate>();
 
   /**
    * Registers a reusable query template.

@@ -30,7 +30,7 @@ export interface QuickConnectConfig {
   /** Cloud region (auto-detected based on latency if not provided) */
   readonly region?: CloudRegion;
   /** Collections to sync (all collections if not specified) */
-  readonly collections?: ReadonlyArray<string>;
+  readonly collections?: readonly string[];
   /** Enable real-time sync via WebSocket (default: true) */
   readonly realtime?: boolean;
   /** Enable end-to-end encryption (default: false) */

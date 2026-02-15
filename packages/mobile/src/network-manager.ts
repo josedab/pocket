@@ -89,7 +89,7 @@ const DEFAULT_STRATEGIES: NetworkSyncStrategies = {
 export class NetworkManager {
   private readonly strategies: NetworkSyncStrategies;
   private readonly _state$: BehaviorSubject<NetworkState>;
-  private readonly _pendingOperations: Array<() => Promise<void>> = [];
+  private readonly _pendingOperations: (() => Promise<void>)[] = [];
 
   constructor(config?: NetworkManagerConfig) {
     this.strategies = config?.strategies ?? DEFAULT_STRATEGIES;

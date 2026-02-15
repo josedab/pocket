@@ -15,9 +15,9 @@ function hashQuery(collection: string, filter: Record<string, unknown>): string 
  */
 export class PatternAnalyzer {
   private readonly config: PrefetchConfig;
-  private patterns: Map<string, QueryPattern> = new Map();
+  private patterns = new Map<string, QueryPattern>();
   private queryHistory: string[] = [];
-  private transitionMatrix: Map<string, Map<string, number>> = new Map();
+  private transitionMatrix = new Map<string, Map<string, number>>();
 
   constructor(config?: Partial<PrefetchConfig>) {
     this.config = { ...DEFAULT_PREFETCH_CONFIG, ...config };

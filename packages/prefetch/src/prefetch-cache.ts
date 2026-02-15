@@ -6,7 +6,7 @@ import { DEFAULT_PREFETCH_CONFIG } from './types.js';
  */
 export class PrefetchCache {
   private readonly config: PrefetchConfig;
-  private cache: Map<string, CacheEntry> = new Map();
+  private cache = new Map<string, CacheEntry>();
   private hits = 0;
   private misses = 0;
 

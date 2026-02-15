@@ -48,7 +48,7 @@ export function createSyncTestHarness(config: NetworkSimulatorConfig = {}): Sync
 
   function createServerInstance(): TestServer {
     const data = new Map<string, unknown>();
-    const changes: Array<Record<string, unknown>> = [];
+    const changes: Record<string, unknown>[] = [];
 
     return {
       data,
@@ -62,7 +62,7 @@ export function createSyncTestHarness(config: NetworkSimulatorConfig = {}): Sync
       getData(): Map<string, unknown> {
         return data;
       },
-      getChanges(): Array<Record<string, unknown>> {
+      getChanges(): Record<string, unknown>[] {
         return [...changes];
       },
     };

@@ -56,7 +56,7 @@ export interface AggregateClause<T> {
  * A group-by clause with optional having condition.
  */
 export interface GroupByClause<T> {
-  readonly fields: ReadonlyArray<keyof T & string>;
+  readonly fields: readonly (keyof T & string)[];
   readonly having?: WhereClause<T>;
 }
 
@@ -104,7 +104,7 @@ export interface PocketQLConfig {
  */
 export interface LogicalGroup<T> {
   readonly type: 'and' | 'or';
-  readonly clauses: ReadonlyArray<WhereClause<T>>;
+  readonly clauses: readonly WhereClause<T>[];
 }
 
 /**
@@ -112,11 +112,11 @@ export interface LogicalGroup<T> {
  */
 export interface QueryExpression<T> {
   readonly collection: string;
-  readonly where: ReadonlyArray<WhereClause<T>>;
-  readonly logicalGroups: ReadonlyArray<LogicalGroup<T>>;
-  readonly sort: ReadonlyArray<SortClause<T>>;
+  readonly where: readonly WhereClause<T>[];
+  readonly logicalGroups: readonly LogicalGroup<T>[];
+  readonly sort: readonly SortClause<T>[];
   readonly projection: ProjectionSpec<T> | null;
-  readonly aggregates: ReadonlyArray<AggregateClause<T>>;
+  readonly aggregates: readonly AggregateClause<T>[];
   readonly groupBy: GroupByClause<T> | null;
   readonly joins: readonly JoinClause[];
   readonly limit: number | null;
@@ -144,13 +144,9 @@ export interface ValidationResult {
 /**
  * Result of an aggregate query.
  */
-export interface AggregateResult {
-  readonly [alias: string]: number;
-}
+export type AggregateResult = Readonly<Record<string, number>>;
 
 /**
  * Result of a join query.
  */
-export interface JoinedResult {
-  readonly [key: string]: unknown;
-}
+export type JoinedResult = Readonly<Record<string, unknown>>;
