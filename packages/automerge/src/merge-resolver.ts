@@ -30,12 +30,12 @@ export interface MergeResolver {
   /** Resolve a single conflict using configured strategies */
   resolve(conflict: MergeConflict): unknown;
   /** Resolve all conflicts in a batch */
-  resolveAll(conflicts: ReadonlyArray<MergeConflict>): ReadonlyArray<{
+  resolveAll(conflicts: readonly MergeConflict[]): readonly {
     readonly conflict: MergeConflict;
     readonly resolvedValue: unknown;
-  }>;
+  }[];
   /** Get the strategy configured for a given field path */
-  getStrategy(path: ReadonlyArray<string | number>): MergeStrategy;
+  getStrategy(path: readonly (string | number)[]): MergeStrategy;
 }
 
 /**
@@ -58,7 +58,7 @@ export interface MergeResolver {
 export function createMergeResolver(config: MergeResolverConfig): MergeResolver {
   const { defaultStrategy, fieldStrategies = {}, customResolver } = config;
 
-  function getStrategy(path: ReadonlyArray<string | number>): MergeStrategy {
+  function getStrategy(path: readonly (string | number)[]): MergeStrategy {
     const pathStr = path.join('.');
     // Check exact match, then prefix matches
     if (fieldStrategies[pathStr]) return fieldStrategies[pathStr];
@@ -117,8 +117,8 @@ export function createMergeResolver(config: MergeResolverConfig): MergeResolver 
   }
 
   function resolveAll(
-    conflicts: ReadonlyArray<MergeConflict>,
-  ): ReadonlyArray<{ readonly conflict: MergeConflict; readonly resolvedValue: unknown }> {
+    conflicts: readonly MergeConflict[],
+  ): readonly { readonly conflict: MergeConflict; readonly resolvedValue: unknown }[] {
     return conflicts.map((c) => ({
       conflict: c,
       resolvedValue: resolve(c),

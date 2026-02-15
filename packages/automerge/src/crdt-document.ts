@@ -71,7 +71,7 @@ function applyOperation<T>(obj: T, op: CrdtOperation): T {
 function diffObjects(
   oldObj: Record<string, unknown>,
   newObj: Record<string, unknown>,
-  path: Array<string | number> = [],
+  path: (string | number)[] = [],
 ): CrdtOperation[] {
   const ops: CrdtOperation[] = [];
 
@@ -186,7 +186,7 @@ export function createCrdtDocument<T extends Record<string, unknown>>(
     return finalChange;
   }
 
-  function applyChanges(remoteChanges: ReadonlyArray<CrdtChange>): MergeResult<T> {
+  function applyChanges(remoteChanges: readonly CrdtChange[]): MergeResult<T> {
     if (destroyed) {
       return { success: false, state: getState(), appliedCount: 0, conflicts: [] };
     }
@@ -239,7 +239,7 @@ export function createCrdtDocument<T extends Record<string, unknown>>(
     return { success: true, state: getState(), appliedCount: applied, conflicts };
   }
 
-  function generateSyncMessage(peerHeads: ReadonlyArray<string>): CrdtSyncMessage | null {
+  function generateSyncMessage(peerHeads: readonly string[]): CrdtSyncMessage | null {
     const peerHeadSet = new Set(peerHeads);
     const missingChanges = changes.filter((c) => !peerHeadSet.has(c.hash));
 
@@ -258,7 +258,7 @@ export function createCrdtDocument<T extends Record<string, unknown>>(
     return applyChanges(message.changes);
   }
 
-  function getChangesSince(heads: ReadonlyArray<string>): ReadonlyArray<CrdtChange> {
+  function getChangesSince(heads: readonly string[]): readonly CrdtChange[] {
     if (heads.length === 0) return [...changes];
 
     const headSet = new Set(heads);
@@ -311,7 +311,7 @@ export function createCrdtDocument<T extends Record<string, unknown>>(
  */
 export function applyCrdtChanges<T extends Record<string, unknown>>(
   document: CrdtDocument<T>,
-  changes: ReadonlyArray<CrdtChange>,
+  changes: readonly CrdtChange[],
 ): MergeResult<T> {
   return document.applyChanges(changes);
 }

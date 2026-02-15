@@ -36,11 +36,11 @@ export interface CrdtChange {
   /** Sequence number within this actor's changes */
   readonly seq: number;
   /** The operations contained in this change */
-  readonly operations: ReadonlyArray<CrdtOperation>;
+  readonly operations: readonly CrdtOperation[];
   /** Hash of this change for integrity verification */
   readonly hash: string;
   /** Dependencies (hashes of preceding changes) */
-  readonly deps: ReadonlyArray<string>;
+  readonly deps: readonly string[];
 }
 
 /**
@@ -48,7 +48,7 @@ export interface CrdtChange {
  */
 export interface CrdtOperation {
   readonly type: 'set' | 'delete' | 'increment' | 'insert' | 'splice';
-  readonly path: ReadonlyArray<string | number>;
+  readonly path: readonly (string | number)[];
   readonly value?: unknown;
 }
 
@@ -59,13 +59,13 @@ export interface CrdtDocumentState<T = Record<string, unknown>> {
   /** The current materialized document value */
   readonly value: T;
   /** All changes that produced this state */
-  readonly changes: ReadonlyArray<CrdtChange>;
+  readonly changes: readonly CrdtChange[];
   /** The actor that owns this document copy */
   readonly actorId: string;
   /** Current logical clock value */
   readonly clock: number;
   /** Heads (latest change hashes) for sync */
-  readonly heads: ReadonlyArray<string>;
+  readonly heads: readonly string[];
 }
 
 /**
@@ -77,13 +77,13 @@ export interface CrdtDocument<T = Record<string, unknown>> {
   /** Apply a local change to the document */
   change(fn: (draft: T) => void, message?: string): CrdtChange;
   /** Apply remote changes from another peer */
-  applyChanges(changes: ReadonlyArray<CrdtChange>): MergeResult<T>;
+  applyChanges(changes: readonly CrdtChange[]): MergeResult<T>;
   /** Generate a sync message for a peer */
-  generateSyncMessage(peerHeads: ReadonlyArray<string>): CrdtSyncMessage | null;
+  generateSyncMessage(peerHeads: readonly string[]): CrdtSyncMessage | null;
   /** Receive and apply a sync message from a peer */
   receiveSyncMessage(message: CrdtSyncMessage): MergeResult<T>;
   /** Get all changes since given heads */
-  getChangesSince(heads: ReadonlyArray<string>): ReadonlyArray<CrdtChange>;
+  getChangesSince(heads: readonly string[]): readonly CrdtChange[];
   /** Fork the document for a new actor */
   fork(actorId: string): CrdtDocument<T>;
   /** Destroy and free resources */
@@ -99,9 +99,9 @@ export interface CrdtSyncMessage {
   /** Target actor ID */
   readonly targetId: string;
   /** Changes included in this message */
-  readonly changes: ReadonlyArray<CrdtChange>;
+  readonly changes: readonly CrdtChange[];
   /** Sender's current heads */
-  readonly heads: ReadonlyArray<string>;
+  readonly heads: readonly string[];
   /** Whether this is a request for missing changes */
   readonly needsResponse: boolean;
   /** Compressed payload if compression is enabled */
@@ -119,7 +119,7 @@ export interface MergeResult<T = Record<string, unknown>> {
   /** Number of changes applied */
   readonly appliedCount: number;
   /** Changes that conflicted (resolved automatically) */
-  readonly conflicts: ReadonlyArray<MergeConflict>;
+  readonly conflicts: readonly MergeConflict[];
 }
 
 /**
@@ -127,7 +127,7 @@ export interface MergeResult<T = Record<string, unknown>> {
  */
 export interface MergeConflict {
   /** Path to the conflicting field */
-  readonly path: ReadonlyArray<string | number>;
+  readonly path: readonly (string | number)[];
   /** The value from the local actor */
   readonly localValue: unknown;
   /** The value from the remote actor */
@@ -145,7 +145,7 @@ export interface PeerState {
   /** Peer's actor ID */
   readonly peerId: string;
   /** Last known heads from this peer */
-  readonly lastHeads: ReadonlyArray<string>;
+  readonly lastHeads: readonly string[];
   /** Whether we have outstanding changes to send */
   readonly hasPendingChanges: boolean;
   /** Last sync timestamp */
@@ -165,7 +165,7 @@ export interface SyncSession {
   /** Remove a peer from this sync session */
   removePeer(peerId: string): void;
   /** Get state for all connected peers */
-  getPeerStates(): ReadonlyArray<PeerState>;
+  getPeerStates(): readonly PeerState[];
   /** Generate sync message for a specific peer */
   generateMessage(peerId: string): CrdtSyncMessage | null;
   /** Receive a sync message from a peer */
@@ -193,9 +193,9 @@ export interface AutomergeSyncAdapter {
     changeFn: (draft: T) => void,
   ): CrdtChange;
   /** Apply remote changes received from sync transport */
-  applyRemoteChanges(collectionName: string, documentId: string, changes: ReadonlyArray<CrdtChange>): MergeResult;
+  applyRemoteChanges(collectionName: string, documentId: string, changes: readonly CrdtChange[]): MergeResult;
   /** Get all documents managed by this adapter */
-  getDocumentIds(collectionName: string): ReadonlyArray<string>;
+  getDocumentIds(collectionName: string): readonly string[];
   /** Destroy all resources */
   destroy(): void;
 }
