@@ -131,7 +131,7 @@ export class PlatformDetector {
       return 'ios';
     }
 
-    if (/Android/.test(userAgent)) {
+    if (userAgent.includes('Android')) {
       return 'android';
     }
 

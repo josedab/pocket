@@ -339,7 +339,7 @@ function base64urlEncode(data: string): string {
   const bytes = new TextEncoder().encode(data);
   let result = '';
   for (let i = 0; i < bytes.length; i += 3) {
-    const b0 = bytes[i] as number;
+    const b0 = bytes[i]!;
     const b1 = bytes[i + 1] ?? 0;
     const b2 = bytes[i + 2] ?? 0;
     result += chars[(b0 >> 2) & 0x3f];
@@ -357,7 +357,7 @@ function base64urlDecode(encoded: string): string {
   const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_';
   const bytes: number[] = [];
   for (let i = 0; i < encoded.length; i += 4) {
-    const c0 = encoded[i] as string;
+    const c0 = encoded[i]!;
     const c1 = encoded[i + 1];
     const c2 = encoded[i + 2];
     const c3 = encoded[i + 3];
@@ -527,9 +527,9 @@ export class AuthService {
         return { valid: false, payload: null, error: 'Invalid token format' };
       }
 
-      const header = parts[0] as string;
-      const body = parts[1] as string;
-      const signature = parts[2] as string;
+      const header = parts[0]!;
+      const body = parts[1]!;
+      const signature = parts[2]!;
       const expectedSig = signPayload(`${header}.${body}`, this.config.jwtSecret);
 
       if (signature !== expectedSig) {
@@ -732,7 +732,7 @@ export class AuthService {
    */
   touchSession(sessionId: string): Session | null {
     const session = this.sessions.get(sessionId);
-    if (!session || session.status !== 'active') return null;
+    if (session?.status !== 'active') return null;
 
     if (session.expiresAt < Date.now()) {
       session.status = 'expired';
@@ -924,11 +924,11 @@ export class AuthService {
 
       const userData = (await userResponse.json()) as Record<string, string>;
       const profile: OAuthProfile = {
-        providerId: userData['id'] ?? userData['sub'] ?? '',
+        providerId: userData.id ?? userData.sub ?? '',
         provider,
-        email: userData['email'] ?? '',
-        name: userData['name'] ?? null,
-        avatarUrl: userData['avatar_url'] ?? userData['picture'] ?? null,
+        email: userData.email ?? '',
+        name: userData.name ?? null,
+        avatarUrl: userData.avatar_url ?? userData.picture ?? null,
       };
 
       const userId = `${provider}_${profile.providerId}`;

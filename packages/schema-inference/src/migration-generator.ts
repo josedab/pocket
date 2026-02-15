@@ -98,8 +98,8 @@ function detectRenames(
   removed: Map<string, InferredField>,
   added: Map<string, InferredField>,
   threshold: number,
-): Array<{ oldName: string; newName: string; field: InferredField }> {
-  const renames: Array<{ oldName: string; newName: string; field: InferredField }> = [];
+): { oldName: string; newName: string; field: InferredField }[] {
+  const renames: { oldName: string; newName: string; field: InferredField }[] = [];
   const matchedOld = new Set<string>();
   const matchedNew = new Set<string>();
 
@@ -243,7 +243,7 @@ function generateUpScript(steps: readonly MigrationStep[], _collectionName: stri
     switch (step.type) {
       case 'add-field':
         lines.push(indent(
-          `await collection.updateMany({}, { $set: { '${step.fieldPath}': ${step.details['nullable'] ? 'null' : 'undefined'} } });`,
+          `await collection.updateMany({}, { $set: { '${step.fieldPath}': ${step.details.nullable ? 'null' : 'undefined'} } });`,
           1,
         ));
         break;
@@ -255,13 +255,13 @@ function generateUpScript(steps: readonly MigrationStep[], _collectionName: stri
         break;
       case 'rename-field':
         lines.push(indent(
-          `await collection.updateMany({}, { $rename: { '${step.details['oldName']}': '${step.details['newName']}' } });`,
+          `await collection.updateMany({}, { $rename: { '${step.details.oldName}': '${step.details.newName}' } });`,
           1,
         ));
         break;
       case 'change-type':
         lines.push(indent(
-          `// Manual migration needed: convert '${step.fieldPath}' from ${String(step.details['oldType'])} to ${String(step.details['newType'])}`,
+          `// Manual migration needed: convert '${step.fieldPath}' from ${String(step.details.oldType)} to ${String(step.details.newType)}`,
           1,
         ));
         lines.push(indent(
@@ -326,13 +326,13 @@ function generateDownScript(steps: readonly MigrationStep[], _collectionName: st
         break;
       case 'rename-field':
         lines.push(indent(
-          `await collection.updateMany({}, { $rename: { '${step.details['newName']}': '${step.details['oldName']}' } });`,
+          `await collection.updateMany({}, { $rename: { '${step.details.newName}': '${step.details.oldName}' } });`,
           1,
         ));
         break;
       case 'change-type':
         lines.push(indent(
-          `// Manual rollback needed: convert '${step.fieldPath}' from ${String(step.details['newType'])} back to ${String(step.details['oldType'])}`,
+          `// Manual rollback needed: convert '${step.fieldPath}' from ${String(step.details.newType)} back to ${String(step.details.oldType)}`,
           1,
         ));
         break;

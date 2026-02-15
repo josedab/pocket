@@ -73,7 +73,7 @@ export function createQueryBuilder<T>(collection: string): QueryBuilder<T> {
     select(...fields: (keyof T & string)[]): QueryBuilder<T> {
       const projection: ProjectionSpec<T> = {};
       for (const f of fields) {
-        (projection as Record<string, boolean>)[f as string] = true;
+        (projection as Record<string, boolean>)[f] = true;
       }
       state.projection = projection;
       return builder;

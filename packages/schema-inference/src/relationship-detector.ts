@@ -6,7 +6,7 @@
  * @module
  */
 
-import type { InferredSchema, InferredField, ConfidenceScore } from './types.js';
+import type { InferredSchema, ConfidenceScore } from './types.js';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -130,8 +130,8 @@ function detectEmbeddedRelationships(
 
     if (field.type === 'array' && field.items) {
       const itemFields = field.items.fields;
-      const firstItem = itemFields.values().next().value as InferredField | undefined;
-      if (firstItem && firstItem.type === 'object') {
+      const firstItem = itemFields.values().next().value;
+      if (firstItem?.type === 'object') {
         relationships.push({
           source: collectionName,
           sourceField: fieldName,

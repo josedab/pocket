@@ -76,7 +76,7 @@ export function createViewEngine(config: ViewManagerConfig = {}) {
       if (typedEntry.definition.sourceCollection !== event.collection) continue;
 
       const docId =
-        (event.document as Record<string, unknown>)['_id'] as string ??
+        (event.document as Record<string, unknown>)._id as string ??
         String(Date.now());
 
       switch (event.type) {

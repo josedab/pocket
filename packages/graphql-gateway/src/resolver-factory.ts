@@ -87,7 +87,7 @@ export class ResolverFactory {
       if (_name.startsWith('delete')) {
         return true;
       }
-      return { id: args['id'] ?? 'new-id', ...((args['input'] as object) ?? {}) };
+      return { id: args.id ?? 'new-id', ...((args.input as object) ?? {}) };
     };
   }
 

@@ -221,7 +221,7 @@ export class P2PSync {
 
     // Determine what blocks we have
     const localHashes = this.store.getAllHashes();
-    let sent = 0;
+    const sent = 0;
     const received = 0;
 
     // In a real implementation, we'd exchange have/want messages with the peer.
