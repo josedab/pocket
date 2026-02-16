@@ -2,7 +2,9 @@
 # Pre-commit hook: runs lint-staged + typecheck on changed packages.
 # To skip: git commit --no-verify
 
+echo "🔍 Running lint-staged..."
 pnpm lint-staged
+echo "✅ Lint-staged complete."
 
 # Run typecheck on changed packages (parallel via single turbo invocation)
 CHANGED_PACKAGES=$(git diff --cached --name-only --diff-filter=ACMR | grep '^packages/' | cut -d'/' -f2 | sort -u)
@@ -16,10 +18,11 @@ if [ -n "$CHANGED_PACKAGES" ]; then
   done
 
   if [ -n "$FILTERS" ]; then
-    echo "Typechecking changed packages..."
+    echo "🔎 Typechecking changed packages..."
     npx turbo run typecheck $FILTERS 2>/dev/null || {
-      echo "⚠️  Typecheck failed. Use 'git commit --no-verify' to bypass."
+      echo "❌ Typecheck failed. Use 'git commit --no-verify' to bypass."
       exit 1
     }
+    echo "✅ Typecheck passed."
   fi
 fi
