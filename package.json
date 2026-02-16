@@ -42,6 +42,7 @@
     "create-package": "node scripts/create-package.mjs",
     "bench": "pnpm --filter @pocket/benchmarks bench",
     "audit:metadata": "node scripts/audit-package-metadata.mjs",
+    "prepublish:check": "node scripts/pre-publish-check.mjs",
     "status": "node scripts/package-status.mjs",
     "health": "node scripts/health-check.mjs",
     "quickstart": "pnpm install && pnpm build && echo '' && echo '✅ Pocket is ready!' && echo '' && echo 'Next steps:' && echo '  pnpm test              Run all tests' && echo '  pnpm status            View package health' && echo '  See QUICKSTART.md      5-minute contributor guide' && echo ''",
@@ -105,6 +106,18 @@
     {
       "path": "packages/storage-opfs/dist/index.js",
       "limit": "8 KB"
+    },
+    {
+      "path": "packages/storage-memory/dist/index.js",
+      "limit": "5 KB"
+    },
+    {
+      "path": "packages/cloud/dist/index.js",
+      "limit": "30 KB"
+    },
+    {
+      "path": "packages/ai/dist/index.js",
+      "limit": "25 KB"
     }
   ]
 }

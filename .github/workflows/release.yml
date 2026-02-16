@@ -43,6 +43,9 @@ jobs:
       - name: Run tests
         run: pnpm test
 
+      - name: Pre-publish verification
+        run: node scripts/pre-publish-check.mjs
+
       - name: Create Release Pull Request or Publish
         uses: changesets/action@v1
         with:
