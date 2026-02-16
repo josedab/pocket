@@ -1,0 +1,29 @@
+name: Documentation Check
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'packages/**'
+      - 'packages/.status.json'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'packages/**'
+      - 'packages/.status.json'
+
+jobs:
+  readme-check:
+    name: Package READMEs
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Check stable/beta packages have READMEs
+        run: node scripts/check-package-readmes.mjs
