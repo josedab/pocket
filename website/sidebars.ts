@@ -93,6 +93,26 @@ const sidebars: SidebarsConfig = {
     'changelog',
     'roadmap',
     'contributing',
+    {
+      type: 'category',
+      label: 'Architecture Decisions',
+      collapsed: true,
+      items: [
+        'adr/README',
+        'adr/adr-001-local-first-architecture',
+        'adr/adr-002-rxjs-for-reactivity',
+        'adr/adr-003-pluggable-storage-adapters',
+        'adr/adr-004-vector-clocks-for-sync',
+        'adr/adr-005-monorepo-structure',
+        'adr/adr-006-plugin-system-architecture',
+        'adr/adr-007-event-reduce-algorithm',
+        'adr/adr-008-react-hooks-integration',
+        'adr/adr-009-transport-layer-abstraction',
+        'adr/adr-010-optimistic-updates-with-rollback',
+        'adr/adr-011-bundle-size-constraints',
+        'adr/adr-012-umbrella-package-pattern',
+      ],
+    },
   ],
 };
 
