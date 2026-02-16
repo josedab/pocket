@@ -61,5 +61,9 @@
     "database",
     "local-first",
     "privacy"
-  ]
+  ],
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org"
+  }
 }

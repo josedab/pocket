@@ -61,5 +61,9 @@
     "devtools",
     "inspector",
     "gui"
-  ]
+  ],
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org"
+  }
 }

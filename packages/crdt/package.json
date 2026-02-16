@@ -60,5 +60,9 @@
     "conflict-free",
     "database",
     "local-first"
-  ]
+  ],
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org"
+  }
 }
