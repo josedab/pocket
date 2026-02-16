@@ -118,3 +118,20 @@ export type {
   RemoteCursorInput,
   SelectionRange,
 } from './cursor-overlay.js';
+
+// Collaborative Canvas
+export { CanvasEngine, createCanvasEngine, DEFAULT_CANVAS_STYLE } from './canvas-engine.js';
+export type {
+  CanvasCursor,
+  CanvasEngineConfig,
+  CanvasEvent,
+  CanvasOperation,
+  CanvasOperationType,
+  CanvasShape,
+  CanvasSnapshot,
+  CanvasTool,
+  CanvasViewport,
+  Point,
+  ShapeStyle,
+  ShapeType,
+} from './canvas-engine.js';
