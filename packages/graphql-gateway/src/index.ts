@@ -116,3 +116,13 @@ export type {
 } from './pagination.js';
 
 export { PaginationHelper, createPaginationHelper } from './pagination.js';
+
+// Federation
+export { FederationGenerator, createFederationGenerator } from './federation.js';
+export type {
+  FederatedEntity,
+  FederationConfig,
+  FederationSubgraph,
+  FederationSupergraphConfig,
+  ReferenceResolver,
+} from './federation.js';
