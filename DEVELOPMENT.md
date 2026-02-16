@@ -2,10 +2,20 @@
 
 This guide covers advanced development topics for contributors working on Pocket's internals.
 
-> ⚠️ **Memory Warning**: With 59+ packages, running `vitest run` at the root may cause out-of-memory errors. Use the Turbo-based test runner (`pnpm test`) which isolates per-package, or set:
+## System Requirements
+
+| Requirement | Minimum | Recommended |
+|-------------|---------|-------------|
+| Node.js | 18.0.0 | 20+ (see `.nvmrc`) |
+| pnpm | 8.12.0 | Latest 8.x |
+| RAM | 8 GB | 16 GB (for full test suite) |
+| Disk | 2 GB | 4 GB (with node_modules + build artifacts) |
+
+> ⚠️ **Memory Warning**: With 70+ packages, running `vitest run` at the root may cause out-of-memory errors. Use the Turbo-based test runner (`pnpm test`) which isolates per-package, or set:
 > ```bash
-> NODE_OPTIONS="--max-old-space-size=8192" pnpm test
+> export NODE_OPTIONS="--max-old-space-size=8192"
 > ```
+> Add this to your shell profile (`.bashrc`, `.zshrc`) for persistent configuration.
 > For targeted testing, run tests per-package: `npx vitest run --project unit packages/<name>/src/__tests__/`
 
 ## Table of Contents
@@ -251,8 +261,9 @@ pnpm docs:dev
 ```
 
 > **Note:** The `website/` directory contains the canonical Docusaurus documentation site.
-> The `docs/` directory contains VitePress-based API reference pages that are auto-generated.
-> When writing or updating user-facing documentation, edit files under `website/docs/`.
+> The `docs/` directory is **deprecated** for user-facing content and retained only for auto-generated TypeDoc API reference output.
+> When writing or updating documentation, **always edit files under `website/docs/`**.
+> Architecture Decision Records (ADRs) are in `website/docs/adr/`.
 
 ## Code Style Reference
 

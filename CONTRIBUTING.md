@@ -2,6 +2,8 @@
 
 Thank you for your interest in contributing to Pocket! This document provides guidelines and instructions for contributing.
 
+> **New here?** Check out **[QUICKSTART.md](./QUICKSTART.md)** for a 5-minute guide to making your first contribution.
+
 Please note that this project is released with a [Code of Conduct](./CODE_OF_CONDUCT.md). By participating in this project you agree to abide by its terms.
 
 ## Prerequisites
@@ -70,7 +72,12 @@ pocket/
 │   ├── todo-app/          # Todo example app
 │   └── notes-app/         # Notes example app
 ├── website/               # Docusaurus documentation site (canonical)
-├── docs/                  # VitePress API docs (auto-generated)
+│   └── docs/
+│       ├── api/           # Hand-written API reference
+│       ├── concepts/      # Core concepts
+│       ├── guides/        # How-to guides
+│       └── adr/           # Architecture Decision Records
+├── docs/                  # Auto-generated TypeDoc API docs (deprecated for user content)
 └── test/                  # Integration tests
 ```
 
