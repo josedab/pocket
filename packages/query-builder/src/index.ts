@@ -125,3 +125,14 @@ export { QueryCodeGenerator, createQueryCodeGenerator } from './code-generator.j
 // Query Templates
 export type { QueryTemplate, TemplateParam } from './query-template.js';
 export { QueryTemplateRegistry, createQueryTemplateRegistry } from './query-template.js';
+
+// Visual Builder (no-code query construction)
+export { VisualBuilder, createVisualBuilder, OPERATORS_BY_TYPE } from './visual-builder.js';
+export type {
+  FieldSchema,
+  VisualAggregateNode,
+  VisualBuilderEvent,
+  VisualBuilderState,
+  VisualFilterNode,
+  VisualSortNode,
+} from './visual-builder.js';
