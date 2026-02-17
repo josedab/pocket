@@ -100,3 +100,66 @@ export {
   type ExportResult,
   type ScheduledExport,
 } from './report-exporter.js';
+
+// Session Recorder
+export {
+  SessionRecorder,
+  createSessionRecorder,
+  type InteractionEvent,
+  type InteractionType,
+  type RecordedSession,
+  type RecorderStatus,
+  type SessionRecorderConfig,
+} from './session-recorder.js';
+
+// Dashboard Components (framework-agnostic render descriptors)
+export {
+  buildChart,
+  buildFunnel,
+  buildMetricCard,
+  buildTopEvents,
+  type ChartDescriptor,
+  type ChartPoint,
+  type DashboardLayoutDescriptor,
+  type FunnelDescriptor,
+  type FunnelStepDescriptor,
+  type MetricCardDescriptor,
+  type TimeRangePreset,
+  type TopEventsDescriptor,
+} from './dashboard-components.js';
+
+// Dashboard React Hooks
+export {
+  createUseDashboardHook,
+  type DashboardReactHooks,
+  type UseDashboardConfig,
+  type UseDashboardReturn,
+} from './dashboard-hooks.js';
+
+// Funnel Computation Engine
+export {
+  computeFunnel,
+  computeFunnels,
+  type FunnelDefinition,
+  type FunnelResult as ComputedFunnelResult,
+  type FunnelStepResult,
+} from './funnel-engine.js';
+
+// Retention Engine
+export {
+  RetentionEngine,
+  createRetentionEngine,
+  type PruneResult,
+  type RetentionPolicyConfig,
+} from './retention-engine.js';
+
+// A/B Testing
+export {
+  ABTestEngine,
+  createABTestEngine,
+  type Experiment,
+  type ExperimentResults,
+  type ExperimentVariant,
+  type VariantAssignment,
+  type VariantMetrics,
+} from './ab-testing.js';
