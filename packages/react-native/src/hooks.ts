@@ -591,7 +591,7 @@ export function useCount<T extends Document>(
       col
         .count(filter)
         .then((c) => setCount(c))
-        .catch(() => {});
+        .catch(() => { /* query error in subscription - ignored */ });
     });
 
     return () => subscription.unsubscribe();
@@ -669,7 +669,7 @@ export function useAll<T extends Document>(
       col
         .getAll()
         .then((docs) => setData(docs))
-        .catch(() => {});
+        .catch(() => { /* query error in subscription - ignored */ });
     });
 
     return () => subscription.unsubscribe();
