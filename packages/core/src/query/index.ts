@@ -5,3 +5,4 @@ export * from './query-planner.js';
 export * from './query-cache.js';
 export * from './index-advisor.js';
 export * from './predictive-prefetch.js';
+export * from './query-analyzer.js';
