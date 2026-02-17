@@ -72,3 +72,17 @@ export {
   type ColumnarStoreStats,
   type PartitionInfo,
 } from './columnar-store.js';
+
+// Retention Engine & Range Index
+export {
+  RetentionEngine,
+  RangeIndex,
+  createRetentionEngine,
+  createRangeIndex,
+} from './retention-engine.js';
+export type {
+  RetentionEngineConfig,
+  RetentionStats,
+  RetentionTier,
+  TieredData,
+} from './retention-engine.js';
