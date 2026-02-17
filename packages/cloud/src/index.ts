@@ -50,7 +50,7 @@
  * // One-line cloud sync setup
  * const cloudSync = await createCloudSync({
  *   projectId: 'proj_abc123',
- *   apiKey: 'pk_live_xxxxxxxx',
+ *   apiKey: 'pk_test_YOUR_API_KEY',
  *   collections: ['todos', 'notes']
  * });
  *
@@ -226,10 +226,13 @@ export {
 // Quick Connect
 export {
   connectToCloud,
+  connectWithRelay,
   type CloudConnection,
   type CloudConnectionEvent,
   type CloudUsageSnapshot,
   type QuickConnectConfig,
+  type RelayCloudConnection,
+  type RelayConnectConfig,
 } from './quick-connect.js';
 
 // Auth Service
@@ -253,6 +256,27 @@ export {
   type UserRole,
 } from './auth-service.js';
 
+// Cloud SDK
+export {
+  CloudSDK,
+  createCloudSDK,
+  type CloudSDKConfig,
+  type CloudSDKStats,
+  type CloudSDKStatus,
+} from './cloud-sdk.js';
+
+// Provisioning API
+export {
+  ProvisioningAPI,
+  createProvisioningAPI,
+  type PlanQuotas,
+  type ProjectInfo,
+  type ProjectPlan,
+  type ProvisioningConfig,
+  type ProvisioningEvent,
+  type ProvisioningUsageMetrics,
+} from './provisioning-api.js';
+
 // Auto-Provisioning Pipeline
 export {
   AutoProvisionPipeline,
@@ -264,3 +288,54 @@ export {
   type ProvisionStepName,
   type ProvisionStepStatus,
 } from './auto-provision.js';
+
+// Managed Relay
+export {
+  ManagedRelay,
+  createManagedRelay,
+  type ManagedRelayConfig,
+  type RelayConnection,
+  type RelayEvent,
+  type RelayMetrics,
+  type RelayStatus,
+  type TenantRelayMetrics,
+} from './managed-relay.js';
+
+// Auto-Scaler
+export {
+  AutoScaler,
+  createAutoScaler,
+  type AutoScalerConfig,
+  type AutoScalerState,
+  type ScaleDirection,
+  type ScalerMetrics,
+  type ScalingDecision,
+  type ScalingPolicy,
+  type ScalingPolicyType,
+} from './auto-scaler.js';
+
+// Tenant Quota Tracker
+export {
+  TenantQuotaTracker,
+  createTenantQuotaTracker,
+  DEFAULT_TIER_QUOTAS,
+  type QuotaCheckResult,
+  type TenantQuotaState,
+  type TierQuota,
+} from './tenant-quota.js';
+
+// Relay Deduplication
+export {
+  RelayDedup,
+  createRelayDedup,
+  type RelayDedupConfig,
+} from './relay-dedup.js';
+
+// Webhook Security
+export {
+  generateWebhookSignature,
+  verifyWebhookPayload,
+  createWebhookHeaders,
+  type SignatureVerifyResult,
+  type WebhookSecurityConfig,
+} from './webhook-security.js';
