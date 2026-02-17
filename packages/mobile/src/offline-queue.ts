@@ -10,9 +10,9 @@
  *
  * @example
  * ```typescript
- * import { createOfflineQueue } from '@pocket/mobile';
+ * import { createMobileOfflineQueue } from '@pocket/mobile';
  *
- * const queue = createOfflineQueue({
+ * const queue = createMobileOfflineQueue({
  *   maxSize: 1000,
  *   conflictStrategy: 'client-wins',
  *   onReplayComplete: (results) => {
@@ -437,7 +437,7 @@ export class OfflineQueue {
  *
  * @example
  * ```typescript
- * const queue = createOfflineQueue({
+ * const queue = createMobileOfflineQueue({
  *   maxSize: 500,
  *   conflictStrategy: 'client-wins',
  *   onReplayComplete: (results) => console.log('Replayed:', results.length),
@@ -450,6 +450,6 @@ export class OfflineQueue {
  * });
  * ```
  */
-export function createOfflineQueue(config?: OfflineQueueConfig): OfflineQueue {
+export function createMobileOfflineQueue(config?: OfflineQueueConfig): OfflineQueue {
   return new OfflineQueue(config);
 }

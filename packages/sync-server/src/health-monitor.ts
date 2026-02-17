@@ -132,9 +132,9 @@ const SERVER_VERSION = '1.0.0';
  *
  * @example
  * ```typescript
- * import { createHealthMonitor } from '@pocket/sync-server';
+ * import { createServerHealthMonitor } from '@pocket/sync-server';
  *
- * const monitor = createHealthMonitor({
+ * const monitor = createServerHealthMonitor({
  *   checkInterval: 15000,
  *   alertThresholds: { maxConnections: 500 },
  *   onAlert: (alert) => console.warn(alert.message),
@@ -579,9 +579,9 @@ export class HealthMonitor {
  *
  * @example
  * ```typescript
- * import { createHealthMonitor } from '@pocket/sync-server';
+ * import { createServerHealthMonitor } from '@pocket/sync-server';
  *
- * const monitor = createHealthMonitor({
+ * const monitor = createServerHealthMonitor({
  *   checkInterval: 10000,
  *   onAlert: (alert) => {
  *     if (alert.severity === 'critical') {
@@ -591,6 +591,6 @@ export class HealthMonitor {
  * });
  * ```
  */
-export function createHealthMonitor(config?: MonitorConfig): HealthMonitor {
+export function createServerHealthMonitor(config?: MonitorConfig): HealthMonitor {
   return new HealthMonitor(config);
 }

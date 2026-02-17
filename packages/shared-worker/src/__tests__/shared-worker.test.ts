@@ -1,8 +1,8 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { createNodeBroadcastAdapter } from '../broadcast-adapter.js';
-import { createLeaderElection } from '../leader-election.js';
+import { createWorkerLeaderElection } from '../leader-election.js';
 import type { LeaderElection } from '../leader-election.js';
-import { createQueryDeduplicator } from '../query-dedup.js';
+import { createWorkerQueryDedup } from '../query-dedup.js';
 import type { QueryDeduplicator } from '../query-dedup.js';
 import { createTabCoordinator } from '../tab-coordinator.js';
 import type { TabCoordinator } from '../tab-coordinator.js';
@@ -98,7 +98,7 @@ describe('LeaderElection', () => {
   });
 
   it('should elect single tab as leader', () => {
-    leader1 = createLeaderElection(
+    leader1 = createWorkerLeaderElection(
       { heartbeatIntervalMs: 100, leaderTimeoutMs: 300, channelName: 'leader-test' },
       adapter1,
     );
@@ -109,14 +109,14 @@ describe('LeaderElection', () => {
   });
 
   it('should transfer leadership on tab close', () => {
-    leader1 = createLeaderElection(
+    leader1 = createWorkerLeaderElection(
       { heartbeatIntervalMs: 100, leaderTimeoutMs: 300, channelName: 'leader-test' },
       adapter1,
     );
     leader1.start();
     expect(leader1.isLeader()).toBe(true);
 
-    const leader2 = createLeaderElection(
+    const leader2 = createWorkerLeaderElection(
       { heartbeatIntervalMs: 100, leaderTimeoutMs: 300, channelName: 'leader-test' },
       adapter2,
     );
@@ -133,7 +133,7 @@ describe('LeaderElection', () => {
   });
 
   it('should notify on leader change via callback', () => {
-    leader1 = createLeaderElection(
+    leader1 = createWorkerLeaderElection(
       { heartbeatIntervalMs: 100, leaderTimeoutMs: 300, channelName: 'leader-test' },
       adapter1,
     );
@@ -154,7 +154,7 @@ describe('QueryDeduplicator', () => {
 
   beforeEach(() => {
     vi.useFakeTimers();
-    dedup = createQueryDeduplicator({ ttlMs: 1000 });
+    dedup = createWorkerQueryDedup({ ttlMs: 1000 });
   });
 
   afterEach(() => {

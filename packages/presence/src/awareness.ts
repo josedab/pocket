@@ -9,9 +9,9 @@
  *
  * @example
  * ```typescript
- * import { createAwarenessProtocol } from '@pocket/presence';
+ * import { createPresenceAwareness } from '@pocket/presence';
  *
- * const awareness = createAwarenessProtocol({ cleanupInterval: 30000 });
+ * const awareness = createPresenceAwareness({ cleanupInterval: 30000 });
  *
  * // Set local state
  * awareness.setLocalState({ user: { name: 'Alice' }, cursor: { x: 100, y: 200 } });
@@ -190,6 +190,6 @@ export class AwarenessProtocol {
  * @param config - Optional configuration
  * @returns A new AwarenessProtocol instance
  */
-export function createAwarenessProtocol(config?: AwarenessProtocolConfig): AwarenessProtocol {
+export function createPresenceAwareness(config?: AwarenessProtocolConfig): AwarenessProtocol {
   return new AwarenessProtocol(config);
 }

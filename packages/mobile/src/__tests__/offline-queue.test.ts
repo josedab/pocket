@@ -1,26 +1,26 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { createOfflineQueue, OfflineQueue } from '../offline-queue.js';
+import { createMobileOfflineQueue, OfflineQueue } from '../offline-queue.js';
 import type { QueuedOperation } from '../types.js';
 
 describe('OfflineQueue', () => {
   let queue: OfflineQueue;
 
   beforeEach(() => {
-    queue = createOfflineQueue();
+    queue = createMobileOfflineQueue();
   });
 
   afterEach(() => {
     queue.destroy();
   });
 
-  describe('createOfflineQueue', () => {
+  describe('createMobileOfflineQueue', () => {
     it('returns an OfflineQueue instance', () => {
       expect(queue).toBeInstanceOf(OfflineQueue);
     });
 
     it('accepts optional config', () => {
       queue.destroy();
-      queue = createOfflineQueue({ maxSize: 10, conflictStrategy: 'server-wins' });
+      queue = createMobileOfflineQueue({ maxSize: 10, conflictStrategy: 'server-wins' });
       expect(queue).toBeInstanceOf(OfflineQueue);
       expect(queue.getConflictStrategy()).toBe('server-wins');
     });
@@ -156,7 +156,7 @@ describe('OfflineQueue', () => {
     it('calls onReplayComplete callback', async () => {
       const onReplayComplete = vi.fn();
       queue.destroy();
-      queue = createOfflineQueue({ onReplayComplete });
+      queue = createMobileOfflineQueue({ onReplayComplete });
 
       queue.enqueue({ collection: 'todos', type: 'insert', payload: {} });
       await queue.replay();
@@ -203,7 +203,7 @@ describe('OfflineQueue', () => {
       const serialized = queue.serialize();
 
       queue.destroy();
-      queue = createOfflineQueue();
+      queue = createMobileOfflineQueue();
       queue.deserialize(serialized);
 
       expect(queue.size()).toBe(2);
@@ -216,7 +216,7 @@ describe('OfflineQueue', () => {
       const serialized = queue.serialize();
 
       queue.destroy();
-      queue = createOfflineQueue();
+      queue = createMobileOfflineQueue();
       expect(queue.getStatus()).toBe('empty');
 
       queue.deserialize(serialized);
@@ -258,7 +258,7 @@ describe('OfflineQueue', () => {
   describe('max queue size enforcement', () => {
     it('evicts lowest-priority item when queue is full', () => {
       queue.destroy();
-      queue = createOfflineQueue({ maxSize: 2 });
+      queue = createMobileOfflineQueue({ maxSize: 2 });
 
       queue.enqueue({ collection: 'a', type: 'insert', payload: {}, priority: 'high' });
       queue.enqueue({ collection: 'b', type: 'insert', payload: {}, priority: 'normal' });
@@ -274,7 +274,7 @@ describe('OfflineQueue', () => {
 
     it('reports isFull correctly', () => {
       queue.destroy();
-      queue = createOfflineQueue({ maxSize: 1 });
+      queue = createMobileOfflineQueue({ maxSize: 1 });
       expect(queue.isFull()).toBe(false);
 
       queue.enqueue({ collection: 'a', type: 'insert', payload: {} });

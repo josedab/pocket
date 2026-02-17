@@ -59,7 +59,7 @@ export type {
 // Schema Parser
 export {
   SchemaParser,
-  createSchemaParser,
+  createFormSchemaParser,
   field,
   parseSchema,
   withFormMeta,

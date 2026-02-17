@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { AwarenessProtocol, createAwarenessProtocol } from '../awareness.js';
+import { AwarenessProtocol, createPresenceAwareness } from '../awareness.js';
 
 describe('AwarenessProtocol', () => {
   beforeEach(() => {
@@ -12,7 +12,7 @@ describe('AwarenessProtocol', () => {
 
   describe('set and get local state', () => {
     it('should set and get local state', () => {
-      const awareness = createAwarenessProtocol();
+      const awareness = createPresenceAwareness();
 
       awareness.setLocalState({ user: { name: 'Alice' }, cursor: { x: 10, y: 20 } });
 
@@ -23,7 +23,7 @@ describe('AwarenessProtocol', () => {
     });
 
     it('should return null when local state is not set', () => {
-      const awareness = createAwarenessProtocol();
+      const awareness = createPresenceAwareness();
 
       expect(awareness.getLocalState()).toBeNull();
 
@@ -31,7 +31,7 @@ describe('AwarenessProtocol', () => {
     });
 
     it('should return a copy of local state', () => {
-      const awareness = createAwarenessProtocol();
+      const awareness = createPresenceAwareness();
 
       awareness.setLocalState({ value: 1 });
 
@@ -44,7 +44,7 @@ describe('AwarenessProtocol', () => {
     });
 
     it('should update local state when called multiple times', () => {
-      const awareness = createAwarenessProtocol();
+      const awareness = createPresenceAwareness();
 
       awareness.setLocalState({ step: 1 });
       awareness.setLocalState({ step: 2 });
@@ -57,7 +57,7 @@ describe('AwarenessProtocol', () => {
 
   describe('handle remote state updates', () => {
     it('should handle incoming state update from remote client', () => {
-      const awareness = createAwarenessProtocol();
+      const awareness = createPresenceAwareness();
 
       awareness.onUpdate('user-2', { user: { name: 'Bob' }, cursor: { x: 50, y: 80 } });
 
@@ -69,7 +69,7 @@ describe('AwarenessProtocol', () => {
     });
 
     it('should handle updates from multiple remote clients', () => {
-      const awareness = createAwarenessProtocol();
+      const awareness = createPresenceAwareness();
 
       awareness.onUpdate('user-2', { name: 'Bob' });
       awareness.onUpdate('user-3', { name: 'Charlie' });
@@ -81,7 +81,7 @@ describe('AwarenessProtocol', () => {
     });
 
     it('should update existing remote state', () => {
-      const awareness = createAwarenessProtocol();
+      const awareness = createPresenceAwareness();
 
       awareness.onUpdate('user-2', { cursor: { x: 10, y: 20 } });
       awareness.onUpdate('user-2', { cursor: { x: 30, y: 40 } });
@@ -96,7 +96,7 @@ describe('AwarenessProtocol', () => {
 
   describe('remove state', () => {
     it('should remove a client state', () => {
-      const awareness = createAwarenessProtocol();
+      const awareness = createPresenceAwareness();
 
       awareness.onUpdate('user-2', { name: 'Bob' });
       awareness.onUpdate('user-3', { name: 'Charlie' });
@@ -112,7 +112,7 @@ describe('AwarenessProtocol', () => {
     });
 
     it('should be a no-op for non-existent client', () => {
-      const awareness = createAwarenessProtocol();
+      const awareness = createPresenceAwareness();
 
       awareness.removeState('non-existent');
 
@@ -124,7 +124,7 @@ describe('AwarenessProtocol', () => {
 
   describe('get all states', () => {
     it('should include both local and remote states', () => {
-      const awareness = createAwarenessProtocol();
+      const awareness = createPresenceAwareness();
 
       awareness.setLocalState({ role: 'editor' });
       awareness.onUpdate('user-2', { role: 'viewer' });
@@ -136,7 +136,7 @@ describe('AwarenessProtocol', () => {
     });
 
     it('should return a copy of the states map', () => {
-      const awareness = createAwarenessProtocol();
+      const awareness = createPresenceAwareness();
 
       awareness.setLocalState({ value: 1 });
 
@@ -148,7 +148,7 @@ describe('AwarenessProtocol', () => {
     });
 
     it('should return empty map when no states', () => {
-      const awareness = createAwarenessProtocol();
+      const awareness = createPresenceAwareness();
 
       expect(awareness.getStates().size).toBe(0);
 
@@ -158,7 +158,7 @@ describe('AwarenessProtocol', () => {
 
   describe('states$ observable', () => {
     it('should emit initial empty state', () => {
-      const awareness = createAwarenessProtocol();
+      const awareness = createPresenceAwareness();
       const emissions: Map<string, Record<string, unknown>>[] = [];
 
       awareness.states$.subscribe((s) => {
@@ -172,7 +172,7 @@ describe('AwarenessProtocol', () => {
     });
 
     it('should emit when local state is set', () => {
-      const awareness = createAwarenessProtocol();
+      const awareness = createPresenceAwareness();
       const emissions: Map<string, Record<string, unknown>>[] = [];
 
       awareness.states$.subscribe((s) => {
@@ -188,7 +188,7 @@ describe('AwarenessProtocol', () => {
     });
 
     it('should emit when remote state is updated', () => {
-      const awareness = createAwarenessProtocol();
+      const awareness = createPresenceAwareness();
       const emissions: Map<string, Record<string, unknown>>[] = [];
 
       awareness.states$.subscribe((s) => {
@@ -204,7 +204,7 @@ describe('AwarenessProtocol', () => {
     });
 
     it('should emit when state is removed', () => {
-      const awareness = createAwarenessProtocol();
+      const awareness = createPresenceAwareness();
 
       awareness.onUpdate('user-2', { name: 'Bob' });
 
@@ -223,7 +223,7 @@ describe('AwarenessProtocol', () => {
     });
 
     it('should complete on destroy', () => {
-      const awareness = createAwarenessProtocol();
+      const awareness = createPresenceAwareness();
       let completed = false;
 
       awareness.states$.subscribe({
@@ -240,7 +240,7 @@ describe('AwarenessProtocol', () => {
 
   describe('destroy', () => {
     it('should clear all states on destroy', () => {
-      const awareness = createAwarenessProtocol();
+      const awareness = createPresenceAwareness();
 
       awareness.setLocalState({ value: 1 });
       awareness.onUpdate('user-2', { value: 2 });
@@ -252,7 +252,7 @@ describe('AwarenessProtocol', () => {
     });
 
     it('should prevent setLocalState after destroy', () => {
-      const awareness = createAwarenessProtocol();
+      const awareness = createPresenceAwareness();
 
       awareness.destroy();
       awareness.setLocalState({ value: 1 });
@@ -261,7 +261,7 @@ describe('AwarenessProtocol', () => {
     });
 
     it('should prevent onUpdate after destroy', () => {
-      const awareness = createAwarenessProtocol();
+      const awareness = createPresenceAwareness();
 
       awareness.destroy();
       awareness.onUpdate('user-2', { value: 1 });
@@ -270,15 +270,15 @@ describe('AwarenessProtocol', () => {
     });
   });
 
-  describe('createAwarenessProtocol factory', () => {
+  describe('createPresenceAwareness factory', () => {
     it('should create instance with default config', () => {
-      const awareness = createAwarenessProtocol();
+      const awareness = createPresenceAwareness();
       expect(awareness).toBeInstanceOf(AwarenessProtocol);
       awareness.destroy();
     });
 
     it('should create instance with custom config', () => {
-      const awareness = createAwarenessProtocol({ cleanupInterval: 60000 });
+      const awareness = createPresenceAwareness({ cleanupInterval: 60000 });
       expect(awareness).toBeInstanceOf(AwarenessProtocol);
       awareness.destroy();
     });
