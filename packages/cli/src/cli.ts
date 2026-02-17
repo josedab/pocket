@@ -7,8 +7,15 @@
  */
 
 import { backup } from './commands/backup.js';
+import { createPluginCommand } from './commands/create-plugin.js';
 import { doctor } from './commands/doctor.js';
 import { exportData } from './commands/export.js';
+import {
+  functionsDeployCommand,
+  functionsInitCommand,
+  functionsListCommand,
+  functionsRemoveCommand,
+} from './commands/functions.js';
 import { generateTypes } from './commands/generate/types.js';
 import { importData } from './commands/import.js';
 import { init } from './commands/init.js';
@@ -84,6 +91,7 @@ Usage: pocket <command> [options]
 
 Commands:
   init                    Initialize a new Pocket project
+  create-plugin <name>    Scaffold a new Pocket plugin project
   doctor                  Check project health and configuration
   migrate create <name>   Create a new migration
   migrate up              Run pending migrations
@@ -95,6 +103,10 @@ Commands:
   export [collection]     Export data to JSON/NDJSON
   import <file>           Import data from JSON/NDJSON
   generate types          Generate TypeScript types from schema
+  functions:init          Initialize a starter functions config
+  functions:deploy <cfg>  Deploy functions from config file
+  functions:list <cfg>    List defined functions
+  functions:remove <cfg> <name>  Remove a function by name
 
 Options:
   --help, -h              Show help
@@ -102,6 +114,7 @@ Options:
 
 Examples:
   pocket init                           Create pocket.config.ts
+  pocket create-plugin my-cache         Scaffold a new plugin project
   pocket doctor                         Check project health
   pocket migrate create add-users       Create a new migration
   pocket migrate up                     Run pending migrations
@@ -152,6 +165,15 @@ async function main(): Promise<void> {
           force: args.flags.force === true,
           skipMigrations: args.flags['skip-migrations'] === true,
         });
+        break;
+
+      case 'create-plugin':
+        if (!args.positional[0]) {
+          console.error('Error: Plugin name is required');
+          console.error('Usage: pocket create-plugin <name>');
+          process.exit(1);
+        }
+        await createPluginCommand(args.positional[0], args.flags.output as string | undefined);
         break;
 
       case 'doctor':
@@ -264,6 +286,40 @@ async function main(): Promise<void> {
             console.error('Available commands: types');
             process.exit(1);
         }
+        break;
+
+      case 'functions:init':
+        await functionsInitCommand(args.flags.output as string | undefined);
+        break;
+
+      case 'functions:deploy':
+        if (!args.positional[0]) {
+          console.error('Error: Config file path is required');
+          console.error('Usage: pocket functions:deploy <config>');
+          process.exit(1);
+        }
+        await functionsDeployCommand(
+          args.positional[0],
+          args.flags.output as string | undefined,
+        );
+        break;
+
+      case 'functions:list':
+        if (!args.positional[0]) {
+          console.error('Error: Config file path is required');
+          console.error('Usage: pocket functions:list <config>');
+          process.exit(1);
+        }
+        await functionsListCommand(args.positional[0]);
+        break;
+
+      case 'functions:remove':
+        if (!args.positional[0] || !args.positional[1]) {
+          console.error('Error: Config file path and function name are required');
+          console.error('Usage: pocket functions:remove <config> <name>');
+          process.exit(1);
+        }
+        await functionsRemoveCommand(args.positional[0], args.positional[1]);
         break;
 
       case '':

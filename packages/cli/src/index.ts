@@ -56,6 +56,15 @@ export type {
 export { findConfigFile, loadConfig, loadProjectConfig, validateConfig } from './config/loader.js';
 
 // Commands
+export { createPluginCommand, type CreatePluginOptions } from './commands/create-plugin.js';
+export {
+  functionsDeployCommand,
+  functionsInitCommand,
+  functionsListCommand,
+  functionsRemoveCommand,
+  type FunctionDefinition,
+  type FunctionsCommandResult,
+} from './commands/functions.js';
 export { exportData, type ExportOptions } from './commands/export.js';
 export { generateTypes, type GenerateTypesOptions } from './commands/generate/types.js';
 export { importData, type ImportOptions } from './commands/import.js';
@@ -120,6 +129,15 @@ export type {
   RelationshipSuggestion,
   SchemaAnalysis,
 } from './commands/ai-assistant.js';
+
+// Edge Deploy
+export {
+  edgeDeploy,
+  type EdgeDeployOptions,
+  type EdgeDeployResult,
+  type EdgePlatform,
+  type GeneratedDeployFile,
+} from './commands/edge-deploy.js';
 
 // Convenience namespace for migrate commands
 export const migrate = {
