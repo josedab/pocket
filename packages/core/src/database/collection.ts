@@ -772,6 +772,11 @@ export class Collection<T extends Document = Document> {
       true
     );
   }
+
+  /** Release resources held by this collection */
+  destroy(): void {
+    this.changes$.complete();
+  }
 }
 
 /**

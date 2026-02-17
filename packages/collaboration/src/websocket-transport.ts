@@ -243,6 +243,14 @@ export class WebSocketTransport implements CollabTransport {
       this.heartbeatTimer = null;
     }
   }
+
+  /** Release all resources */
+  destroy(): void {
+    this.disconnect();
+    this.connectionStateSubject.complete();
+    this.handlers.length = 0;
+    this.messageQueue.length = 0;
+  }
 }
 
 /**

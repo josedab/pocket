@@ -649,6 +649,11 @@ class SQLiteDocumentStore<T extends Document> implements DocumentStore<T> {
 
     return { sql, params };
   }
+
+  /** Release resources */
+  destroy(): void {
+    this.changes$.complete();
+  }
 }
 
 /**

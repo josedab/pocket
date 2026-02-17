@@ -269,6 +269,11 @@ class TauriSQLiteDocumentStore<T extends Document> implements DocumentStore<T> {
       this.emitChange('delete', doc._id, null, doc);
     }
   }
+
+  /** Release resources */
+  destroy(): void {
+    this.changes$.complete();
+  }
 }
 
 /**

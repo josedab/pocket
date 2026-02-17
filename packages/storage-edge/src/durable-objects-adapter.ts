@@ -385,6 +385,11 @@ class DurableObjectDocumentStore<T extends Document> implements DocumentStore<T>
   private normalizeIndexField(field: string | IndexField): IndexField {
     return typeof field === 'string' ? { field } : field;
   }
+
+  /** Release resources */
+  destroy(): void {
+    this.changes$.complete();
+  }
 }
 
 /**

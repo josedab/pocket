@@ -287,6 +287,11 @@ export class QuerySuggestionEngine {
     }
     return fields;
   }
+
+  /** Release resources held by this engine */
+  destroy(): void {
+    this.suggestions$.complete();
+  }
 }
 
 /**
