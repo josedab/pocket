@@ -39,7 +39,7 @@ import {
  * ```typescript
  * const client = new CloudClient({
  *   projectId: 'proj_abc123',
- *   apiKey: 'pk_live_xxxxxxxx'
+ *   apiKey: 'pk_test_YOUR_API_KEY'
  * });
  *
  * // Validate the API key
@@ -366,7 +366,7 @@ export class CloudClient {
  * ```typescript
  * const client = createCloudClient({
  *   projectId: 'proj_abc123',
- *   apiKey: 'pk_live_xxxxxxxx'
+ *   apiKey: 'pk_test_YOUR_API_KEY'
  * });
  *
  * const project = await client.getProjectInfo();

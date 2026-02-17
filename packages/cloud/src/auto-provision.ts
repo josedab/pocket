@@ -106,7 +106,7 @@ const REGION_LATENCY_ENDPOINTS: Record<CloudRegion, string> = {
  * @example
  * ```typescript
  * const pipeline = createAutoProvisionPipeline({
- *   apiKey: 'pk_live_abc123xyz789',
+ *   apiKey: 'pk_test_YOUR_API_KEY',
  * });
  *
  * pipeline.progress$.subscribe(p =>
@@ -415,11 +415,11 @@ export class AutoProvisionPipeline {
  * ```typescript
  * // Create and execute immediately
  * const result = await createAutoProvisionPipeline({
- *   apiKey: 'pk_live_abc123',
+ *   apiKey: 'pk_test_YOUR_API_KEY',
  * }).execute();
  *
  * // Or observe progress
- * const pipeline = createAutoProvisionPipeline({ apiKey: 'pk_live_abc123' });
+ * const pipeline = createAutoProvisionPipeline({ apiKey: 'pk_test_YOUR_API_KEY' });
  * pipeline.progress$.subscribe(p => console.log(p.message));
  * const result = await pipeline.execute();
  * ```

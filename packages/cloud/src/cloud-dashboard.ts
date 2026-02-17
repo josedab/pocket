@@ -90,7 +90,7 @@ export interface AnalyticsQueryOptions {
  *
  * const dashboard = new CloudDashboard({
  *   projectId: 'proj_abc123',
- *   apiKey: 'pk_live_xxxxxxxx'
+ *   apiKey: 'pk_test_YOUR_API_KEY'
  * });
  *
  * // List all projects
@@ -448,7 +448,7 @@ export class CloudDashboard {
  * ```typescript
  * const dashboard = createCloudDashboard({
  *   projectId: 'proj_abc123',
- *   apiKey: 'pk_live_xxxxxxxx'
+ *   apiKey: 'pk_test_YOUR_API_KEY'
  * });
  *
  * const projects = await dashboard.listProjects();
