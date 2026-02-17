@@ -109,3 +109,12 @@ export * from './background-sync.js';
 
 // Battery-aware sync
 export * from './battery-aware-sync.js';
+
+// Expo Plugin
+export { ExpoPlugin, createExpoPlugin } from './expo-plugin.js';
+export type {
+  ExpoPluginConfig,
+  ExpoPluginState,
+  OfflineQueueEntry,
+  PushSyncPayload,
+} from './expo-plugin.js';
