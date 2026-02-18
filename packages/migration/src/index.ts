@@ -74,10 +74,7 @@ export type {
 } from './types.js';
 
 // Base Adapter
-export {
-  MigrationAdapter,
-  type GetDocumentsOptions,
-} from './adapters/base-adapter.js';
+export { MigrationAdapter, type GetDocumentsOptions } from './adapters/base-adapter.js';
 
 // PouchDB Adapter
 export {
@@ -87,18 +84,10 @@ export {
 } from './adapters/pouchdb-adapter.js';
 
 // RxDB Adapter
-export {
-  RxDBAdapter,
-  createRxDBAdapter,
-  type RxDBData,
-} from './adapters/rxdb-adapter.js';
+export { RxDBAdapter, createRxDBAdapter, type RxDBData } from './adapters/rxdb-adapter.js';
 
 // Dexie Adapter
-export {
-  DexieAdapter,
-  createDexieAdapter,
-  type DexieData,
-} from './adapters/dexie-adapter.js';
+export { DexieAdapter, createDexieAdapter, type DexieData } from './adapters/dexie-adapter.js';
 
 // Firestore Adapter
 export {
@@ -108,7 +97,31 @@ export {
 } from './adapters/firestore-adapter.js';
 
 // Migration Engine
+export { MigrationEngine, createMigrationEngine } from './migration-engine.js';
+
+// Schema Diff Analyzer
 export {
-  MigrationEngine,
-  createMigrationEngine,
-} from './migration-engine.js';
+  SchemaDiffAnalyzer,
+  createSchemaDiffAnalyzer,
+  type CollectionSchema,
+  type FieldSchema,
+  type IndexSchema,
+  type MigrationPlan,
+  type MigrationStep,
+  type SchemaDefinition,
+  type SchemaDiff,
+  type SchemaDiffConfig,
+  type SchemaDiffType,
+} from './schema-diff.js';
+
+// Migration Runner
+export {
+  MigrationRunner,
+  createMigrationRunner,
+  type DocumentProvider,
+  type MigrationBackup,
+  type MigrationRunConfig,
+  type MigrationRunProgress,
+  type MigrationRunResult,
+  type MigrationRunStatus,
+} from './migration-runner.js';
