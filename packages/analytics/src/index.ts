@@ -56,16 +56,16 @@ export {
 
 export type {
   AnalyticsEvent as AggregationAnalyticsEvent,
-  FunnelStep as AggregationFunnelStep,
   FunnelResult as AggregationFunnelResult,
+  FunnelStep as AggregationFunnelStep,
 } from './aggregation-engine.js';
 
 // Dashboard Data Provider
 export {
   DashboardDataProvider,
   createDashboardDataProvider,
-  type AnalyticsDataSource,
   type AnalyticsDashboardEvent,
+  type AnalyticsDataSource,
   type DashboardDataProviderConfig,
   type DashboardFunnelStep,
   type DashboardRetentionCohort,
@@ -74,3 +74,29 @@ export {
   type EventSummary,
   type TimeSeriesPoint,
 } from './dashboard.js';
+
+// Visualization Engine
+export {
+  DEFAULT_COLOR_PALETTE,
+  VisualizationEngine,
+  createVisualizationEngine,
+  type ChartConfig,
+  type ChartDataPoint,
+  type ChartSeries,
+  type ChartType,
+  type FunnelChartData,
+  type MetricCardData,
+  type RetentionGridData,
+  type VisualizationConfig,
+} from './visualization-engine.js';
+
+// Report Exporter
+export {
+  ReportExporter,
+  createReportExporter,
+  type ExportConfig,
+  type ExportEvent,
+  type ExportFormat,
+  type ExportResult,
+  type ScheduledExport,
+} from './report-exporter.js';
