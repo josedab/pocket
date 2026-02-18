@@ -66,3 +66,26 @@ export {
   DistributedQueryEngine,
   createDistributedQueryEngine,
 } from './distributed-query-engine.js';
+
+// P2P Transport
+export type {
+  P2PTransportConfig,
+  PeerConnectionState,
+  TransportMessage,
+  PeerInfo as TransportPeerInfo,
+  TransportStats,
+  TransportType,
+} from './p2p-transport.js';
+
+export { P2PTransport, createP2PTransport } from './p2p-transport.js';
+
+// Gossip Protocol
+export type {
+  GossipConfig,
+  GossipMessage,
+  GossipPayload,
+  GossipState,
+  GossipStats,
+} from './gossip-protocol.js';
+
+export { GossipProtocol, createGossipProtocol } from './gossip-protocol.js';
