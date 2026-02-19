@@ -116,6 +116,11 @@ const config: Config = {
           position: 'left',
         },
         {
+          to: '/docs/adr/README',
+          label: 'ADRs',
+          position: 'left',
+        },
+        {
           href: 'https://discord.gg/pocket-db',
           label: 'Discord',
           position: 'right',
