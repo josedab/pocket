@@ -239,6 +239,65 @@ describe('${className}', () => {
 `;
 }
 
+function generateReadme(name, description, category) {
+  const className = name
+    .split('-')
+    .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+    .join('');
+
+  const desc = description || `${className} package for Pocket local-first database`;
+
+  return `# @pocket/${name}
+
+[![npm version](https://img.shields.io/npm/v/@pocket/${name}.svg)](https://www.npmjs.com/package/@pocket/${name})
+
+${desc}
+
+## Installation
+
+\`\`\`bash
+npm install @pocket/${name}
+\`\`\`
+
+## Usage
+
+\`\`\`typescript
+import { create${className} } from '@pocket/${name}';
+
+const instance = create${className}();
+\`\`\`
+
+## API
+
+### \`create${className}(config?)\`
+
+Factory function to create a new ${className} instance.
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| \`config.debug\` | \`boolean\` | No | Enable debug logging (default: \`false\`) |
+
+## Development
+
+\`\`\`bash
+# Build
+npx turbo run build --filter=@pocket/${name}
+
+# Test
+npx vitest run --project unit packages/${name}/src/__tests__/
+
+# Watch mode
+npx vitest --project unit packages/${name}/src/__tests__/
+\`\`\`
+
+## License
+
+MIT
+`;
+}
+
 // --- Main ---
 const args = process.argv.slice(2);
 
@@ -276,6 +335,7 @@ mkdirSync(join(pkgDir, 'src', '__tests__'), { recursive: true });
 // Write files
 const files = [
   [join(pkgDir, 'package.json'), generatePackageJson(opts.name, opts.description, opts.category, opts.deps)],
+  [join(pkgDir, 'README.md'), generateReadme(opts.name, opts.description, opts.category)],
   [join(pkgDir, 'tsconfig.json'), generateTsConfig()],
   [join(pkgDir, 'tsup.config.ts'), generateTsupConfig()],
   [join(pkgDir, 'src', 'index.ts'), generateIndexTs(opts.name)],
