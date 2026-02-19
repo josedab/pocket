@@ -104,3 +104,36 @@ export {
   type SyncProfile,
   type SyncPriorityItem,
 } from './adaptive-sync.js';
+
+// Device Sync
+export {
+  DeviceSyncManager,
+  createDeviceSyncManager,
+  type DeviceCapabilities,
+  type DeviceInfo,
+  type DeviceSyncConfig,
+  type DeviceSyncStats,
+  type SyncRule,
+} from './device-sync.js';
+
+
+// Retry Metrics + Circuit Breaker
+export {
+  SyncRetryMonitor,
+  createSyncRetryMonitor,
+  type CircuitBreakerConfig,
+  type CircuitState,
+  type RetryEvent,
+  type RetryEventType,
+  type RetryMetrics,
+} from './retry-metrics.js';
+
+// Selective Sync Filter
+export {
+  SyncFilterEngine,
+  createSyncFilterEngine,
+  type FilterOp,
+  type SyncFilter,
+  type SyncFilterResult,
+  type SyncFilterRule,
+} from './selective-filter.js';

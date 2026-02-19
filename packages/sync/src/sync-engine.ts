@@ -203,6 +203,7 @@ export class SyncEngine {
   private changeSubscriptions = new Map<string, Subscription>();
   private pullIntervalId: ReturnType<typeof setInterval> | null = null;
   private isRunning = false;
+  private retryCount = 0;
 
   constructor(database: Database, config: SyncConfig) {
     this.database = database;
@@ -586,15 +587,47 @@ export class SyncEngine {
 
     // Try to push immediately if connected
     if (this.transport.isConnected() && this.status$.getValue() !== 'syncing') {
+      await this.pushWithRetry(collectionName, event.documentId);
+    }
+  }
+
+  /**
+   * Push changes with exponential backoff retry.
+   */
+  private async pushWithRetry(collectionName: string, documentId: string): Promise<void> {
+    const maxAttempts = this.config.autoRetry ? this.config.maxRetryAttempts : 1;
+    const baseDelay = this.config.retryDelay;
+
+    for (let attempt = 0; attempt < maxAttempts; attempt++) {
       try {
         await this.pushCollection(collectionName);
+        this.retryCount = 0;
+        return;
       } catch (error) {
-        // Will retry later
-        this.logger.warn('Failed to push local change, will retry', {
+        this.retryCount++;
+        const isLastAttempt = attempt >= maxAttempts - 1;
+
+        if (isLastAttempt) {
+          const err = error instanceof Error ? error : new Error(String(error));
+          this.logger.error('Push failed after max retries', err, {
+            collection: collectionName,
+            documentId,
+            attempts: attempt + 1,
+          });
+          this.updateStats({ lastError: err });
+          return;
+        }
+
+        // Exponential backoff with jitter: base * 2^attempt + random jitter
+        const delay = baseDelay * Math.pow(2, attempt) + Math.random() * baseDelay * 0.5;
+        this.logger.warn('Push failed, retrying with backoff', {
           collection: collectionName,
-          documentId: event.documentId,
-          error: error instanceof Error ? error.message : String(error),
+          documentId,
+          attempt: attempt + 1,
+          nextRetryMs: Math.round(delay),
         });
+
+        await new Promise((resolve) => setTimeout(resolve, delay));
       }
     }
   }
