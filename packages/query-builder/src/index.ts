@@ -123,11 +123,11 @@ export { VisualQueryModel, createVisualQueryModel } from './visual-query-model.j
 export { QueryCodeGenerator, createQueryCodeGenerator } from './code-generator.js';
 
 // Query Templates
-export type { QueryTemplate, TemplateParam } from './query-template.js';
 export { QueryTemplateRegistry, createQueryTemplateRegistry } from './query-template.js';
+export type { QueryTemplate, TemplateParam } from './query-template.js';
 
 // Visual Builder (no-code query construction)
-export { VisualBuilder, createVisualBuilder, OPERATORS_BY_TYPE } from './visual-builder.js';
+export { OPERATORS_BY_TYPE, VisualBuilder, createVisualBuilder } from './visual-builder.js';
 export type {
   FieldSchema,
   VisualAggregateNode,
@@ -136,3 +136,25 @@ export type {
   VisualFilterNode,
   VisualSortNode,
 } from './visual-builder.js';
+
+// React Query Builder (visual component models)
+export { ReactQueryBuilder, createReactQueryBuilder } from './react-query-builder.js';
+export type {
+  AggregateRowModel,
+  DragItem,
+  DropZone,
+  FilterRowModel,
+  QueryBuilderUIConfig,
+  QueryBuilderUIEvent,
+  QueryBuilderUIState,
+  SortRowModel,
+} from './react-query-builder.js';
+
+// Query Preview Engine (live result previews)
+export { QueryPreviewEngine, createQueryPreviewEngine } from './query-preview.js';
+export type {
+  PerformanceEstimate,
+  PreviewConfig,
+  PreviewDataProvider,
+  PreviewResult,
+} from './query-preview.js';
