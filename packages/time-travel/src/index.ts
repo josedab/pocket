@@ -95,11 +95,7 @@ export {
 } from './persistent-history.js';
 
 // Audit Export
-export type {
-  AuditExportConfig,
-  AuditReport,
-  AuditSummary,
-} from './audit-export.js';
+export type { AuditExportConfig, AuditReport, AuditSummary } from './audit-export.js';
 
 export { AuditExporter, createAuditExporter } from './audit-export.js';
 
@@ -119,25 +115,51 @@ export { SnapshotEngine, createSnapshotEngine } from './snapshot-engine.js';
 
 // Undo/Redo Manager
 export type {
-  UndoableOperation,
   UndoEntry,
   UndoRedoConfig,
   UndoRedoEvent,
   UndoRedoEventType,
   UndoRedoState,
+  UndoableOperation,
 } from './undo-redo.js';
 
 export { UndoRedoManager, createUndoRedoManager } from './undo-redo.js';
 
 // State Diff Engine
 export type {
+  DiffStrategy,
   FieldChange,
   FieldChangeKind,
   StateDiff,
   StateDiffConfig,
   StateDiffEvent,
   StateDiffEventType,
-  DiffStrategy,
 } from './state-diff.js';
 
 export { StateDiffEngine, createStateDiffEngine } from './state-diff.js';
+
+// Temporal Query Engine
+export type {
+  TemporalDiff,
+  TemporalQueryConfig,
+  TemporalQueryResult,
+  TemporalRange,
+  VersionInfo,
+} from './temporal-query.js';
+
+export { TemporalQueryEngine, createTemporalQueryEngine } from './temporal-query.js';
+
+// Delta Compression
+export type {
+  CompressedVersion,
+  CompressionStats,
+  DeltaCompressionConfig,
+  DeltaOperation,
+  DeltaOperationType,
+} from './delta-compression.js';
+
+export {
+  DEFAULT_DELTA_CONFIG,
+  DeltaCompressor,
+  createDeltaCompressor,
+} from './delta-compression.js';
