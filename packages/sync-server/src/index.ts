@@ -97,4 +97,49 @@ export { WebhookManager, createWebhookManager } from './webhook-manager.js';
 // Health Monitor
 export type { HealthCheck, HealthStatus, MonitorConfig, ServerMetrics } from './health-monitor.js';
 
-export { HealthMonitor, createHealthMonitor } from './health-monitor.js';
+export { HealthMonitor, createServerHealthMonitor } from './health-monitor.js';
+
+// Functions
+export type {
+  FunctionContext,
+  FunctionRegistryConfig,
+  FunctionResult,
+  FunctionStats,
+  PocketFunction,
+  TriggerEvent,
+} from './functions.js';
+
+export { FunctionRegistry, createFunctionRegistry } from './functions.js';
+
+// Webhooks
+export type {
+  RetryPolicy,
+  WebhookConfig as WebhooksConfig,
+  WebhookDelivery as WebhooksDelivery,
+  WebhookEvent,
+  WebhookManagerConfig,
+  WebhookPayload,
+  WebhookSender,
+  WebhookStats,
+} from './webhooks.js';
+
+export { WebhookManager as WebhooksManager, createWebhookNotifier as createWebhooksManager } from './webhooks.js';
+
+// Realtime Engine
+export type {
+  RealtimeConfig,
+  RealtimeEvent,
+  RealtimeSubscription,
+  SubscriptionMatch,
+} from './realtime.js';
+
+export { RealtimeEngine, createRealtimeEngine } from './realtime.js';
+
+// Realtime Adapter
+export type {
+  RealtimeAdapterConfig,
+  RealtimeClientConnection,
+  RealtimeProtocolMessage,
+} from './realtime-adapter.js';
+
+export { RealtimeAdapter, createRealtimeAdapter } from './realtime-adapter.js';
