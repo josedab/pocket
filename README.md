@@ -234,6 +234,21 @@ function TodoList() {
 - [Todo App](./examples/todo-app) - Simple todo application
 - [Notes App](./examples/notes-app) - Notes with sync
 
+## Getting Started
+
+New to the project? See **[QUICKSTART.md](./QUICKSTART.md)** for a 5-minute guide to making your first contribution.
+
+## System Requirements
+
+| Requirement | Minimum | Recommended |
+|-------------|---------|-------------|
+| Node.js | 18.0.0 | 20+ (see `.nvmrc`) |
+| pnpm | 8.12.0 | Latest 8.x |
+| RAM | 8 GB | 16 GB (for full test suite) |
+| Disk | 2 GB | 4 GB (with node_modules + build artifacts) |
+
+> **Memory tip:** If you hit out-of-memory errors, set `NODE_OPTIONS="--max-old-space-size=8192"` before running commands. See [DEVELOPMENT.md](./DEVELOPMENT.md) for details.
+
 ## Development
 
 | Command | Description |
@@ -283,7 +298,7 @@ See [`Taskfile.yml`](./Taskfile.yml) for the full list of available tasks.
 
 ## Contributing
 
-See [CONTRIBUTING.md](./CONTRIBUTING.md) for development setup and guidelines.
+See [CONTRIBUTING.md](./CONTRIBUTING.md) for development setup and guidelines, or jump straight to **[QUICKSTART.md](./QUICKSTART.md)** for a 5-minute setup walkthrough.
 
 Please note that this project is released with a [Code of Conduct](./CODE_OF_CONDUCT.md). By participating in this project you agree to abide by its terms.
 
