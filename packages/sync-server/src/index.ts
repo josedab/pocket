@@ -77,3 +77,24 @@ export {
   type RateLimitResult,
   type RateLimiterConfig,
 } from './middleware/index.js';
+
+// Edge Adapter
+export type {
+  EdgeAdapterConfig,
+  EdgeAdapterMetrics,
+  EdgeRequest,
+  EdgeResponse,
+  EdgeRuntime,
+} from './edge-adapter.js';
+
+export { EdgeSyncAdapter, createEdgeAdapter, createOneLineSync } from './edge-adapter.js';
+
+// Webhook Manager
+export type { WebhookConfig, WebhookDelivery, WebhookEventType } from './webhook-manager.js';
+
+export { WebhookManager, createWebhookManager } from './webhook-manager.js';
+
+// Health Monitor
+export type { HealthCheck, HealthStatus, MonitorConfig, ServerMetrics } from './health-monitor.js';
+
+export { HealthMonitor, createHealthMonitor } from './health-monitor.js';
