@@ -121,7 +121,14 @@ export {
 export {
   SchemaDesigner,
   createSchemaDesigner,
+  type CanvasCollection,
+  type CanvasField,
+  type CanvasIndex,
+  type CanvasRelationship,
   type CollectionSchemaInfo,
+  type DesignerAction,
+  type FieldType,
+  type SchemaCanvas,
   type SchemaDesignerConfig,
   type SchemaFieldInfo,
   type SchemaRelationship,
@@ -211,3 +218,46 @@ export {
   type MetricsCollectorConfig,
   type TimeSeriesPoint,
 } from './metrics-collector.js';
+
+// React Schema Designer UI
+export * from './react/index.js';
+
+// Studio SDK
+export {
+  StudioSDK,
+  createStudioSDK,
+  type InspectionResult,
+  type QueryExecutionResult,
+  type StudioSDKConfig,
+  type StudioStatus,
+} from './studio-sdk.js';
+
+// Network Simulator
+export {
+  NetworkSimulator,
+  createNetworkSimulator,
+  type NetworkCondition,
+  type NetworkEvent,
+  type NetworkPreset,
+  type NetworkSimulatorConfig,
+  type NetworkSimulatorStats,
+} from './network-simulator.js';
+
+// Studio Launcher
+export {
+  createStudioLauncher,
+  getAvailablePanels,
+  printStudioBanner,
+  type StudioLauncherConfig,
+  type StudioLauncherStatus,
+  type StudioPanel,
+} from './studio-launcher.js';
+
+// Query History
+export {
+  QueryHistoryManager,
+  createQueryHistoryManager,
+  type PersistedQueryEntry,
+  type QueryHistoryExportFormat,
+  type QueryHistoryStats,
+} from './query-history.js';

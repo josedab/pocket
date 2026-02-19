@@ -331,6 +331,81 @@ export class StudioServer {
         break;
       }
 
+      case '/api/studio/panels': {
+        if (method === 'GET') {
+          const { getAvailablePanels } = await import('./studio-launcher.js');
+          const panels = getAvailablePanels({
+            port: this.config.port ?? 4680,
+          });
+          this.sendJson(res, 200, { panels });
+        } else {
+          this.sendJson(res, 405, { error: 'Method not allowed' });
+        }
+        break;
+      }
+
+      case '/api/studio/status': {
+        if (method === 'GET') {
+          this.sendJson(res, 200, {
+            running: true,
+            port: this.config.port ?? 4680,
+            startedAt: Date.now(),
+          });
+        } else {
+          this.sendJson(res, 405, { error: 'Method not allowed' });
+        }
+        break;
+      }
+
+      case '/api/network/presets': {
+        if (method === 'GET') {
+          const { NetworkSimulator } = await import('./network-simulator.js');
+          const sim = new NetworkSimulator();
+          this.sendJson(res, 200, {
+            presets: sim.getPresets().map((p) => ({
+              name: p,
+              condition: sim.getPresetCondition(p),
+            })),
+          });
+          sim.destroy();
+        } else {
+          this.sendJson(res, 405, { error: 'Method not allowed' });
+        }
+        break;
+      }
+
+      case '/api/network/condition': {
+        if (method === 'GET') {
+          this.sendJson(res, 200, {
+            condition: { latencyMs: 0, jitterMs: 0, packetLossRate: 0, online: true },
+            preset: 'perfect',
+          });
+        } else {
+          this.sendJson(res, 405, { error: 'Method not allowed' });
+        }
+        break;
+      }
+
+      case '/api/health': {
+        this.sendJson(res, 200, {
+          status: 'healthy',
+          uptime: process.uptime(),
+          timestamp: Date.now(),
+          version: '0.1.0',
+        });
+        break;
+      }
+
+      case '/api/ready': {
+        const ready = !!this.inspector;
+        this.sendJson(res, ready ? 200 : 503, {
+          ready,
+          database: !!this.inspector,
+          timestamp: Date.now(),
+        });
+        break;
+      }
+
       default:
         this.sendJson(res, 404, { error: 'Not found' });
     }
@@ -348,6 +423,12 @@ export class StudioServer {
       '/api/sync/status',
       '/api/query/explain',
       '/api/stats',
+      '/api/studio/panels',
+      '/api/studio/status',
+      '/api/network/presets',
+      '/api/network/condition',
+      '/api/health',
+      '/api/ready',
     ];
 
     for (const pattern of routes) {
