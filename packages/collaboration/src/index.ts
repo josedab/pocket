@@ -135,3 +135,87 @@ export type {
   ShapeStyle,
   ShapeType,
 } from './canvas-engine.js';
+
+// Collaboration SDK (unified coordinator)
+export { CollaborationSDK, createCollaborationSDK } from './collaboration-sdk.js';
+export type {
+  CollaborationSDKConfig,
+  CollaborationSnapshot,
+  RemoteEdit,
+  SDKStatus,
+} from './collaboration-sdk.js';
+
+// React Collaboration Components (framework-agnostic render descriptors)
+export {
+  buildCursorDescriptors,
+  buildPresenceDescriptors,
+  buildStatusDescriptor,
+  COLLAB_CSS_VARS,
+} from './react-components.js';
+export type {
+  AvatarRenderDescriptor,
+  CollabCursorsProps,
+  ConnectionStatusProps,
+  CursorRenderDescriptor,
+  PresenceBarProps,
+  SelectionHighlightProps,
+  StatusRenderDescriptor,
+} from './react-components.js';
+
+// Document Sync Manager
+export { DocumentSyncManager, createDocumentSyncManager } from './document-sync-manager.js';
+export type {
+  DocumentSyncManagerConfig,
+  DocumentSyncState,
+  DocumentVersion,
+  SyncManagerEvent,
+  SyncManagerStatus,
+} from './document-sync-manager.js';
+
+// Yjs Adapter
+export { YjsAdapter, createYjsAdapter } from './yjs-adapter.js';
+export type {
+  YDocLike,
+  YMapLike,
+  YTextLike,
+  YArrayLike,
+  YjsAdapterConfig,
+  YjsAdapterEvent,
+} from './yjs-adapter.js';
+
+// Framework Adapters (Vue/Svelte)
+export {
+  createVueCollabAdapters,
+  createSvelteCollabAdapters,
+  type VueCollabCursorsReturn,
+  type VueCollabPresenceReturn,
+  type VueCollabStatusReturn,
+  type VueReactivity,
+  type SvelteReadable,
+  type SvelteStoreFactory,
+} from './framework-adapters.js';
+
+// Conflict Metrics Tracker
+export {
+  ConflictMetricsTracker,
+  createConflictMetricsTracker,
+  type ConflictEvent,
+  type ConflictMetrics,
+  type ConflictResolutionStrategy,
+} from './conflict-metrics.js';
+
+// Presence Throttle
+export {
+  PresenceThrottle,
+  createPresenceThrottle,
+  type PresenceThrottleConfig,
+} from './presence-throttle.js';
+
+// Undo/Redo Stack
+export {
+  UndoRedoStack,
+  createUndoRedoStack,
+  type UndoEntry,
+  type UndoRedoConfig,
+  type UndoRedoState,
+} from './undo-redo.js';
