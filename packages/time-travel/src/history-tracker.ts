@@ -14,7 +14,8 @@ import type {
   TimeTravelConfig,
   TimeTravelEvent,
   TimeTravelState,
-} from './types.js';
+
+  } from './types.js';
 import { DEFAULT_TIME_TRAVEL_CONFIG } from './types.js';
 
 /**
@@ -485,6 +486,12 @@ export class HistoryTracker {
    */
   setEnabled(enabled: boolean): void {
     (this.config as { enabled: boolean }).enabled = enabled;
+  }
+
+  /** Release resources */
+  destroy(): void {
+    this.state$.complete();
+    this.events$.complete();
   }
 }
 

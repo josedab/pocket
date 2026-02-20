@@ -432,4 +432,9 @@ export class ExpoSQLiteDocumentStore<T extends Document> implements DocumentStor
       this.emitChange('delete', doc._id, null, doc);
     }
   }
+
+  /** Release resources */
+  destroy(): void {
+    this.changes$.complete();
+  }
 }

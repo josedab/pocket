@@ -255,6 +255,11 @@ export class EventStore {
       console.log('[EventStore]', ...args);
     }
   }
+
+  /** Release resources held by this event store */
+  destroy(): void {
+    this.syncStatus$.complete();
+  }
 }
 
 /**

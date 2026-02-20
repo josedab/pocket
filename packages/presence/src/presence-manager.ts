@@ -65,6 +65,7 @@ export class PresenceManager {
     this.stopHeartbeat();
     this.clearActivityTimeout();
     this.destroy$.next();
+    this.events$.complete();
 
     // Unsubscribe from all rooms
     for (const unsubscribe of this.subscriptions.values()) {

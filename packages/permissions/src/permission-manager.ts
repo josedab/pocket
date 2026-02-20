@@ -397,6 +397,13 @@ export class PermissionManager {
 
     this.auditLog$.next(entry);
   }
+
+  /** Release resources */
+  destroy(): void {
+    this.config$.complete();
+    this.events$.complete();
+    this.auditLog$.complete();
+  }
 }
 
 /**

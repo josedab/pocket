@@ -547,6 +547,12 @@ export class FormManager<T extends Record<string, unknown> = Record<string, unkn
   getVisibleFields(): FieldConfig[] {
     return this.config.fields.filter((f) => this.isFieldVisible(f.name));
   }
+
+  /** Release resources held by this form manager */
+  destroy(): void {
+    this.state$.complete();
+    this.events$.complete();
+  }
 }
 
 /**

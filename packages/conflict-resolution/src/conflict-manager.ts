@@ -472,6 +472,12 @@ export class ConflictManager {
       data,
     });
   }
+
+  /** Release resources held by this manager */
+  destroy(): void {
+    this.state$.complete();
+    this.events$.complete();
+  }
 }
 
 /**

@@ -340,6 +340,12 @@ export class TimeTravelDebugger {
       data,
     });
   }
+
+  /** Release resources */
+  destroy(): void {
+    this.state$.complete();
+    this.events$.complete();
+  }
 }
 
 /**
