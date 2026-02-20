@@ -1,3 +1,9 @@
+---
+slug: /adr/README
+title: Architecture Decision Records
+sidebar_position: 0
+---
+
 # Architecture Decision Records
 
 This directory contains Architecture Decision Records (ADRs) for the Pocket project.
