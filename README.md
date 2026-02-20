@@ -224,6 +224,7 @@ function TodoList() {
 | `@pocket/conflict-resolution` | 🔵 Experimental | 0 | Extension |
 | `@pocket/zod` | 🔵 Experimental | 0 | Extension |
 | `@pocket/query` | 🔵 Experimental | 0 | Extension |
+| `@pocket/pwa` | 🟡 Beta | 1 | Extension |
 | `@pocket/create-pocket-app` | 🔵 Experimental | 0 | Tooling |
 | `pocket` | 🔵 Experimental | 0 | Meta |
 
