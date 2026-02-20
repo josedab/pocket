@@ -292,8 +292,6 @@ export function usePrefetchQuery(): <T extends Document>(
 
       // We can't use the hook here, so we need to import the collection differently
       // This is a simplified version that works for prefetching
-      console.log(`Prefetching ${collectionName}...`);
-
       // Store a placeholder to prevent duplicate prefetches
       promiseCache.set(cacheKey, Promise.resolve([]));
     },
