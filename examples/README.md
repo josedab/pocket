@@ -9,6 +9,8 @@ Explore these example applications to see Pocket in action. Each example demonst
 | [todo-app](./todo-app) | A simple todo application with persistent storage | React, Vite, IndexedDB | `pnpm --filter @pocket/example-todo-app dev` |
 | [notes-app](./notes-app) | A notes application with client-server sync | React, Vite, IndexedDB, Sync | `pnpm --filter @pocket/example-notes-app dev` |
 | [stackblitz-react](./stackblitz-react) | A lightweight React example for running in StackBlitz | React, Vite, Memory Storage | `pnpm --filter @pocket/example-stackblitz-react dev` |
+| [playground](./playground) | Interactive playground with CRUD, live queries, and a query explorer | React, Vite, Memory Storage | `npm run dev` (standalone) |
+| [nextjs-app](./nextjs-app) | RSC server loading with local-first client hydration | Next.js 15, React 19, Memory Storage | `pnpm --filter pocket-nextjs-example dev` |
 
 ## Prerequisites
 
