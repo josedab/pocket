@@ -61,5 +61,9 @@
     "auto-generate",
     "local-first",
     "database"
-  ]
+  ],
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org"
+  }
 }

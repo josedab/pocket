@@ -1,12 +1,12 @@
 {
-  "name": "@pocket/conflict-resolution",
+  "name": "@pocket/pwa",
   "version": "0.1.0",
-  "description": "Conflict resolution UI components and utilities for Pocket",
+  "description": "Offline-first PWA toolkit for Pocket",
   "license": "MIT",
   "repository": {
     "type": "git",
     "url": "https://github.com/pocket-db/pocket",
-    "directory": "packages/conflict-resolution"
+    "directory": "packages/pwa"
   },
   "homepage": "https://pocket-db.dev",
   "bugs": {
@@ -44,7 +44,6 @@
   },
   "dependencies": {
     "@pocket/core": "workspace:*",
-    "@pocket/sync": "workspace:*",
     "rxjs": "^7.8.1"
   },
   "devDependencies": {
@@ -55,11 +54,11 @@
   },
   "keywords": [
     "pocket",
-    "conflict-resolution",
-    "merge",
-    "sync",
+    "database",
     "local-first",
-    "database"
+    "pwa",
+    "offline-first",
+    "service-worker"
   ],
   "publishConfig": {
     "access": "public",

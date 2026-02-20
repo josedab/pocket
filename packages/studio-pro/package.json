@@ -60,5 +60,9 @@
     "schema-designer",
     "query-playground",
     "sync-dashboard"
-  ]
+  ],
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org"
+  }
 }
