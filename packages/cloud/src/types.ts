@@ -56,7 +56,7 @@ export type CloudStatus =
  * ```typescript
  * const config: CloudConfig = {
  *   projectId: 'proj_abc123',
- *   apiKey: 'pk_live_xxxxxxxx'
+ *   apiKey: 'pk_test_YOUR_API_KEY'
  * };
  * ```
  *
@@ -64,7 +64,7 @@ export type CloudStatus =
  * ```typescript
  * const config: CloudConfig = {
  *   projectId: 'proj_abc123',
- *   apiKey: 'pk_live_xxxxxxxx',
+ *   apiKey: 'pk_test_YOUR_API_KEY',
  *   region: 'eu-west-1',
  *   tier: 'pro',
  *   endpoint: 'https://custom-cloud.pocket-db.dev'
@@ -111,7 +111,7 @@ export interface CloudConfig {
  * ```typescript
  * const options: CloudSyncOptions = {
  *   projectId: 'proj_abc123',
- *   apiKey: 'pk_live_xxxxxxxx',
+ *   apiKey: 'pk_test_YOUR_API_KEY',
  *   collections: ['todos', 'notes'],
  *   conflictStrategy: 'last-write-wins',
  *   useWebSocket: true

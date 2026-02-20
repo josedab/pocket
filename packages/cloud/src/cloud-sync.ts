@@ -62,7 +62,7 @@ export interface CloudSyncStatus {
  *
  * const cloudSync = await createCloudSync({
  *   projectId: 'proj_abc123',
- *   apiKey: 'pk_live_xxxxxxxx',
+ *   apiKey: 'pk_test_YOUR_API_KEY',
  *   collections: ['todos', 'notes']
  * });
  *
@@ -83,7 +83,7 @@ export interface CloudSyncStatus {
  * ```typescript
  * const cloudSync = await createCloudSync({
  *   projectId: 'proj_abc123',
- *   apiKey: 'pk_live_xxxxxxxx',
+ *   apiKey: 'pk_test_YOUR_API_KEY',
  *   region: 'eu-west-1',
  *   collections: ['todos'],
  *   conflictStrategy: 'last-write-wins',
@@ -574,7 +574,7 @@ export class CloudSync {
  *
  * const cloudSync = await createCloudSync({
  *   projectId: 'proj_abc123',
- *   apiKey: 'pk_live_xxxxxxxx'
+ *   apiKey: 'pk_test_YOUR_API_KEY'
  * });
  *
  * cloudSync.connect(db);
@@ -585,7 +585,7 @@ export class CloudSync {
  * ```typescript
  * const cloudSync = await createCloudSync({
  *   projectId: 'proj_abc123',
- *   apiKey: 'pk_live_xxxxxxxx',
+ *   apiKey: 'pk_test_YOUR_API_KEY',
  *   region: 'eu-west-1',
  *   collections: ['todos', 'notes'],
  *   conflictStrategy: 'server-wins',

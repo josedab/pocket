@@ -106,7 +106,7 @@ export interface ServerHealthCheck {
  *   host: 'localhost',
  *   auth: {
  *     required: true,
- *     apiKeys: ['pk_live_xxxxxxxx'],
+ *     apiKeys: ['pk_test_YOUR_API_KEY'],
  *   },
  *   corsOrigins: ['https://app.example.com'],
  *   maxConnectionsPerTenant: 10,
@@ -164,7 +164,7 @@ interface ResolvedServerConfig {
  *
  * const server = createCloudSyncServer({
  *   port: 3000,
- *   auth: { required: true, apiKeys: ['pk_live_xxxxxxxx'] },
+ *   auth: { required: true, apiKeys: ['pk_test_YOUR_API_KEY'] },
  *   maxConnectionsPerTenant: 20,
  * });
  *
@@ -365,7 +365,7 @@ export class CloudSyncServer {
    *
    * @example
    * ```typescript
-   * const isValid = await server.validateApiKey('pk_live_xxxxxxxx');
+   * const isValid = await server.validateApiKey('pk_test_YOUR_API_KEY');
    * if (!isValid) {
    *   console.error('Unauthorized');
    * }
@@ -629,7 +629,7 @@ export class CloudSyncServer {
  *   host: 'localhost',
  *   auth: {
  *     required: true,
- *     apiKeys: ['pk_live_xxxxxxxx'],
+ *     apiKeys: ['pk_test_YOUR_API_KEY'],
  *   },
  *   corsOrigins: ['https://app.example.com'],
  *   maxConnectionsPerTenant: 20,
