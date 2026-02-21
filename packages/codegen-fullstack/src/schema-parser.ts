@@ -9,7 +9,7 @@ export interface SchemaParser {
 /**
  * Creates a schema parser that converts raw input into a validated SchemaDefinition.
  */
-export function createSchemaParser(): SchemaParser {
+export function createFullstackSchemaParser(): SchemaParser {
   function parse(input: string | object): SchemaDefinition {
     let raw: unknown;
 

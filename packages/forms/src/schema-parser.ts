@@ -431,6 +431,6 @@ export class SchemaParser {
 /**
  * Create a schema parser
  */
-export function createSchemaParser(): SchemaParser {
+export function createFormSchemaParser(): SchemaParser {
   return new SchemaParser();
 }

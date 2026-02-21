@@ -22,7 +22,7 @@ export interface LeaderElection {
   onLeaderChange(callback: (state: LeaderElectionState) => void): () => void;
 }
 
-export function createLeaderElection(
+export function createWorkerLeaderElection(
   config: LeaderElectionConfig,
   adapter: BroadcastAdapter,
 ): LeaderElection {

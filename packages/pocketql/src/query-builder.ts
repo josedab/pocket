@@ -40,7 +40,7 @@ function formatWhere<T>(clause: WhereClause<T>): string {
 /**
  * Creates a type-safe query builder for the given collection.
  */
-export function createQueryBuilder<T>(collection: string): QueryBuilder<T> {
+export function createPocketQLBuilder<T>(collection: string): QueryBuilder<T> {
   const state = {
     collection,
     where: [] as WhereClause<T>[],

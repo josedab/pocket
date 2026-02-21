@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { createSchemaInspector } from '../schema-inspector.js';
-import { createQueryPlayground } from '../query-playground.js';
+import { createProQueryPlayground } from '../query-playground.js';
 import { createSyncDashboard } from '../sync-dashboard.js';
 import { createDataInspector } from '../data-inspector.js';
 import type { SchemaInspector } from '../schema-inspector.js';
@@ -150,7 +150,7 @@ describe('QueryPlayground', () => {
   ];
 
   beforeEach(() => {
-    playground = createQueryPlayground({ maxHistoryEntries: 50 });
+    playground = createProQueryPlayground({ maxHistoryEntries: 50 });
   });
 
   it('should execute a query with no filter', () => {

@@ -17,7 +17,7 @@ export interface QueryExecutor {
 /**
  * Creates a query executor with the given configuration.
  */
-export function createQueryExecutor(_config: PocketQLConfig = {}): QueryExecutor {
+export function createPocketQLExecutor(_config: PocketQLConfig = {}): QueryExecutor {
   return {
     execute<T>(compiled: CompiledQuery<T>, data: T[]): T[] {
       let results = data.filter(compiled.filterFn);

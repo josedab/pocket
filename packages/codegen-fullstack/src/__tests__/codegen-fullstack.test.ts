@@ -1,10 +1,10 @@
 import { describe, expect, it } from 'vitest';
-import { createSchemaParser } from '../schema-parser.js';
+import { createFullstackSchemaParser } from '../schema-parser.js';
 import { createTypeGenerator } from '../type-generator.js';
 import { createHooksGenerator } from '../hooks-generator.js';
 import { createApiGenerator } from '../api-generator.js';
-import { createMigrationGenerator } from '../migration-generator.js';
-import { createCodeGenerator } from '../index.js';
+import { createFullstackMigrationGenerator } from '../migration-generator.js';
+import { createFullstackCodeGenerator } from '../index.js';
 import type { SchemaDefinition } from '../types.js';
 
 const testSchema: SchemaDefinition = {
@@ -41,7 +41,7 @@ const testSchema: SchemaDefinition = {
 
 describe('codegen-fullstack', () => {
   describe('SchemaParser', () => {
-    const parser = createSchemaParser();
+    const parser = createFullstackSchemaParser();
 
     it('should parse a JSON string into SchemaDefinition', () => {
       const result = parser.parse(JSON.stringify(testSchema));
@@ -250,7 +250,7 @@ describe('codegen-fullstack', () => {
   });
 
   describe('MigrationGenerator', () => {
-    const generator = createMigrationGenerator();
+    const generator = createFullstackMigrationGenerator();
 
     const schemaV2: SchemaDefinition = {
       name: 'test-app',
@@ -331,9 +331,9 @@ describe('codegen-fullstack', () => {
     });
   });
 
-  describe('createCodeGenerator (full pipeline)', () => {
+  describe('createFullstackCodeGenerator (full pipeline)', () => {
     it('should generate files for all targets', () => {
-      const generator = createCodeGenerator({
+      const generator = createFullstackCodeGenerator({
         schema: testSchema,
         outputDir: 'generated',
         targets: ['typescript', 'react-hooks', 'api-routes', 'validation'],
@@ -353,7 +353,7 @@ describe('codegen-fullstack', () => {
     });
 
     it('should prefix all paths with outputDir', () => {
-      const generator = createCodeGenerator({
+      const generator = createFullstackCodeGenerator({
         schema: testSchema,
         outputDir: 'src/generated',
         targets: ['typescript'],
@@ -366,7 +366,7 @@ describe('codegen-fullstack', () => {
     });
 
     it('should accept JSON string as input', () => {
-      const generator = createCodeGenerator({
+      const generator = createFullstackCodeGenerator({
         schema: testSchema,
         outputDir: 'out',
         targets: ['typescript'],
@@ -377,7 +377,7 @@ describe('codegen-fullstack', () => {
     });
 
     it('should report validation warnings for invalid schema', () => {
-      const generator = createCodeGenerator({
+      const generator = createFullstackCodeGenerator({
         schema: testSchema,
         outputDir: 'out',
         targets: ['typescript'],

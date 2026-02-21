@@ -16,7 +16,7 @@ export interface QueryDeduplicator {
   getStats(): QueryDeduplicationStats;
 }
 
-export function createQueryDeduplicator(config: QueryDeduplicationConfig): QueryDeduplicator {
+export function createWorkerQueryDedup(config: QueryDeduplicationConfig): QueryDeduplicator {
   const cache = new Map<string, QueryDeduplicationEntry>();
   const inflight = new Map<string, Promise<unknown>>();
   let cacheHits = 0;

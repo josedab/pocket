@@ -6,9 +6,9 @@
 import { BehaviorSubject } from 'rxjs';
 import type { Observable } from 'rxjs';
 import { createBroadcastAdapter } from './broadcast-adapter.js';
-import { createLeaderElection } from './leader-election.js';
+import { createWorkerLeaderElection } from './leader-election.js';
 import type { LeaderElection } from './leader-election.js';
-import { createQueryDeduplicator } from './query-dedup.js';
+import { createWorkerQueryDedup } from './query-dedup.js';
 import type { QueryDeduplicator } from './query-dedup.js';
 import type {
   BroadcastAdapter,
@@ -38,7 +38,7 @@ export function createTabCoordinator(config: CoordinatorConfig): TabCoordinator 
 
   const adapter: BroadcastAdapter = createBroadcastAdapter(channelName);
 
-  const leaderElection = createLeaderElection(
+  const leaderElection = createWorkerLeaderElection(
     {
       heartbeatIntervalMs: heartbeatMs,
       leaderTimeoutMs,
@@ -47,7 +47,7 @@ export function createTabCoordinator(config: CoordinatorConfig): TabCoordinator 
     adapter,
   );
 
-  const queryDeduplicator = createQueryDeduplicator({ ttlMs: 5000 });
+  const queryDeduplicator = createWorkerQueryDedup({ ttlMs: 5000 });
 
   const messageListeners = new Set<(message: BroadcastMessage) => void>();
   let adapterUnsub: (() => void) | null = null;

@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
 
-import { createQueryBuilder } from '../query-builder.js';
+import { createPocketQLBuilder } from '../query-builder.js';
 import { createQueryCompiler } from '../query-compiler.js';
-import { createQueryExecutor } from '../query-executor.js';
+import { createPocketQLExecutor } from '../query-executor.js';
 
 interface User {
   id: string;
@@ -35,7 +35,7 @@ const testDepartments: Department[] = [
 describe('PocketQL', () => {
   describe('QueryBuilder', () => {
     it('should build a basic query with where clause', () => {
-      const query = createQueryBuilder<User>('users')
+      const query = createPocketQLBuilder<User>('users')
         .where('role', 'eq', 'admin')
         .build();
 
@@ -45,7 +45,7 @@ describe('PocketQL', () => {
     });
 
     it('should chain multiple where clauses', () => {
-      const query = createQueryBuilder<User>('users')
+      const query = createPocketQLBuilder<User>('users')
         .where('role', 'eq', 'admin')
         .where('age', 'gte', 30)
         .build();
@@ -56,7 +56,7 @@ describe('PocketQL', () => {
     });
 
     it('should build query with sort and limit', () => {
-      const query = createQueryBuilder<User>('users')
+      const query = createPocketQLBuilder<User>('users')
         .orderBy('age', 'desc')
         .limit(10)
         .build();
@@ -67,7 +67,7 @@ describe('PocketQL', () => {
     });
 
     it('should build query with skip', () => {
-      const query = createQueryBuilder<User>('users')
+      const query = createPocketQLBuilder<User>('users')
         .skip(5)
         .limit(10)
         .build();
@@ -77,7 +77,7 @@ describe('PocketQL', () => {
     });
 
     it('should build query with projection/select', () => {
-      const query = createQueryBuilder<User>('users')
+      const query = createPocketQLBuilder<User>('users')
         .select('name', 'email')
         .build();
 
@@ -85,7 +85,7 @@ describe('PocketQL', () => {
     });
 
     it('should build query with aggregations', () => {
-      const query = createQueryBuilder<User>('users')
+      const query = createPocketQLBuilder<User>('users')
         .aggregate('age', 'avg', 'avgAge')
         .aggregate('age', 'max', 'maxAge')
         .build();
@@ -96,7 +96,7 @@ describe('PocketQL', () => {
     });
 
     it('should build query with groupBy', () => {
-      const query = createQueryBuilder<User>('users')
+      const query = createPocketQLBuilder<User>('users')
         .groupBy('role')
         .build();
 
@@ -105,7 +105,7 @@ describe('PocketQL', () => {
     });
 
     it('should build query with join', () => {
-      const query = createQueryBuilder<User>('users')
+      const query = createPocketQLBuilder<User>('users')
         .join({
           collection: 'departments',
           localField: 'departmentId',
@@ -121,7 +121,7 @@ describe('PocketQL', () => {
     });
 
     it('should support and/or logical groups', () => {
-      const query = createQueryBuilder<User>('users')
+      const query = createPocketQLBuilder<User>('users')
         .or(
           { field: 'role', operator: 'eq', value: 'admin' },
           { field: 'age', operator: 'gte', value: 30 },
@@ -134,7 +134,7 @@ describe('PocketQL', () => {
     });
 
     it('should generate human-readable toString()', () => {
-      const str = createQueryBuilder<User>('users')
+      const str = createPocketQLBuilder<User>('users')
         .select('name', 'email')
         .where('role', 'eq', 'admin')
         .orderBy('name', 'asc')
@@ -149,7 +149,7 @@ describe('PocketQL', () => {
     });
 
     it('should generate SELECT * when no projection', () => {
-      const str = createQueryBuilder<User>('users').toString();
+      const str = createPocketQLBuilder<User>('users').toString();
       expect(str).toContain('SELECT *');
       expect(str).toContain('FROM users');
     });
@@ -159,7 +159,7 @@ describe('PocketQL', () => {
     const compiler = createQueryCompiler({ strict: true, maxResults: 1000 });
 
     it('should compile a query expression', () => {
-      const expression = createQueryBuilder<User>('users')
+      const expression = createPocketQLBuilder<User>('users')
         .where('role', 'eq', 'admin')
         .build();
 
@@ -169,7 +169,7 @@ describe('PocketQL', () => {
     });
 
     it('should validate a valid query', () => {
-      const expression = createQueryBuilder<User>('users')
+      const expression = createPocketQLBuilder<User>('users')
         .where('age', 'gt', 18)
         .limit(50)
         .build();
@@ -180,7 +180,7 @@ describe('PocketQL', () => {
     });
 
     it('should reject query exceeding maxResults', () => {
-      const expression = createQueryBuilder<User>('users')
+      const expression = createPocketQLBuilder<User>('users')
         .limit(5000)
         .build();
 
@@ -190,7 +190,7 @@ describe('PocketQL', () => {
     });
 
     it('should reject negative limit in strict mode', () => {
-      const expression = createQueryBuilder<User>('users')
+      const expression = createPocketQLBuilder<User>('users')
         .limit(-1)
         .build();
 
@@ -200,7 +200,7 @@ describe('PocketQL', () => {
     });
 
     it('should explain a query plan', () => {
-      const expression = createQueryBuilder<User>('users')
+      const expression = createPocketQLBuilder<User>('users')
         .where('role', 'eq', 'admin')
         .orderBy('age', 'desc')
         .limit(10)
@@ -217,7 +217,7 @@ describe('PocketQL', () => {
     });
 
     it('should optimize queries by reordering equality checks first', () => {
-      const expression = createQueryBuilder<User>('users')
+      const expression = createPocketQLBuilder<User>('users')
         .where('age', 'gt', 18)
         .where('role', 'eq', 'admin')
         .build();
@@ -230,10 +230,10 @@ describe('PocketQL', () => {
 
   describe('QueryExecutor', () => {
     const compiler = createQueryCompiler();
-    const executor = createQueryExecutor();
+    const executor = createPocketQLExecutor();
 
     it('should execute a simple where query', () => {
-      const expression = createQueryBuilder<User>('users')
+      const expression = createPocketQLBuilder<User>('users')
         .where('role', 'eq', 'admin')
         .build();
 
@@ -244,7 +244,7 @@ describe('PocketQL', () => {
     });
 
     it('should execute query with multiple where clauses', () => {
-      const expression = createQueryBuilder<User>('users')
+      const expression = createPocketQLBuilder<User>('users')
         .where('role', 'eq', 'admin')
         .where('age', 'gte', 35)
         .build();
@@ -256,7 +256,7 @@ describe('PocketQL', () => {
     });
 
     it('should execute query with sorting', () => {
-      const expression = createQueryBuilder<User>('users')
+      const expression = createPocketQLBuilder<User>('users')
         .orderBy('age', 'asc')
         .build();
 
@@ -267,7 +267,7 @@ describe('PocketQL', () => {
     });
 
     it('should execute query with limit and skip', () => {
-      const expression = createQueryBuilder<User>('users')
+      const expression = createPocketQLBuilder<User>('users')
         .orderBy('age', 'asc')
         .skip(1)
         .limit(2)
@@ -281,7 +281,7 @@ describe('PocketQL', () => {
     });
 
     it('should execute query with projection', () => {
-      const expression = createQueryBuilder<User>('users')
+      const expression = createPocketQLBuilder<User>('users')
         .select('name', 'email')
         .limit(1)
         .build();
@@ -293,7 +293,7 @@ describe('PocketQL', () => {
     });
 
     it('should execute with or logical group', () => {
-      const expression = createQueryBuilder<User>('users')
+      const expression = createPocketQLBuilder<User>('users')
         .or(
           { field: 'name', operator: 'eq', value: 'Alice' },
           { field: 'name', operator: 'eq', value: 'Bob' },
@@ -306,7 +306,7 @@ describe('PocketQL', () => {
     });
 
     it('should execute with string operators', () => {
-      const expression = createQueryBuilder<User>('users')
+      const expression = createPocketQLBuilder<User>('users')
         .where('name', 'startsWith', 'A')
         .build();
 
@@ -317,7 +317,7 @@ describe('PocketQL', () => {
     });
 
     it('should execute with in operator', () => {
-      const expression = createQueryBuilder<User>('users')
+      const expression = createPocketQLBuilder<User>('users')
         .where('role', 'in', ['admin'])
         .build();
 
@@ -327,7 +327,7 @@ describe('PocketQL', () => {
     });
 
     it('should execute aggregate queries', () => {
-      const expression = createQueryBuilder<User>('users')
+      const expression = createPocketQLBuilder<User>('users')
         .aggregate('age', 'count', 'totalCount')
         .aggregate('age', 'sum', 'totalAge')
         .aggregate('age', 'avg', 'avgAge')
@@ -345,7 +345,7 @@ describe('PocketQL', () => {
     });
 
     it('should execute join queries', () => {
-      const expression = createQueryBuilder<User>('users')
+      const expression = createPocketQLBuilder<User>('users')
         .join({
           collection: 'departments',
           localField: 'departmentId',
@@ -366,7 +366,7 @@ describe('PocketQL', () => {
         { id: '99', name: 'Ghost', email: 'ghost@test.com', age: 40, role: 'user', departmentId: 'missing' },
       ];
 
-      const expression = createQueryBuilder<User>('users')
+      const expression = createPocketQLBuilder<User>('users')
         .join({
           collection: 'departments',
           localField: 'departmentId',

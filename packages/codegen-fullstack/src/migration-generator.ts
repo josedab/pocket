@@ -8,7 +8,7 @@ export interface MigrationGenerator {
 /**
  * Creates a generator that produces migration files between schema versions.
  */
-export function createMigrationGenerator(): MigrationGenerator {
+export function createFullstackMigrationGenerator(): MigrationGenerator {
   function detectChanges(from: SchemaDefinition, to: SchemaDefinition): SchemaDiff[] {
     const diffs: SchemaDiff[] = [];
 

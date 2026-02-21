@@ -419,7 +419,7 @@ export class RangeIndex {
 // ── Factories ─────────────────────────────────────────────
 
 /** Create a new retention engine with tiered storage */
-export function createRetentionEngine(config: RetentionEngineConfig): RetentionEngine {
+export function createTimeSeriesRetention(config: RetentionEngineConfig): RetentionEngine {
   return new RetentionEngine(config);
 }
 

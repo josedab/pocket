@@ -5,9 +5,9 @@
  *
  * @example
  * ```typescript
- * import { createQueryPlayground } from '@pocket/studio-pro';
+ * import { createProQueryPlayground } from '@pocket/studio-pro';
  *
- * const playground = createQueryPlayground({ maxHistoryEntries: 50 });
+ * const playground = createProQueryPlayground({ maxHistoryEntries: 50 });
  * const result = playground.execute({
  *   collection: 'users',
  *   filter: { age: { $gt: 21 } },
@@ -85,14 +85,14 @@ function matchesFilter(doc: Record<string, unknown>, filter: Record<string, unkn
  *
  * @example
  * ```typescript
- * const playground = createQueryPlayground({ maxHistoryEntries: 100 });
+ * const playground = createProQueryPlayground({ maxHistoryEntries: 100 });
  * const result = playground.execute(
  *   { collection: 'users', filter: { active: true } },
  *   documents,
  * );
  * ```
  */
-export function createQueryPlayground(
+export function createProQueryPlayground(
   config: Partial<StudioConfig> = {},
 ): QueryPlayground {
   const maxHistory = config.maxHistoryEntries ?? 100;

@@ -77,7 +77,7 @@ export {
 export {
   RetentionEngine,
   RangeIndex,
-  createRetentionEngine,
+  createTimeSeriesRetention,
   createRangeIndex,
 } from './retention-engine.js';
 export type {

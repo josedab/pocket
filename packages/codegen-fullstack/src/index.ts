@@ -13,7 +13,7 @@ export type {
 } from './types.js';
 
 // Schema Parser
-export { createSchemaParser } from './schema-parser.js';
+export { createFullstackSchemaParser } from './schema-parser.js';
 export type { SchemaParser } from './schema-parser.js';
 
 // Type Generator
@@ -29,12 +29,12 @@ export { createApiGenerator } from './api-generator.js';
 export type { ApiGenerator, ApiGeneratorConfig } from './api-generator.js';
 
 // Migration Generator
-export { createMigrationGenerator } from './migration-generator.js';
+export { createFullstackMigrationGenerator } from './migration-generator.js';
 export type { MigrationGenerator } from './migration-generator.js';
 
 // Main entry point
 import type { GeneratorConfig, GeneratorResult } from './types.js';
-import { createSchemaParser } from './schema-parser.js';
+import { createFullstackSchemaParser } from './schema-parser.js';
 import { createTypeGenerator } from './type-generator.js';
 import { createHooksGenerator } from './hooks-generator.js';
 import { createApiGenerator } from './api-generator.js';
@@ -42,8 +42,8 @@ import { createApiGenerator } from './api-generator.js';
 /**
  * Creates a full-stack code generator that produces files for all configured targets.
  */
-export function createCodeGenerator(config: GeneratorConfig) {
-  const parser = createSchemaParser();
+export function createFullstackCodeGenerator(config: GeneratorConfig) {
+  const parser = createFullstackSchemaParser();
   const typeGen = createTypeGenerator();
   const hooksGen = createHooksGenerator();
   const apiGen = createApiGenerator({ framework: config.framework });

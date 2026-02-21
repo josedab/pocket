@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
-import { RetentionEngine, RangeIndex, createRetentionEngine, createRangeIndex } from '../retention-engine.js';
+import { RetentionEngine, RangeIndex, createTimeSeriesRetention, createRangeIndex } from '../retention-engine.js';
 import type { TimeSeriesPoint } from '../types.js';
 
 function generatePoints(count: number, startMs: number, intervalMs: number): TimeSeriesPoint[] {
@@ -14,7 +14,7 @@ describe('RetentionEngine', () => {
   let engine: RetentionEngine;
 
   beforeEach(() => {
-    engine = createRetentionEngine({
+    engine = createTimeSeriesRetention({
       tiers: [
         { name: 'raw', maxAge: 3600000, aggregationInterval: 0, aggregation: 'avg' },
         { name: 'hourly', maxAge: 86400000, aggregationInterval: 3600000, aggregation: 'avg' },
@@ -82,7 +82,7 @@ describe('RetentionEngine', () => {
     let expiredTier = '';
     let expiredCount = 0;
 
-    const e = createRetentionEngine({
+    const e = createTimeSeriesRetention({
       tiers: [
         { name: 'raw', maxAge: 1000, aggregationInterval: 0, aggregation: 'avg' },
       ],

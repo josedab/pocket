@@ -16,7 +16,7 @@
  * ```typescript
  * import {
  *   createSchemaInspector,
- *   createQueryPlayground,
+ *   createProQueryPlayground,
  *   createSyncDashboard,
  *   createDataInspector,
  * } from '@pocket/studio-pro';
@@ -26,7 +26,7 @@
  *   { _id: '1', name: 'Alice', age: 30 },
  * ]);
  *
- * const playground = createQueryPlayground();
+ * const playground = createProQueryPlayground();
  * const result = playground.execute(
  *   { collection: 'users', filter: { age: { $gt: 21 } } },
  *   documents,
@@ -64,7 +64,7 @@ export { createSchemaInspector } from './schema-inspector.js';
 export type { SchemaInspector } from './schema-inspector.js';
 
 // Query Playground
-export { createQueryPlayground } from './query-playground.js';
+export { createProQueryPlayground } from './query-playground.js';
 export type { QueryPlayground, PlaygroundQuery, PlaygroundResult } from './query-playground.js';
 
 // Sync Dashboard
