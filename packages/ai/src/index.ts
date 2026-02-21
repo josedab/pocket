@@ -24,3 +24,24 @@ export * from './index-advisor.js';
 
 // Semantic Search & Autocomplete
 export * from './semantic-search.js';
+
+// Query Copilot
+export * from './query-copilot.js';
+
+// Schema Analyzer
+export * from './schema-analyzer.js';
+
+// Query Explainer
+export * from './query-explainer.js';
+
+// Local Inference Adapter
+export * from './local-inference.js';
+
+// Query Validator
+export * from './query-validator.js';
+
+// Copilot Cache
+export * from './copilot-cache.js';
+
+// Streaming Copilot
+export * from './streaming-copilot.js';

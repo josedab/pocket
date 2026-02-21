@@ -51,3 +51,15 @@ export type { DataTransformationConfig } from './data-tools.js';
 // Execution planner
 export { createExecutionPlanner } from './planner.js';
 export type { ExecutionPlan, ExecutionPlanner, ExecutionStep, PlanSummary } from './planner.js';
+
+// Offline agent
+export { OfflineAgent, createOfflineAgent } from './offline-agent.js';
+export type {
+  OfflineAgentConfig,
+  CollectionContext,
+  CollectionFieldDescriptor,
+  AgentQuery,
+  OfflineAgentStep,
+  OfflineAgentResult,
+  OfflineAgentStats,
+} from './offline-agent.js';
