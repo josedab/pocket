@@ -132,5 +132,48 @@ export {
   type HealthMonitorConfig,
 } from './health-monitor.js';
 
+// Global Sync Mesh
+export {
+  GlobalSyncMesh,
+  createGlobalSyncMesh,
+  type EdgeRegion,
+  type GlobalSyncMeshConfig,
+  type MeshMetrics,
+  type RegionNodeInfo,
+  type RegionNodeStatus,
+  type ReplicationEvent,
+  type ReplicationStrategy,
+  type RoutingDecision,
+} from './global-sync-mesh.js';
+
+// Health Dashboard
+export {
+  buildHealthDashboard,
+  type AlertThresholds,
+  type HealthAlert,
+  type HealthDashboardSnapshot,
+  type LatencyPercentiles,
+  type RegionHealthSummary,
+} from './health-dashboard.js';
+
+// Region Failover
+export {
+  RegionFailoverManager,
+  createRegionFailoverManager,
+  type FailoverConfig,
+  type FailoverEvent,
+  type FailoverState,
+} from './region-failover.js';
+
+// Cache Warmer
+export {
+  CacheWarmer,
+  createCacheWarmer,
+  type AccessPattern,
+  type CacheWarmerConfig,
+  type PrefetchRequest,
+  type PrefetchResult,
+} from './cache-warmer.js';
+
 // Re-export core types for convenience
 export type { Document, StorageAdapter, StorageConfig } from '@pocket/core';

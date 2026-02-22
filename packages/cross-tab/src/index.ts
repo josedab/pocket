@@ -136,3 +136,24 @@ export {
   type HeartbeatMessage,
   type HeartbeatStatus,
 } from './heartbeat.js';
+
+// Cross-Device Settings Sync
+export {
+  CrossDeviceSync,
+  createCrossDeviceSync,
+  type CrossDeviceSyncConfig,
+  type DeviceInfo,
+  type DeviceSyncEvent,
+  type DeviceSyncState,
+  type DeviceSyncStatus,
+  type SettingsEntry,
+} from './cross-device-sync.js';
+
+// Browser Compatibility Layer
+export {
+  createCompatSender,
+  detectCapabilities,
+  type BrowserCapabilities,
+  type CrossTabSender,
+  type CrossTabTransport,
+} from './browser-compat.js';

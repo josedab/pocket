@@ -39,3 +39,11 @@ export type {
   GracefulDegradation,
   GracefulDegradationConfig,
 } from './graceful-degradation.js';
+
+// Multi-tab SDK
+export { createMultiTabSDK } from './multi-tab-sdk.js';
+export type {
+  MultiTabSDK,
+  MultiTabSDKConfig,
+  MultiTabStatus,
+} from './multi-tab-sdk.js';

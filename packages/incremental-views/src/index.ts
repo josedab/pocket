@@ -22,3 +22,15 @@ export type { AggregateResult, GroupedResult, LiveView, LiveViewConfig } from '.
 // LRU cache for view eviction
 export { createViewCache } from './lru-cache.js';
 export type { ViewCache, ViewCacheConfig, ViewCacheStats } from './lru-cache.js';
+
+// Materialized view manager
+export { createMaterializedViewManager } from './materialized-view-manager.js';
+export type {
+  MaterializedViewManager,
+  ManagedView,
+  ViewManagerConfig as MvManagerConfig,
+  ViewDefinition as MvViewDefinition,
+  ViewAggregation,
+  ViewResult,
+  ViewManagerStats,
+} from './materialized-view-manager.js';

@@ -57,5 +57,6 @@
  */
 
 export * from './adapter.js';
+export * from './attachment-store.js';
 export * from './serialization.js';
 export * from './transaction.js';

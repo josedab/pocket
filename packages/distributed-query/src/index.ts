@@ -89,3 +89,14 @@ export type {
 } from './gossip-protocol.js';
 
 export { GossipProtocol, createGossipProtocol } from './gossip-protocol.js';
+
+// Sync Mesh
+export type {
+  MeshChange,
+  MeshStats,
+  MeshStatus,
+  MeshTopology,
+  SyncMeshConfig,
+} from './sync-mesh.js';
+
+export { SyncMesh, createSyncMesh } from './sync-mesh.js';
