@@ -132,6 +132,106 @@ function evaluateCondition(
 }
 
 /**
+ * Safely resolve a $doc.path or $user.path reference to its value.
+ * Returns undefined for unrecognized prefixes.
+ */
+function resolveExpressionOperand(
+  token: string,
+  doc: Record<string, unknown>,
+  user: UserContext
+): unknown {
+  const trimmed = token.trim();
+
+  if (trimmed.startsWith('$doc.')) {
+    return getNestedValue(doc, trimmed.substring(5));
+  }
+  if (trimmed.startsWith('$user.')) {
+    return getNestedValue(user as unknown as Record<string, unknown>, trimmed.substring(6));
+  }
+
+  // Numeric literal
+  if (/^-?\d+(\.\d+)?$/.test(trimmed)) {
+    return Number(trimmed);
+  }
+
+  // Boolean literal
+  if (trimmed === 'true') return true;
+  if (trimmed === 'false') return false;
+  if (trimmed === 'null') return null;
+
+  // Quoted string literal
+  if (
+    (trimmed.startsWith("'") && trimmed.endsWith("'")) ||
+    (trimmed.startsWith('"') && trimmed.endsWith('"'))
+  ) {
+    return trimmed.slice(1, -1);
+  }
+
+  return undefined;
+}
+
+const SAFE_OPERATORS = ['===', '!==', '==', '!=', '>=', '<=', '>', '<'] as const;
+
+/**
+ * Evaluate a simple expression string without using eval or new Function.
+ * Supports: `$doc.field === $user.field`, `$doc.field > 42`, etc.
+ * Only property access via dot notation and basic comparison operators are allowed.
+ */
+function evaluateSafeExpression(
+  expression: string,
+  doc: Record<string, unknown>,
+  user: UserContext
+): boolean {
+  // Reject expressions that contain suspicious patterns
+  if (/[;{}()[\]\\]/.test(expression)) {
+    return false;
+  }
+
+  // Find the comparison operator
+  let matchedOp: (typeof SAFE_OPERATORS)[number] | undefined;
+  let opIndex = -1;
+
+  for (const op of SAFE_OPERATORS) {
+    const idx = expression.indexOf(op);
+    if (idx !== -1 && (opIndex === -1 || idx < opIndex || op.length > (matchedOp?.length ?? 0))) {
+      // Pick the longest operator at the earliest position
+      if (opIndex === -1 || idx < opIndex) {
+        matchedOp = op;
+        opIndex = idx;
+      } else if (idx === opIndex && op.length > (matchedOp?.length ?? 0)) {
+        matchedOp = op;
+      }
+    }
+  }
+
+  if (!matchedOp || opIndex === -1) {
+    return false;
+  }
+
+  const left = resolveExpressionOperand(expression.substring(0, opIndex), doc, user);
+  const right = resolveExpressionOperand(expression.substring(opIndex + matchedOp.length), doc, user);
+
+  switch (matchedOp) {
+    case '===':
+    case '==':
+      return left === right;
+    case '!==':
+    case '!=':
+      return left !== right;
+    case '>':
+      return Number(left) > Number(right);
+    case '>=':
+      return Number(left) >= Number(right);
+    case '<':
+      return Number(left) < Number(right);
+    case '<=':
+      return Number(left) <= Number(right);
+    default:
+      return false;
+  }
+}
+
+/**
  * Evaluate RLS filter
  */
 function evaluateRLSFilter(
@@ -173,21 +273,8 @@ function evaluateRLSFilter(
     case 'expression': {
       if (!filter.expression) return false;
 
-      // Simple expression evaluation
-      // In production, use a proper expression parser
       try {
-        // Create safe evaluation context
-        const context = {
-          doc: document,
-          user: userContext,
-        };
-
-        // Very basic expression support
-        const expr = filter.expression.replace(/\$doc\./g, 'doc.').replace(/\$user\./g, 'user.');
-
-        // eslint-disable-next-line @typescript-eslint/no-implied-eval
-        const fn = new Function('doc', 'user', `return ${expr}`);
-        return Boolean(fn(context.doc, context.user));
+        return evaluateSafeExpression(filter.expression, document, userContext);
       } catch {
         return false;
       }

@@ -72,3 +72,23 @@ export {
   type KeyDerivationConfig,
   type KeyRotationEvent,
 } from './encrypted-sync-pipeline.js';
+
+// Web Crypto Provider
+export {
+  WebCryptoProvider,
+  createWebCryptoProvider,
+  toBase64 as webCryptoToBase64,
+  fromBase64 as webCryptoFromBase64,
+  type CryptoProvider,
+  type WebCryptoConfig,
+  type KeyDerivationParams,
+} from './web-crypto-provider.js';
+
+// Encrypted Sync Transport
+export {
+  EncryptedSyncTransport,
+  createEncryptedSyncTransport,
+  type EncryptedSyncTransportConfig,
+  type EncryptedDocument as SyncEncryptedDocument,
+  type KeyInfo as SyncKeyInfo,
+} from './encrypted-sync.js';
