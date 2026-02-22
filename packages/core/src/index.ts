@@ -54,3 +54,6 @@ export * from './schema-evolution/index.js';
 
 // Query Accelerator
 export * from './query-accelerator/index.js';
+
+// Streaming Pipeline
+export * from './streaming/index.js';
