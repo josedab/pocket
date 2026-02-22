@@ -93,5 +93,24 @@ export type { WatchEvent, WatchFs, WatchModeConfig, WatchModeHandle } from './wa
 // Main Code Generator
 export { CodeGenerator, createCodeGenerator } from './codegen.js';
 
+// Generation Pipeline
+export { GenerationPipeline, createGenerationPipeline } from './generation-pipeline.js';
+export type { GenerationTarget, PipelineConfig, PipelineOutput } from './generation-pipeline.js';
+
+// DSL Schema Parser
+export { createDSLParser, parsePocketSchema, schemaToCodegenInput } from './schema-dsl.js';
+export type {
+  DslFieldType,
+  PocketCollectionDef,
+  PocketDslSchema,
+  PocketFieldDef,
+  SchemaParseError,
+  SchemaParseResult,
+} from './schema-dsl.js';
+
+// GraphQL Generator
+export { GraphQLGenerator, createGraphQLGenerator } from './generators/graphql-generator.js';
+export type { GraphQLGeneratorConfig } from './generators/graphql-generator.js';
+
 // CLI
 export { parseArgs, runCLI, type CLIOptions } from './cli.js';
