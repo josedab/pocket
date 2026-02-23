@@ -57,3 +57,6 @@ export * from './query-accelerator/index.js';
 
 // Streaming Pipeline
 export * from './streaming/index.js';
+
+// Database Federation
+export * from './database-federation/index.js';
