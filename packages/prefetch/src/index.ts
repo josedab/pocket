@@ -62,3 +62,21 @@ export { PrefetchEngine, createPrefetchEngine } from './prefetch-engine.js';
 // Adaptive Learning Model
 export { AdaptiveLearningModel, createAdaptiveLearningModel } from './adaptive-model.js';
 export type { AdaptiveModelConfig, NavigationContext, SessionStats } from './adaptive-model.js';
+
+// Smart Prefetch (Markov model)
+export {
+  SmartPrefetchEngine,
+  createSmartPrefetch,
+  type MarkovTransition,
+  type SmartPrefetchConfig,
+  type SmartPrefetchStats,
+} from './smart-prefetch.js';
+
+// Persistent Prefetch (cross-session Markov model)
+export {
+  PersistentPrefetchEngine,
+  createPersistentPrefetch,
+  type PersistentPrefetchConfig,
+  type PrefetchStorage,
+  type SerializedModel,
+} from './persistent-prefetch.js';
