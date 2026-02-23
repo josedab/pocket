@@ -28,3 +28,15 @@ export { RetentionEngine, createRetentionEngine } from './retention-engine.js';
 
 // Compliance Reporter
 export { ComplianceReporter, createComplianceReporter } from './compliance-reporter.js';
+
+// Compliance Engine
+export { ComplianceEngine, createComplianceEngine } from './compliance-engine.js';
+export type {
+  AuditEntry,
+  ComplianceEngineConfig,
+  ComplianceEngineReport,
+  EngineRetentionPolicy,
+  GDPRDeletionResult,
+  GDPRExportResult,
+  RetentionResult,
+} from './compliance-engine.js';
