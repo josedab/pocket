@@ -120,10 +120,10 @@ export {
 export {
   PluginMarketplaceSDK,
   createPluginMarketplaceSDK,
-  type MarketplaceSDKConfig,
-  type PluginSearchResult,
   type InstalledPlugin,
+  type MarketplaceSDKConfig,
   type MarketplaceStats,
+  type PluginSearchResult,
 } from './plugin-marketplace-sdk.js';
 
 // Security Scanner
@@ -134,15 +134,15 @@ export {
   type SecurityCategory,
   type SecurityFinding,
   type SecurityPattern,
-  type SecurityScannerConfig,
   type SecurityScanResult,
+  type SecurityScannerConfig,
   type SecuritySeverity,
 } from './security-scanner.js';
 
 // Marketplace Security Review
 export {
-  reviewPluginSecurity,
   batchReviewPlugins,
+  reviewPluginSecurity,
   type MarketplaceSecurityReview,
   type SecurityPolicy,
 } from './marketplace-security.js';
@@ -164,3 +164,28 @@ export {
   type DepAuditResult,
   type KnownVulnerability,
 } from './dep-audit.js';
+
+// Plugin Installer
+export {
+  PluginInstaller,
+  createPluginInstaller,
+  type InstallResult,
+  type ManagedPlugin,
+  type PluginInstallerConfig,
+  type PluginInstallerEvent,
+  type UninstallResult,
+  type UpdateCheckResult,
+} from './plugin-installer.js';
+
+// Dependency Graph Visualizer
+export { DependencyGraphBuilder, createDependencyGraphBuilder } from './dependency-graph.js';
+export type {
+  DependencyEdge,
+  DependencyGraph,
+  GraphAnalysis,
+  PackageNode,
+} from './dependency-graph.js';
+
+// Template Scaffold
+export { PluginTemplateScaffold, createTemplateScaffold } from './template-scaffold.js';
+export type { ScaffoldResult, TemplateConfig } from './template-scaffold.js';
