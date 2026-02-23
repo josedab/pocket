@@ -115,3 +115,52 @@ export {
   type PluginDiscovery,
   type PluginEntry,
 } from './plugin-discovery.js';
+
+// Plugin Marketplace SDK
+export {
+  PluginMarketplaceSDK,
+  createPluginMarketplaceSDK,
+  type MarketplaceSDKConfig,
+  type PluginSearchResult,
+  type InstalledPlugin,
+  type MarketplaceStats,
+} from './plugin-marketplace-sdk.js';
+
+// Security Scanner
+export {
+  SecurityScanner,
+  createSecurityScanner,
+  type PluginScanInput,
+  type SecurityCategory,
+  type SecurityFinding,
+  type SecurityPattern,
+  type SecurityScannerConfig,
+  type SecurityScanResult,
+  type SecuritySeverity,
+} from './security-scanner.js';
+
+// Marketplace Security Review
+export {
+  reviewPluginSecurity,
+  batchReviewPlugins,
+  type MarketplaceSecurityReview,
+  type SecurityPolicy,
+} from './marketplace-security.js';
+
+// Publish Pipeline
+export {
+  publishPlugin,
+  type PublishCheck,
+  type PublishPipelineOptions,
+  type PublishReadiness,
+  type PublishReport,
+} from './publish-pipeline.js';
+
+// Dependency Audit
+export {
+  auditDependencies,
+  getDefaultVulnDb,
+  type DepAuditFinding,
+  type DepAuditResult,
+  type KnownVulnerability,
+} from './dep-audit.js';
