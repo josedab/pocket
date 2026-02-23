@@ -64,3 +64,19 @@ export * from './context/provider.js';
 
 // Hooks
 export * from './hooks/index.js';
+
+// React Server Components Bridge
+export {
+  createHydrationPayload,
+  createServerPocket,
+  createSuspenseResource,
+  serverQuery,
+  validateHydrationPayload,
+} from './rsc-bridge.js';
+export type {
+  HydrationPayload,
+  ServerDatabase,
+  ServerPocketConfig,
+  ServerQueryResult,
+  SuspenseConfig,
+} from './rsc-bridge.js';
