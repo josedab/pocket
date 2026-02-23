@@ -60,14 +60,21 @@ export { TokenManager, createTokenManager } from './token-manager.js';
 export { AuthManager, createAuthManager } from './auth-manager.js';
 
 // Providers
+export {
+  CredentialsProvider,
+  createCredentialsProvider,
+} from './providers/credentials-provider.js';
 export { OAuth2Provider, createOAuth2Provider } from './providers/oauth2-provider.js';
 export { PasskeyProvider, createPasskeyProvider } from './providers/passkey-provider.js';
-export { CredentialsProvider, createCredentialsProvider } from './providers/credentials-provider.js';
 
 // Plugin
-export type { AuthPluginConfig } from './auth-plugin.js';
 export { createAuthPlugin, createSyncAuthHeaders } from './auth-plugin.js';
+export type { AuthPluginConfig } from './auth-plugin.js';
 
 // Middleware
-export type { AuthMiddleware, AuthRequest, AuthResponse, NextFunction } from './middleware.js';
 export { extractUser, requireRole, verifyToken } from './middleware.js';
+export type { AuthMiddleware, AuthRequest, AuthResponse, NextFunction } from './middleware.js';
+
+// Offline RBAC
+export { OfflineRBAC, createOfflineRBAC } from './offline-rbac.js';
+export type { PermissionCheck, RBACConfig, RBACState } from './offline-rbac.js';
