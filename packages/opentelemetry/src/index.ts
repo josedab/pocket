@@ -82,20 +82,32 @@ export {
 
 // Exporters & Health Checks
 export {
-  MetricExporter,
   HealthCheckMonitor,
-  createMetricExporter,
+  MetricExporter,
   createHealthCheckMonitor,
+  createMetricExporter,
   createPocketHealthChecks,
 } from './exporters.js';
 export type {
+  ExportResult,
   ExportableMetric,
   ExportableSpan,
   ExporterConfig,
   ExporterType,
-  ExportResult,
   HealthCheck,
   HealthCheckConfig,
   HealthCheckResult,
   NamedHealthCheck,
 } from './exporters.js';
+
+// Observability Dashboard
+export { ObservabilityDashboard, createObservabilityDashboard } from './observability-dashboard.js';
+export type {
+  AlertRule,
+  DashboardAlert,
+  DashboardEvent,
+  DashboardSnapshot,
+  ObservabilityConfig,
+  ObservabilityMetricPoint,
+  ObservabilityMetricSeries,
+} from './observability-dashboard.js';
