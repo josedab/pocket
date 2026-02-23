@@ -51,3 +51,6 @@ export * from './observability/index.js';
 
 // Schema Evolution
 export * from './schema-evolution/index.js';
+
+// Query Accelerator
+export * from './query-accelerator/index.js';
