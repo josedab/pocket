@@ -155,10 +155,42 @@ export function createCodeExecutor(config?: CodeExecutorConfig): CodeExecutor {
 }
 
 function executeCode(code: string, context: Record<string, unknown>): unknown {
+  // Reject code containing dangerous globals
+  const blockedPatterns = [
+    /\bprocess\b/,
+    /\brequire\b/,
+    /\bimport\b/,
+    /\b__dirname\b/,
+    /\b__filename\b/,
+    /\bglobalThis\b/,
+    /\bFetch\b/,
+    /\bXMLHttpRequest\b/,
+    /\beval\b/,
+    /\bFunction\b/,
+    /\bwindow\b\s*\./,
+    /\bdocument\b\s*\./,
+    /\blocalStorage\b/,
+    /\bsessionStorage\b/,
+    /\bfetch\s*\(/,
+    /\bnew\s+WebSocket\b/,
+    /\bnew\s+Worker\b/,
+    /\bnew\s+SharedWorker\b/,
+  ];
+
+  for (const pattern of blockedPatterns) {
+    if (pattern.test(code)) {
+      throw new Error(
+        `Blocked: code contains restricted identifier "${pattern.source.replace(/\\b/g, '')}"`
+      );
+    }
+  }
+
   const contextKeys = Object.keys(context);
   const contextValues = Object.values(context);
 
-  // Create a function with context variables as parameters
+  // Create a function with context variables as parameters.
+  // This is intentional for the playground — user code execution is the
+  // feature, but we block dangerous globals above and run in strict mode.
   // eslint-disable-next-line @typescript-eslint/no-implied-eval
   const fn = new Function(...contextKeys, `'use strict';\n${code}`) as (
     ...args: unknown[]
