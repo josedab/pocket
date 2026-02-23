@@ -21,6 +21,7 @@ import { importData } from './commands/import.js';
 import { init } from './commands/init.js';
 import { create as migrateCreate } from './commands/migrate/create.js';
 import { down as migrateDown } from './commands/migrate/down.js';
+import { evolveSchema, formatEvolveResults, type StoredSchema } from './commands/migrate/evolve.js';
 import { status as migrateStatus } from './commands/migrate/status.js';
 import { up as migrateUp } from './commands/migrate/up.js';
 import { restore } from './commands/restore.js';
@@ -97,6 +98,7 @@ Commands:
   migrate up              Run pending migrations
   migrate down [n]        Rollback n migrations (default: 1)
   migrate status          Show migration status
+  migrate evolve          Detect schema changes and generate migrations
   studio                  Launch data inspection UI
   backup                  Create a backup of your data
   restore <file>          Restore data from a backup
@@ -236,9 +238,37 @@ async function main(): Promise<void> {
             await migrateStatus();
             break;
 
+          case 'evolve': {
+            const schemaPath = args.flags.schema as string | undefined;
+            let currentSchemas: Record<string, StoredSchema> = {};
+
+            if (schemaPath) {
+              try {
+                const { readFileSync } = await import('node:fs');
+                const raw = readFileSync(schemaPath, 'utf-8');
+                currentSchemas = JSON.parse(raw) as Record<string, StoredSchema>;
+              } catch (e) {
+                console.error(
+                  `Error reading schema file: ${e instanceof Error ? e.message : String(e)}`
+                );
+                process.exit(1);
+              }
+            }
+
+            const results = await evolveSchema(currentSchemas, {
+              cwd: args.flags.cwd as string | undefined,
+              collection: args.flags.collection as string | undefined,
+              dryRun: args.flags['dry-run'] === true,
+              allowLossy: args.flags['allow-lossy'] === true,
+              outputDir: args.flags.output as string | undefined,
+            });
+            console.log(formatEvolveResults(results));
+            break;
+          }
+
           default:
             console.error(`Unknown migrate command: ${args.subcommand}`);
-            console.error('Available commands: create, up, down, status');
+            console.error('Available commands: create, up, down, status, evolve');
             process.exit(1);
         }
         break;
@@ -298,10 +328,7 @@ async function main(): Promise<void> {
           console.error('Usage: pocket functions:deploy <config>');
           process.exit(1);
         }
-        await functionsDeployCommand(
-          args.positional[0],
-          args.flags.output as string | undefined,
-        );
+        await functionsDeployCommand(args.positional[0], args.flags.output as string | undefined);
         break;
 
       case 'functions:list':
