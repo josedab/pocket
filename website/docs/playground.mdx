@@ -1,110 +1,36 @@
 ---
-id: playground
-title: Interactive Playground
-sidebar_label: Playground
 sidebar_position: 2
+title: Playground
+description: Try Pocket in your browser — no installation required
 ---
-
-import { PlaygroundWithSelector } from '@site/src/components/Playground';
-import { allExamples, crudExample, reactiveExample, searchExample, schemaExample } from '@site/src/components/Playground/examples';
 
 # Interactive Playground
 
-Try Pocket directly in your browser! No installation required.
+Try Pocket directly in your browser. Edit the code, see live results — no installation required.
 
-<PlaygroundWithSelector examples={allExamples} defaultExample="CRUD Operations" height="650px" />
+import StackBlitzEmbed from '@site/src/components/StackBlitzEmbed';
 
-## About the Playground
+<StackBlitzEmbed />
 
-The interactive playground uses [StackBlitz](https://stackblitz.com) to run a full development environment in your browser. You can:
+## What's in the Playground
 
-- **Edit code** in real-time and see changes instantly
-- **Explore** the full project structure
-- **Share** your experiments with others
-- **Fork** examples to save your work
+The playground includes a complete todo app demonstrating:
 
-## Available Examples
+- **Database creation** with in-memory storage
+- **CRUD operations** — insert, update, delete documents
+- **Reactive queries** — live-updating query results
+- **Query explorer** — write filter JSON and see results in real time
 
-### CRUD Operations
-
-Learn the basics of working with Pocket: creating, reading, updating, and deleting documents.
-
-```typescript
-// Insert a document
-await db.collection('todos').insert({
-  title: 'Learn Pocket',
-  completed: false,
-});
-
-// Query documents
-const todos = await db.collection('todos').find().exec();
-
-// Update a document
-await db.collection('todos').update(
-  { _id: todoId },
-  { $set: { completed: true } }
-);
-
-// Delete a document
-await db.collection('todos').remove({ _id: todoId });
-```
-
-### Reactive Queries
-
-See how Pocket's live queries automatically update when data changes.
-
-```typescript
-// React hook that auto-updates
-const { data: messages } = useLiveQuery<Message>(
-  'messages',
-  (query) => query.orderBy('timestamp', 'desc').limit(10)
-);
-```
-
-### Full-Text Search
-
-Explore Pocket's built-in search capabilities.
-
-```typescript
-// Search with filters
-const results = await db.collection('articles')
-  .find()
-  .where('category').equals('tutorial')
-  .search('pocket queries')
-  .exec();
-```
-
-### Schema Validation
-
-Define schemas to validate your data.
-
-```typescript
-const db = Database.create({
-  name: 'my-app',
-  schema: {
-    users: {
-      properties: {
-        name: { type: 'string', required: true },
-        email: { type: 'string', pattern: '^[^@]+@[^@]+\\.[^@]+$' },
-        age: { type: 'number', minimum: 0 },
-      },
-    },
-  },
-});
-```
-
-## Running Locally
-
-Want to run these examples on your machine? Use `create-pocket-app`:
+## Run Locally
 
 ```bash
-npx create-pocket-app my-app --template react-todo
-cd my-app
-npm run dev
+cd examples/playground
+pnpm install
+pnpm dev
 ```
 
-## Need Help?
+## Next Steps
 
-- Check out the [Getting Started guide](/docs/intro)
-- Read the [API Reference](/docs/api/database)
-- Join our [Discord community](https://discord.gg/pocket-db)
+- [Quick Start](/docs/quick-reference) — Quick reference for Pocket APIs
+- [API Reference](/docs/api/database) — Full API documentation
+- [React Integration](/docs/guides/react-integration) — Use Pocket with React hooks
