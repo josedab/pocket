@@ -45,3 +45,6 @@ export * from './copilot-cache.js';
 
 // Streaming Copilot
 export * from './streaming-copilot.js';
+
+// Local Query Inference (pattern-based, no LLM required)
+export * from './local-query-inference.js';
