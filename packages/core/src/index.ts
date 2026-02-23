@@ -48,3 +48,6 @@ export * from './validation/index.js';
 
 // Observability
 export * from './observability/index.js';
+
+// Schema Evolution
+export * from './schema-evolution/index.js';
