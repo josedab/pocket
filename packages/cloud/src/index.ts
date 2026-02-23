@@ -316,26 +316,43 @@ export {
 
 // Tenant Quota Tracker
 export {
+  DEFAULT_TIER_QUOTAS,
   TenantQuotaTracker,
   createTenantQuotaTracker,
-  DEFAULT_TIER_QUOTAS,
   type QuotaCheckResult,
   type TenantQuotaState,
   type TierQuota,
 } from './tenant-quota.js';
 
 // Relay Deduplication
-export {
-  RelayDedup,
-  createRelayDedup,
-  type RelayDedupConfig,
-} from './relay-dedup.js';
+export { RelayDedup, createRelayDedup, type RelayDedupConfig } from './relay-dedup.js';
 
 // Webhook Security
 export {
+  createWebhookHeaders,
   generateWebhookSignature,
   verifyWebhookPayload,
-  createWebhookHeaders,
   type SignatureVerifyResult,
   type WebhookSecurityConfig,
 } from './webhook-security.js';
+
+// Zero-Config Cloud Sync
+export {
+  PocketCloud,
+  createPocketCloud,
+  type PocketCloudConfig,
+  type PocketCloudStatus,
+  type PocketCloudSyncStats,
+  type SyncableDatabase,
+} from './zero-config-cloud.js';
+
+// Cloud Console
+export { CloudConsole, createCloudConsole } from './cloud-console.js';
+export type {
+  ApiKey,
+  ConsoleConfig,
+  ConsoleEvent,
+  ConsoleStats,
+  Tenant,
+  TenantUsage,
+} from './cloud-console.js';
