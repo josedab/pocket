@@ -114,3 +114,23 @@ export type { GraphQLGeneratorConfig } from './generators/graphql-generator.js';
 
 // CLI
 export { parseArgs, runCLI, type CLIOptions } from './cli.js';
+
+// Typed Query Generator
+export { TypedQueryGenerator, createTypedQueryGenerator } from './typed-query-generator.js';
+export type { TypedQueryGeneratorConfig } from './typed-query-generator.js';
+
+// Schema Contract Engine
+export {
+  SchemaContractEngine,
+  createSchemaContractEngine,
+  generateFromContract,
+  parseSchemaContract,
+} from './schema-contract-engine.js';
+export type {
+  CollectionOptions,
+  ContractParseResult,
+  GeneratedOutput,
+  ParsedCollection,
+  ParsedField,
+  SchemaContractConfig,
+} from './schema-contract-engine.js';
