@@ -120,7 +120,7 @@ export type {
 } from './cursor-overlay.js';
 
 // Collaborative Canvas
-export { CanvasEngine, createCanvasEngine, DEFAULT_CANVAS_STYLE } from './canvas-engine.js';
+export { CanvasEngine, DEFAULT_CANVAS_STYLE, createCanvasEngine } from './canvas-engine.js';
 export type {
   CanvasCursor,
   CanvasEngineConfig,
@@ -147,10 +147,10 @@ export type {
 
 // React Collaboration Components (framework-agnostic render descriptors)
 export {
+  COLLAB_CSS_VARS,
   buildCursorDescriptors,
   buildPresenceDescriptors,
   buildStatusDescriptor,
-  COLLAB_CSS_VARS,
 } from './react-components.js';
 export type {
   AvatarRenderDescriptor,
@@ -175,24 +175,24 @@ export type {
 // Yjs Adapter
 export { YjsAdapter, createYjsAdapter } from './yjs-adapter.js';
 export type {
+  YArrayLike,
   YDocLike,
   YMapLike,
   YTextLike,
-  YArrayLike,
   YjsAdapterConfig,
   YjsAdapterEvent,
 } from './yjs-adapter.js';
 
 // Framework Adapters (Vue/Svelte)
 export {
-  createVueCollabAdapters,
   createSvelteCollabAdapters,
+  createVueCollabAdapters,
+  type SvelteReadable,
+  type SvelteStoreFactory,
   type VueCollabCursorsReturn,
   type VueCollabPresenceReturn,
   type VueCollabStatusReturn,
   type VueReactivity,
-  type SvelteReadable,
-  type SvelteStoreFactory,
 } from './framework-adapters.js';
 
 // Conflict Metrics Tracker
@@ -219,3 +219,22 @@ export {
   type UndoRedoConfig,
   type UndoRedoState,
 } from './undo-redo.js';
+
+// React Collaboration SDK (hooks + components factory)
+export {
+  createCollabReactSDK,
+  type CollabProviderProps,
+  type CollabReactAPI,
+  type CollabReactHooks,
+  type CollaboratorInfo,
+} from './react-collab.js';
+
+// Collaborative Text Engine
+export { CollaborativeTextEngine, createCollaborativeTextEngine } from './collaborative-text.js';
+export type {
+  CollabTextConfig,
+  CursorState,
+  TextEvent,
+  TextOperation,
+  TextState,
+} from './collaborative-text.js';
