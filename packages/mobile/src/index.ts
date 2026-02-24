@@ -98,3 +98,16 @@ export * from './background-sync.js';
 
 // App lifecycle management
 export * from './app-lifecycle.js';
+
+// JSI Storage Engine (next-gen)
+export {
+  JSIStorageAdapter,
+  createJSIStorageAdapter,
+  decideSyncSchedule,
+  getTurboModuleSpec,
+  type BatterySchedulerConfig,
+  type BatteryState,
+  type PocketJSIModule,
+  type PocketTurboModuleSpec,
+  type SyncScheduleDecision,
+} from './jsi-engine.js';
