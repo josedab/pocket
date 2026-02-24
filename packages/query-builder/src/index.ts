@@ -158,3 +158,14 @@ export type {
   PreviewDataProvider,
   PreviewResult,
 } from './query-preview.js';
+
+// Visual Query Builder
+export { VisualQueryBuilder, createVisualQueryBuilder } from './visual-query-builder.js';
+export type {
+  CodeExportResult,
+  QueryPreview,
+  VisualFilter,
+  VisualOperator,
+  VisualQuerySpec,
+  VisualSort,
+} from './visual-query-builder.js';
