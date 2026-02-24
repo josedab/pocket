@@ -77,11 +77,11 @@ export {
 export {
   WebCryptoProvider,
   createWebCryptoProvider,
-  toBase64 as webCryptoToBase64,
   fromBase64 as webCryptoFromBase64,
+  toBase64 as webCryptoToBase64,
   type CryptoProvider,
-  type WebCryptoConfig,
   type KeyDerivationParams,
+  type WebCryptoConfig,
 } from './web-crypto-provider.js';
 
 // Encrypted Sync Transport
@@ -92,3 +92,16 @@ export {
   type EncryptedDocument as SyncEncryptedDocument,
   type KeyInfo as SyncKeyInfo,
 } from './encrypted-sync.js';
+
+// Field Encryption Engine
+export {
+  FieldEncryptionEngine,
+  SimpleFieldCryptoProvider,
+  createFieldEncryption,
+} from './field-encryption.js';
+export type {
+  EncryptionConfig,
+  EncryptionStats,
+  FieldCryptoProvider,
+  KeyInfo as FieldKeyInfo,
+} from './field-encryption.js';
