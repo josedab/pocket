@@ -80,3 +80,17 @@ export type {
   CRDTType,
   MergeResult,
 } from './crdt-sync-engine.js';
+
+// Peritext Rich Text CRDT (next-gen)
+export {
+  PeritextDocument,
+  createPeritextDocument,
+  type CharAtom,
+  type CharId,
+  type EditorAdapter,
+  type FormatMark,
+  type FormattedSpan,
+  type MarkType,
+  type PeritextOp,
+  type PeritextSnapshot,
+} from './peritext.js';
