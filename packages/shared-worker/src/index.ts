@@ -42,8 +42,14 @@ export type {
 
 // Multi-tab SDK
 export { createMultiTabSDK } from './multi-tab-sdk.js';
+export type { MultiTabSDK, MultiTabSDKConfig, MultiTabStatus } from './multi-tab-sdk.js';
+
+// SharedWorker Host
+export { SharedWorkerHost, createSharedWorkerHost } from './shared-worker-host.js';
 export type {
-  MultiTabSDK,
-  MultiTabSDKConfig,
-  MultiTabStatus,
-} from './multi-tab-sdk.js';
+  HostedDatabase,
+  MessagePortLike,
+  SharedWorkerHostConfig,
+  SharedWorkerHostStats,
+  TabConnection,
+} from './shared-worker-host.js';
