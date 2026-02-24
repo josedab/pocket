@@ -1,9 +1,7 @@
-import { describe, it, expect, beforeEach } from 'vitest';
-import type { SchemaCanvas } from '../schema-designer.js';
+import { beforeEach, describe, expect, it } from 'vitest';
 import {
   createUseSchemaDesignerHook,
   type ReactHooksForDesigner,
-  type UseSchemaDesignerReturn,
 } from '../react/schema-designer-ui.js';
 
 // ─── Mock React Hooks ────────────────────────────────────────────────────────
