@@ -44,11 +44,11 @@ export {
 
 // Snapshot Matcher
 export {
-  SnapshotMatcher,
-  createSnapshotMatcher,
-  UUID_NORMALIZER,
-  TIMESTAMP_NORMALIZER,
   EPOCH_NORMALIZER,
+  SnapshotMatcher,
+  TIMESTAMP_NORMALIZER,
+  UUID_NORMALIZER,
+  createSnapshotMatcher,
 } from './snapshot-matcher.js';
 export type {
   CollectionDiff,
@@ -60,3 +60,21 @@ export type {
   SnapshotDiff,
   SnapshotNormalizer,
 } from './snapshot-matcher.js';
+
+// Stability Suite
+export { StabilitySuite, createStabilitySuite } from './stability-suite.js';
+export type {
+  ChaosError,
+  ChaosOperation,
+  ChaosTestConfig,
+  ChaosTestResult,
+  FuzzAnomaly,
+  FuzzCrash,
+  FuzzTarget,
+  FuzzTestConfig,
+  FuzzTestResult,
+  LoadTestConfig,
+  LoadTestResult,
+  MemoryLeakResult,
+  MemoryLeakSuspect,
+} from './stability-suite.js';
