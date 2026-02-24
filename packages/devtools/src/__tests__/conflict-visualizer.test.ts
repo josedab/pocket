@@ -1,9 +1,6 @@
-import { describe, it, expect, beforeEach } from 'vitest';
-import {
-  ConflictVisualizer,
-  createConflictVisualizer,
-} from '../conflict-visualizer.js';
+import { beforeEach, describe, expect, it } from 'vitest';
 import type { ConflictEvent } from '../conflict-visualizer.js';
+import { ConflictVisualizer, createConflictVisualizer } from '../conflict-visualizer.js';
 
 function makeEvent(overrides: Partial<ConflictEvent> = {}): ConflictEvent {
   return {
@@ -97,7 +94,7 @@ describe('ConflictVisualizer', () => {
         localVersion: { a: 1 },
         remoteVersion: { a: 2 },
         resolution: 'remote-wins',
-      }),
+      })
     );
 
     const detail = visualizer.getConflictDetail('d1');
@@ -115,13 +112,25 @@ describe('ConflictVisualizer', () => {
   it('aggregates stats by collection and strategy', () => {
     const now = Date.now();
     visualizer.recordConflict(
-      makeEvent({ id: 's1', collection: 'todos', strategy: 'merge', timestamp: now, resolvedAt: now + 200 }),
+      makeEvent({
+        id: 's1',
+        collection: 'todos',
+        strategy: 'merge',
+        timestamp: now,
+        resolvedAt: now + 200,
+      })
     );
     visualizer.recordConflict(
-      makeEvent({ id: 's2', collection: 'notes', strategy: 'merge', timestamp: now, resolvedAt: now + 400 }),
+      makeEvent({
+        id: 's2',
+        collection: 'notes',
+        strategy: 'merge',
+        timestamp: now,
+        resolvedAt: now + 400,
+      })
     );
     visualizer.recordConflict(
-      makeEvent({ id: 's3', collection: 'todos', strategy: 'last-write-wins' }),
+      makeEvent({ id: 's3', collection: 'todos', strategy: 'last-write-wins' })
     );
 
     const stats = visualizer.getStats();
@@ -172,7 +181,7 @@ describe('ConflictVisualizer', () => {
 
     const timeline = vis.getTimeline();
     expect(timeline.totalConflicts).toBe(3);
-    expect(timeline.events[0].id).toBe('m2');
+    expect(timeline.events[0]!.id).toBe('m2');
     vis.dispose();
   });
 
