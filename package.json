@@ -45,7 +45,8 @@
     "prepublish:check": "node scripts/pre-publish-check.mjs",
     "status": "node scripts/package-status.mjs",
     "health": "node scripts/health-check.mjs",
-    "quickstart": "pnpm install && pnpm build && echo '' && echo '✅ Pocket is ready!' && echo '' && echo 'Next steps:' && echo '  pnpm test              Run all tests' && echo '  pnpm status            View package health' && echo '  See QUICKSTART.md      5-minute contributor guide' && echo ''",
+    "quickstart": "cp -n .env.example .env.local 2>/dev/null || true && pnpm install && pnpm build && echo '' && echo '✅ Pocket is ready!' && echo '' && pnpm status && echo '' && echo 'Next steps:' && echo '  pnpm test              Run all tests' && echo '  pnpm status            View package health' && echo '  See QUICKSTART.md      5-minute contributor guide' && echo ''",
+    "test:package": "npx turbo run test --filter",
     "prepare": "husky"
   },
   "lint-staged": {
