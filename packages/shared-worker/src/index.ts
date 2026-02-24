@@ -53,3 +53,13 @@ export type {
   SharedWorkerHostStats,
   TabConnection,
 } from './shared-worker-host.js';
+
+// Multi-Tab Middleware (next-gen)
+export {
+  MultiTabMiddleware,
+  createMultiTabMiddleware,
+  type CoordinationEvent,
+  type MultiTabMiddlewareConfig,
+  type TabHealth,
+  type TabRole,
+} from './multi-tab-middleware.js';
