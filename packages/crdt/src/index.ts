@@ -68,3 +68,15 @@ export {
   type PresenceState,
   type PresenceTracker,
 } from './collaborative-hooks.js';
+
+// CRDT Sync Engine
+export { CRDTSyncEngine, createCRDTSyncEngine } from './crdt-sync-engine.js';
+export type {
+  CRDTEvent,
+  CRDTFieldConfig,
+  CRDTOperation,
+  CRDTState,
+  CRDTSyncConfig,
+  CRDTType,
+  MergeResult,
+} from './crdt-sync-engine.js';
