@@ -57,15 +57,15 @@ export type { DetectedFormat, FormatDetector } from './format-detector.js';
 // Import/Export Hub
 export { createImportExportHub } from './import-hub.js';
 export type {
-  ImportFormat,
   ExportFormat,
-  ImportError,
-  ImportResult,
-  ExportResult,
-  ImportOptions,
   ExportOptions,
+  ExportResult,
+  ImportError,
   ImportExportConfig,
   ImportExportHub,
+  ImportFormat,
+  ImportOptions,
+  ImportResult,
 } from './import-hub.js';
 
 // Scheduled Backup
@@ -92,12 +92,38 @@ export {
 
 // Cloud Storage Adapters
 export {
-  S3StorageAdapter,
   GCSStorageAdapter,
-  createS3Adapter,
+  S3StorageAdapter,
   createGCSAdapter,
+  createS3Adapter,
   type CloudStorageAdapter,
   type GCSAdapterConfig,
   type S3AdapterConfig,
   type UploadResult,
 } from './cloud-storage-adapters.js';
+
+// Universal Export/Import
+export {
+  UniversalExporter,
+  UniversalImporter,
+  createUniversalExporter,
+  createUniversalImporter,
+  type ExportableDatabase,
+  type ImportSource,
+  type UniversalExportConfig,
+  type UniversalFormat,
+  type UniversalImportConfig,
+} from './universal-export-import.js';
+
+// Data Vault
+export { DataVault, createDataVault } from './data-vault.js';
+export type {
+  VaultData,
+  VaultExportConfig,
+  VaultExportResult,
+  VaultHeader,
+  VaultImportConfig,
+  VaultImportResult,
+  VaultInfo,
+  VaultableDatabase,
+} from './data-vault.js';
