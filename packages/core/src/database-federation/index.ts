@@ -19,3 +19,14 @@ export type {
   FederatedRegistry,
   JoinStrategy,
 } from './query-optimizer.js';
+
+// Data Mesh (next-gen)
+export {
+  DataMeshRegistry,
+  createDataMeshRegistry,
+  type CrossJoinSpec,
+  type FederatedMeshQuery,
+  type MeshDatabase,
+  type MeshQueryExecutor,
+  type MeshQueryResult,
+} from './data-mesh.js';

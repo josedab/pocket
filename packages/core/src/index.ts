@@ -60,3 +60,6 @@ export * from './streaming/index.js';
 
 // Database Federation
 export * from './database-federation/index.js';
+
+// Graph Engine (multi-model)
+export * from './graph/index.js';
