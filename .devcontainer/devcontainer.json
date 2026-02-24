@@ -29,6 +29,6 @@
       }
     }
   },
-  "postCreateCommand": "pnpm install && pnpm build",
+  "postCreateCommand": "pnpm quickstart",
   "remoteUser": "node"
 }
