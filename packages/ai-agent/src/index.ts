@@ -55,11 +55,34 @@ export type { ExecutionPlan, ExecutionPlanner, ExecutionStep, PlanSummary } from
 // Offline agent
 export { OfflineAgent, createOfflineAgent } from './offline-agent.js';
 export type {
-  OfflineAgentConfig,
+  AgentQuery,
   CollectionContext,
   CollectionFieldDescriptor,
-  AgentQuery,
-  OfflineAgentStep,
+  OfflineAgentConfig,
   OfflineAgentResult,
   OfflineAgentStats,
+  OfflineAgentStep,
 } from './offline-agent.js';
+
+// Scheduled task runner
+export { ScheduledTaskRunner, createScheduledTaskRunner } from './task-runner.js';
+export type {
+  ScheduledTask,
+  TaskExecutionResult,
+  TaskRunnerEvent,
+  TaskRunnerStatus,
+} from './task-runner.js';
+
+// Document watcher
+export { DocumentWatcher, createDocumentWatcher } from './document-watcher.js';
+export type {
+  ChangeSource,
+  DocumentChange,
+  PipelineResult,
+  WatchPipeline,
+  WatchTrigger,
+} from './document-watcher.js';
+
+// Inference cache
+export { InferenceCache, createInferenceCache } from './inference-cache.js';
+export type { InferenceCacheConfig, InferenceCacheStats } from './inference-cache.js';
