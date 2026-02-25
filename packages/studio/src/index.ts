@@ -125,14 +125,10 @@ export {
   type CanvasField,
   type CanvasIndex,
   type CanvasRelationship,
-  type CollectionSchemaInfo,
   type DesignerAction,
   type FieldType,
   type SchemaCanvas,
   type SchemaDesignerConfig,
-  type SchemaFieldInfo,
-  type SchemaRelationship,
-  type SchemaValidationIssue,
 } from './schema-designer.js';
 
 // Data Explorer
@@ -261,3 +257,48 @@ export {
   type QueryHistoryExportFormat,
   type QueryHistoryStats,
 } from './query-history.js';
+
+// DevTools Panel
+export { DevToolsPanel, createDevToolsPanel } from './devtools-panel.js';
+export type {
+  InspectableDatabase,
+  PanelChangeEvent,
+  PanelCollectionInfo,
+  PanelCommand,
+  PanelCommandResult,
+  PanelConfig,
+  PanelMetrics,
+  PanelSnapshot,
+  PanelUpdate,
+} from './devtools-panel.js';
+
+// Conflict Playground
+export { ConflictPlayground, createConflictPlayground } from './conflict-playground.js';
+export type {
+  ConflictPlaygroundEvent,
+  ConflictPlaygroundStats,
+  ConflictRecord,
+  FieldDiff,
+  ManualResolution,
+} from './conflict-playground.js';
+
+// Chrome DevTools Extension Generator
+export {
+  generateContentScript,
+  generateDevToolsPage,
+  generateExtensionFiles,
+  generateExtensionManifest,
+  generatePanelHTML,
+} from './chrome-devtools-extension.js';
+export type {
+  DetectionResult,
+  ExtensionManifest,
+  ExtensionPanelConfig,
+  ExtensionTab,
+  PanelMessage,
+  PanelResponse,
+} from './chrome-devtools-extension.js';
+
+// React Panel Renderer
+export { generateReactPanelApp, getReactPanelFileCount } from './react-panel-renderer.js';
+export type { ReactPanelConfig, ReactPanelFile, ReactPanelTab } from './react-panel-renderer.js';

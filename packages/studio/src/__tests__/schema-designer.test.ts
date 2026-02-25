@@ -1,9 +1,9 @@
-import { describe, it, expect, beforeEach } from 'vitest';
 import { firstValueFrom, take, toArray } from 'rxjs';
+import { beforeEach, describe, expect, it } from 'vitest';
 import {
   SchemaDesigner,
   createSchemaDesigner,
-  type CanvasCollection,
+  type CanvasField,
   type SchemaCanvas,
 } from '../schema-designer.js';
 
@@ -58,7 +58,7 @@ describe('SchemaDesigner', () => {
       name: 'email',
       type: 'string',
       optional: false,
-    });
+    }) as CanvasField;
     expect(field.name).toBe('email');
     expect(field.type).toBe('string');
     expect(designer.getCanvas().collections[0]!.fields).toHaveLength(1);
@@ -70,7 +70,7 @@ describe('SchemaDesigner', () => {
       name: 'email',
       type: 'string',
       optional: false,
-    });
+    }) as CanvasField;
     designer.removeField(coll.id, field.id);
     expect(designer.getCanvas().collections[0]!.fields).toHaveLength(0);
   });
@@ -291,7 +291,11 @@ describe('SchemaDesigner', () => {
 
   it('should undo removeField', () => {
     const coll = designer.addCollection('Users');
-    const field = designer.addField(coll.id, { name: 'email', type: 'string', optional: false });
+    const field = designer.addField(coll.id, {
+      name: 'email',
+      type: 'string',
+      optional: false,
+    }) as CanvasField;
     designer.removeField(coll.id, field.id);
     expect(designer.getCanvas().collections[0]!.fields).toHaveLength(0);
 
@@ -450,7 +454,11 @@ describe('SchemaDesigner', () => {
 
   it('should rename a field', () => {
     const coll = designer.addCollection('Users');
-    const field = designer.addField(coll.id, { name: 'email', type: 'string', optional: false });
+    const field = designer.addField(coll.id, {
+      name: 'email',
+      type: 'string',
+      optional: false,
+    }) as CanvasField;
     designer.renameField(coll.id, field.id, 'emailAddress');
     expect(designer.getCanvas().collections[0]!.fields[0]!.name).toBe('emailAddress');
   });
