@@ -177,3 +177,13 @@ export {
 
 // Re-export core types for convenience
 export type { Document, StorageAdapter, StorageConfig } from '@pocket/core';
+
+// Edge Database Runtime
+export {
+  EdgeDatabaseRuntime,
+  createEdgeRuntime,
+  type EdgeEvent,
+  type EdgeRuntimeConfig,
+  type EdgeStats,
+  type EdgeStatus,
+} from './edge-runtime.js';
