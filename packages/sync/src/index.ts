@@ -101,8 +101,8 @@ export {
   type AdaptiveSyncConfig,
   type AdaptiveSyncStats,
   type NetworkQuality,
-  type SyncProfile,
   type SyncPriorityItem,
+  type SyncProfile,
 } from './adaptive-sync.js';
 
 // Device Sync
@@ -115,7 +115,6 @@ export {
   type DeviceSyncStats,
   type SyncRule,
 } from './device-sync.js';
-
 
 // Retry Metrics + Circuit Breaker
 export {
@@ -137,3 +136,21 @@ export {
   type SyncFilterResult,
   type SyncFilterRule,
 } from './selective-filter.js';
+
+// Federated Sync Mesh
+export * from './federation/index.js';
+
+// Optimistic Sync Queue v2
+export {
+  OptimisticSyncQueue,
+  createOptimisticSyncQueue,
+  createUseOptimisticMutationHook,
+  type EnqueueInput,
+  type MutationOperation,
+  type MutationStatus,
+  type OptimisticMutation,
+  type SyncQueueConfig,
+  type SyncQueueEvent,
+  type SyncQueueStats,
+  type UseOptimisticMutationReturn,
+} from './optimistic-sync-queue.js';
