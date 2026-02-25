@@ -101,6 +101,7 @@ export type { GenerationTarget, PipelineConfig, PipelineOutput } from './generat
 export { createDSLParser, parsePocketSchema, schemaToCodegenInput } from './schema-dsl.js';
 export type {
   DslFieldType,
+  DslRelation,
   PocketCollectionDef,
   PocketDslSchema,
   PocketFieldDef,

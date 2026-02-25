@@ -12,7 +12,14 @@ import type { CollectionSchema, PocketSchema, SchemaField, SchemaFieldType } fro
 // ─── DSL AST Types ───────────────────────────────────────────────────────────
 
 /** Supported DSL field type strings */
-export type DslFieldType = 'string' | 'number' | 'boolean' | 'date' | 'string[]' | 'number[]';
+export type DslFieldType =
+  | 'string'
+  | 'number'
+  | 'boolean'
+  | 'date'
+  | 'string[]'
+  | 'number[]'
+  | 'ref';
 
 /** A single field definition in the DSL */
 export interface PocketFieldDef {
@@ -21,6 +28,10 @@ export interface PocketFieldDef {
   optional: boolean;
   defaultValue?: unknown;
   isArray: boolean;
+  /** For ref type: target collection name */
+  refTarget?: string;
+  /** For ref type: cardinality */
+  refCardinality?: 'one' | 'many';
 }
 
 /** A collection definition in the DSL */
@@ -29,6 +40,16 @@ export interface PocketCollectionDef {
   fields: PocketFieldDef[];
   indexes: string[][];
   uniques: string[][];
+  /** Relations declared via @relation() directive */
+  relations: DslRelation[];
+}
+
+/** Relation definition from DSL. */
+export interface DslRelation {
+  name: string;
+  target: string;
+  type: 'hasOne' | 'hasMany' | 'belongsTo';
+  foreignKey: string;
 }
 
 /** Top-level DSL schema AST */
@@ -52,7 +73,7 @@ export interface SchemaParseResult {
 
 // ─── DSL Field Type Mapping ──────────────────────────────────────────────────
 
-const SIMPLE_TYPE_SET = new Set<string>(['string', 'number', 'boolean', 'date']);
+const SIMPLE_TYPE_SET = new Set<string>(['string', 'number', 'boolean', 'date', 'ref']);
 const ARRAY_TYPE_SET = new Set<string>(['string[]', 'number[]']);
 
 function isValidDslType(t: string): t is DslFieldType {
@@ -104,6 +125,7 @@ export function parsePocketSchema(source: string): SchemaParseResult {
     const fields: PocketFieldDef[] = [];
     const indexes: string[][] = [];
     const uniques: string[][] = [];
+    const relations: DslRelation[] = [];
     i++;
 
     // Parse body until closing brace
@@ -123,15 +145,38 @@ export function parsePocketSchema(source: string): SchemaParseResult {
         break;
       }
 
-      // Directive: @index(...) or @unique(...)
-      const directiveMatch = /^@(index|unique)\(([^)]*)\)$/.exec(bodyTrimmed);
+      // Directive: @index(...), @unique(...), or @relation(...)
+      const directiveMatch = /^@(index|unique|relation)\(([^)]*)\)$/.exec(bodyTrimmed);
       if (directiveMatch) {
         const kind = directiveMatch[1]!;
         const args = directiveMatch[2]!
           .split(',')
           .map((s) => s.trim())
           .filter(Boolean);
-        if (args.length === 0) {
+        if (kind === 'relation') {
+          // @relation(name, target, type, foreignKey)
+          if (args.length >= 3) {
+            const relType = args[2] as 'hasOne' | 'hasMany' | 'belongsTo';
+            if (!['hasOne', 'hasMany', 'belongsTo'].includes(relType)) {
+              errors.push({
+                message: `Invalid relation type "${relType}". Expected: hasOne, hasMany, belongsTo`,
+                line: i + 1,
+              });
+            } else {
+              relations.push({
+                name: args[0]!,
+                target: args[1]!,
+                type: relType,
+                foreignKey: args[3] ?? `${args[1]!.toLowerCase()}Id`,
+              });
+            }
+          } else {
+            errors.push({
+              message: `@relation requires at least 3 args: name, target, type`,
+              line: i + 1,
+            });
+          }
+        } else if (args.length === 0) {
           errors.push({ message: `@${kind} requires at least one field`, line: i + 1 });
         } else if (kind === 'index') {
           indexes.push(args);
@@ -142,7 +187,24 @@ export function parsePocketSchema(source: string): SchemaParseResult {
         continue;
       }
 
-      // Field: name[?]: type [= default]
+      // Field: name[?]: type [= default] or name[?]: ref(Target)
+      const refFieldMatch = /^(\w+)(\?)?\s*:\s*ref\((\w+)\)$/.exec(bodyTrimmed);
+      if (refFieldMatch) {
+        const fieldName = refFieldMatch[1]!;
+        const optional = refFieldMatch[2] === '?';
+        const refTarget = refFieldMatch[3]!;
+        fields.push({
+          name: fieldName,
+          type: 'ref' as DslFieldType,
+          optional,
+          isArray: false,
+          refTarget,
+          refCardinality: 'one',
+        });
+        i++;
+        continue;
+      }
+
       const fieldMatch = /^(\w+)(\?)?\s*:\s*(\w+(?:\[\])?)\s*(?:=\s*(.+))?$/.exec(bodyTrimmed);
       if (!fieldMatch) {
         errors.push({ message: `Invalid field syntax: "${bodyTrimmed}"`, line: i + 1 });
@@ -169,13 +231,16 @@ export function parsePocketSchema(source: string): SchemaParseResult {
       if (rawDefault !== undefined) {
         defaultValue = parseDefault(rawDefault, rawType);
         if (defaultValue === undefined) {
-          errors.push({ message: `Invalid default value "${rawDefault}" for type ${rawType}`, line: i + 1 });
+          errors.push({
+            message: `Invalid default value "${rawDefault}" for type ${rawType}`,
+            line: i + 1,
+          });
           i++;
           continue;
         }
       }
 
-      fields.push({ name: fieldName, type: rawType as DslFieldType, optional, defaultValue, isArray });
+      fields.push({ name: fieldName, type: rawType, optional, defaultValue, isArray });
       i++;
     }
 
@@ -183,7 +248,7 @@ export function parsePocketSchema(source: string): SchemaParseResult {
       errors.push({ message: `Unclosed collection "${collName}"`, line: i });
     }
 
-    collections.push({ name: collName, fields, indexes, uniques });
+    collections.push({ name: collName, fields, indexes, uniques, relations });
   }
 
   if (errors.length > 0) {
@@ -224,6 +289,17 @@ export function schemaToCodegenInput(schema: PocketDslSchema): PocketSchema {
     const fields: Record<string, SchemaField> = {};
 
     for (const f of coll.fields) {
+      // Handle ref type → reference field
+      if (f.type === 'ref' && f.refTarget) {
+        fields[f.name] = {
+          type: 'reference',
+          required: !f.optional,
+          reference: { collection: f.refTarget, field: '_id' },
+          index: true,
+        };
+        continue;
+      }
+
       const baseType = f.isArray ? f.type.replace('[]', '') : f.type;
       const schemaFieldType: SchemaFieldType = f.isArray ? 'array' : (baseType as SchemaFieldType);
 
