@@ -187,3 +187,20 @@ export {
   type EdgeStats,
   type EdgeStatus,
 } from './edge-runtime.js';
+
+// Edge-Native Sync Adapter
+export {
+  EdgeSyncAdapter,
+  createCloudflareSync,
+  createDenoSync,
+  createEdgeSync,
+  createVercelSync,
+  type EdgePlatform,
+  type EdgeSyncAdapterConfig,
+  type EdgeSyncAdapterState,
+  type EdgeSyncChange,
+  type SyncCheckpoint,
+  type SyncPullResult,
+  type SyncPushResult,
+  type SyncStatus,
+} from './edge-sync-adapter.js';
