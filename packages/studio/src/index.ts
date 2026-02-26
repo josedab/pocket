@@ -218,6 +218,21 @@ export {
 // React Schema Designer UI
 export * from './react/index.js';
 
+// Schema Design Engine (next-gen)
+export {
+  SchemaDesignEngine,
+  createSchemaDesignEngine,
+  type CollectionSchema,
+  type DatabaseSchema,
+  type FieldDefinition,
+  type FieldValidation,
+  type IndexDefinition,
+  type RelationshipDefinition,
+  type SchemaChange,
+  type SchemaDiff,
+  type SchemaFieldType,
+} from './schema-design-engine.js';
+
 // Studio SDK
 export {
   StudioSDK,
