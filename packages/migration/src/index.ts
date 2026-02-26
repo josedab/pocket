@@ -125,3 +125,14 @@ export {
   type MigrationRunResult,
   type MigrationRunStatus,
 } from './migration-runner.js';
+
+// Lazy Migration Engine (next-gen)
+export {
+  LazyMigrationEngine,
+  createLazyMigrationEngine,
+  type LazyMigrationChain,
+  type LazyMigrationConfig,
+  type LazyMigrationDocumentStore,
+  type LazyMigrationProgress,
+  type LazyMigrationStep,
+} from './lazy-migration.js';
