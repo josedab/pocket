@@ -78,3 +78,19 @@ export type {
   MemoryLeakResult,
   MemoryLeakSuspect,
 } from './stability-suite.js';
+
+// Offline-First Testing Toolkit (next-gen)
+export {
+  assertConvergence,
+  createMockSync,
+  createTestDatabase,
+  simulateConflict,
+  simulateNetwork,
+  simulateOffline,
+  type MockSync,
+  type NetworkSimulation,
+  type OfflineNetworkCondition,
+  type SimulatedConflict,
+  type TestDatabase,
+  type TestDatabaseOptions,
+} from './offline-toolkit.js';
