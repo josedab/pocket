@@ -73,7 +73,7 @@ const sidebars: SidebarsConfig = {
       type: 'category',
       label: 'Best Practices',
       collapsed: true,
-      items: ['guides/testing', 'guides/performance', 'guides/security'],
+      items: ['guides/testing', 'guides/performance', 'guides/security', 'guides/troubleshooting'],
     },
     {
       type: 'category',
