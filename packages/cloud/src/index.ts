@@ -356,3 +356,38 @@ export type {
   Tenant,
   TenantUsage,
 } from './cloud-console.js';
+
+// Edge Replication
+export {
+  EdgeReplicationManager,
+  createEdgeReplicationManager,
+  type EdgeConsistency,
+  type EdgeReplicationConfig,
+  type EdgeReplicationEvent,
+  type EdgeReplicationStatus,
+  type ReplicaStatus,
+} from './edge-replication.js';
+
+// CDN Router
+export {
+  CDNRouter,
+  createCDNRouter,
+  type CDNRoutingConfig,
+  type LocationHint,
+  type RoutingDecision,
+} from './cdn-router.js';
+
+// Hosted Service (SaaS)
+export {
+  HOSTED_TIER_LIMITS,
+  HostedService,
+  createHostedService,
+  type HostedAccount,
+  type HostedProject,
+  type HostedServiceEvent,
+  type HostedTier,
+  type SignupInput,
+  type TierLimits,
+  type UsageCheckResult,
+  type UsageMeter,
+} from './hosted-service.js';
