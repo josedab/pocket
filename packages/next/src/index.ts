@@ -26,3 +26,29 @@ export type {
   WebhookConfig,
   WebhookPayload,
 } from './isr-adapter.js';
+
+// ISR Bridge (next-gen)
+export {
+  HydrationBridge,
+  createRevalidationHandler,
+  createStaticPropsFactory,
+  verifyRevalidationSignature,
+  type HydrationPayload,
+  type ISRConfig,
+  type ISRDataSource,
+  type ISRRevalidationResult,
+  type PocketStaticProps,
+  type RevalidationRequest,
+} from './isr-bridge.js';
+
+// ISR Middleware (next-gen)
+export {
+  ISRMiddleware,
+  collectionCacheTag,
+  createISRMiddleware,
+  documentCacheTag,
+  type CacheTag,
+  type ISRMiddlewareConfig,
+  type MiddlewareResult,
+  type SyncRevalidationEvent,
+} from './isr-middleware.js';
