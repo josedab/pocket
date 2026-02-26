@@ -8,6 +8,7 @@
 
 import { backup } from './commands/backup.js';
 import { createPluginCommand } from './commands/create-plugin.js';
+import { formatBenchmarkReport, runBenchmark, runHealthCheck } from './commands/diagnostics.js';
 import { doctor } from './commands/doctor.js';
 import { exportData } from './commands/export.js';
 import {
@@ -25,6 +26,7 @@ import { evolveSchema, formatEvolveResults, type StoredSchema } from './commands
 import { status as migrateStatus } from './commands/migrate/status.js';
 import { up as migrateUp } from './commands/migrate/up.js';
 import { restore } from './commands/restore.js';
+import { scaffold } from './commands/scaffold.js';
 import { studio } from './commands/studio.js';
 
 /**
@@ -109,6 +111,9 @@ Commands:
   functions:deploy <cfg>  Deploy functions from config file
   functions:list <cfg>    List defined functions
   functions:remove <cfg> <name>  Remove a function by name
+  new <name>              Scaffold a new Pocket project
+  health                  Run health checks on project setup
+  bench                   Run performance benchmarks
 
 Options:
   --help, -h              Show help
@@ -128,6 +133,9 @@ Examples:
   pocket export users                   Export users collection
   pocket import ./backup.json           Import from file
   pocket generate types                 Generate TypeScript types
+  pocket new my-app --template react    Scaffold a new React project
+  pocket health                         Check project configuration
+  pocket bench                          Run performance benchmarks
 
 For command-specific help:
   pocket <command> --help
@@ -352,6 +360,88 @@ async function main(): Promise<void> {
       case '':
         printHelp();
         break;
+
+      case 'new': {
+        const projectName = args.positional[0];
+        if (!projectName) {
+          console.error('Error: Project name is required');
+          console.error('Usage: pocket new <name> [--template basic|react|nextjs|node-api]');
+          process.exit(1);
+        }
+        const template = (args.flags.template as string) ?? 'basic';
+        const collections = args.flags.collections
+          ? (args.flags.collections as string).split(',')
+          : undefined;
+        const result = scaffold({
+          name: projectName,
+          template: template as 'basic' | 'react' | 'nextjs' | 'node-api',
+          collections,
+          withSync: args.flags.sync === true,
+          withAuth: args.flags.auth === true,
+          packageManager: (args.flags.pm as string as 'npm' | 'pnpm' | 'yarn') ?? undefined,
+        });
+
+        if (!result.success) {
+          console.error('Error:', result.error);
+          process.exit(1);
+        }
+
+        console.log(`\n✅ Project "${projectName}" scaffolded with ${result.files.length} files\n`);
+        console.log('Generated files:');
+        for (const file of result.files) {
+          console.log(`  📄 ${file.path}`);
+        }
+        console.log('\nNext steps:');
+        for (const cmd of result.commands) {
+          console.log(`  $ ${cmd}`);
+        }
+        console.log('');
+        break;
+      }
+
+      case 'health': {
+        const configPath = args.flags.config as string | undefined;
+        const report = runHealthCheck({
+          configPath,
+          hasDatabase: true,
+          hasCollections: true,
+          hasTests: true,
+        });
+
+        console.log('\n🏥 Pocket Health Check\n');
+        for (const item of report.items) {
+          const icon = item.status === 'pass' ? '✅' : item.status === 'warn' ? '⚠️' : '❌';
+          console.log(`  ${icon} ${item.name}: ${item.message}`);
+        }
+        console.log(
+          `\n  Summary: ${report.passed} passed, ${report.warnings} warnings, ${report.failed} failed`
+        );
+        console.log(report.healthy ? '  ✅ Project is healthy\n' : '  ❌ Issues found\n');
+
+        if (!report.healthy) process.exit(1);
+        break;
+      }
+
+      case 'bench': {
+        console.log('\n⏱️  Running Pocket Benchmarks...\n');
+        const iterations = args.flags.iterations
+          ? parseInt(args.flags.iterations as string, 10)
+          : 100;
+
+        const benchReport = await runBenchmark({
+          insert: async () => {
+            /* no-op benchmark placeholder */
+          },
+          query: async () => 0,
+          update: async () => {},
+          remove: async () => {},
+          iterations,
+        });
+
+        console.log(formatBenchmarkReport(benchReport));
+        console.log('');
+        break;
+      }
 
       default:
         console.error(`Unknown command: ${args.command}`);

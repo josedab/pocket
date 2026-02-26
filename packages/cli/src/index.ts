@@ -58,6 +58,15 @@ export { findConfigFile, loadConfig, loadProjectConfig, validateConfig } from '.
 // Commands
 export { createPluginCommand, type CreatePluginOptions } from './commands/create-plugin.js';
 export {
+  DeployCommand,
+  createDeployCommand,
+  type DeployFile,
+  type DeployOptions,
+  type DeployProvider,
+  type DeployResult,
+} from './commands/deploy.js';
+export { exportData, type ExportOptions } from './commands/export.js';
+export {
   functionsDeployCommand,
   functionsInitCommand,
   functionsListCommand,
@@ -65,7 +74,6 @@ export {
   type FunctionDefinition,
   type FunctionsCommandResult,
 } from './commands/functions.js';
-export { exportData, type ExportOptions } from './commands/export.js';
 export { generateTypes, type GenerateTypesOptions } from './commands/generate/types.js';
 export { importData, type ImportOptions } from './commands/import.js';
 export { init, type InitOptions } from './commands/init.js';
@@ -74,46 +82,38 @@ export { down as migrateDown, type MigrateDownOptions } from './commands/migrate
 export { status as migrateStatus, type MigrateStatusOptions } from './commands/migrate/status.js';
 export { up as migrateUp, type MigrateUpOptions } from './commands/migrate/up.js';
 export { studio, type StudioOptions } from './commands/studio.js';
-export {
-  DeployCommand,
-  createDeployCommand,
-  type DeployOptions,
-  type DeployProvider,
-  type DeployFile,
-  type DeployResult,
-} from './commands/deploy.js';
 
 // Enhanced Deploy
 export {
+  cleanupPreviews,
+  clearDeploymentHistory,
+  comparePreviews,
+  createPreview,
+  deletePreview,
   deploy,
   detectFramework,
   generateDeployConfig,
-  createPreview,
-  listPreviews,
-  getPreview,
-  deletePreview,
-  cleanupPreviews,
-  comparePreviews,
-  recordDeployment,
   getDeploymentHistory,
+  getPreview,
+  listPreviews,
+  recordDeployment,
   rollback,
-  clearDeploymentHistory,
-  type FrameworkType,
+  type ConfigGeneratorOptions,
+  type ConfigGeneratorResult,
+  type DeployTarget,
+  type DeploymentDiff,
+  type DeploymentRecord,
   type EnhancedDeployOptions,
   type EnhancedDeployResult,
-  type DeployTarget,
-  type ConfigGeneratorOptions,
+  type FrameworkType,
   type GeneratedFile,
-  type ConfigGeneratorResult,
-  type PreviewOptions,
-  type PreviewDeployment,
   type PreviewComparison,
+  type PreviewDeployment,
   type PreviewDiff,
+  type PreviewOptions,
   type RecordDeploymentOptions,
-  type DeploymentRecord,
   type RollbackOptions,
   type RollbackResult,
-  type DeploymentDiff,
 } from './commands/deploy/index.js';
 
 // AI Assistant
@@ -158,3 +158,24 @@ export const migrate = {
     return status();
   },
 };
+
+// Project Scaffolding (next-gen)
+export {
+  generateCollectionCode,
+  scaffold,
+  type ProjectTemplate,
+  type GeneratedFile as ScaffoldGeneratedFile,
+  type ScaffoldOptions,
+  type ScaffoldResult,
+} from './commands/scaffold.js';
+
+// Diagnostics (next-gen)
+export {
+  formatBenchmarkReport,
+  runBenchmark,
+  runHealthCheck,
+  type BenchmarkReport,
+  type BenchmarkResult,
+  type HealthCheckItem,
+  type HealthReport,
+} from './commands/diagnostics.js';
