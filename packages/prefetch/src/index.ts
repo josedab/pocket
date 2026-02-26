@@ -80,3 +80,14 @@ export {
   type PrefetchStorage,
   type SerializedModel,
 } from './persistent-prefetch.js';
+
+// Navigation Flow Collector
+export {
+  NavigationFlowCollector,
+  createNavigationCollector,
+  type NavigationCollectorConfig,
+  type NavigationCollectorState,
+  type NavigationEvent,
+  type NavigationTransition,
+  type RouteQueryAssociation,
+} from './navigation-collector.js';
