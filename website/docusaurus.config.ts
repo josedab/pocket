@@ -116,6 +116,11 @@ const config: Config = {
           position: 'left',
         },
         {
+          to: '/benchmarks',
+          label: 'Benchmarks',
+          position: 'left',
+        },
+        {
           to: '/docs/adr/README',
           label: 'ADRs',
           position: 'left',

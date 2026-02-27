@@ -66,6 +66,7 @@ const sidebars: SidebarsConfig = {
         'guides/observability',
         'guides/devtools',
         'guides/migrating-from-other-databases',
+        'guides/universal-sync-protocol',
       ],
     },
     {
