@@ -74,3 +74,24 @@ export {
   type RLSMiddlewareConfig,
   type WrappableStore,
 } from './rls-middleware.js';
+
+// Policy DSL
+export {
+  PolicyDSL,
+  PolicyEvaluator,
+  PolicyRuleBuilder,
+  createPolicyDSL,
+  createPolicyEvaluator,
+} from './policy-dsl.js';
+export type {
+  PolicyAction as DSLPolicyAction,
+  PolicyCondition as DSLPolicyCondition,
+  PolicyEffect as DSLPolicyEffect,
+  PolicyRule,
+  PolicySet,
+  RLSContext,
+} from './policy-dsl.js';
+
+// Sync RLS
+export { SyncRLS, createSyncRLS } from './sync-rls.js';
+export type { SyncFilter, SyncRLSConfig } from './sync-rls.js';
