@@ -92,7 +92,7 @@ const TEMPLATES: Record<string, TemplateConfig> = {
       '@sveltejs/vite-plugin-svelte': '^3.0.0',
     },
   },
-  'expo': (() => {
+  expo: (() => {
     const t = getExpoTemplate();
     return {
       name: t.name,
@@ -102,6 +102,47 @@ const TEMPLATES: Record<string, TemplateConfig> = {
       devDependencies: t.devDependencies,
     };
   })(),
+  'react-with-sync': {
+    name: 'React + Sync',
+    description: 'React app with real-time sync and offline support',
+    framework: 'react',
+    dependencies: {
+      react: '^18.2.0',
+      'react-dom': '^18.2.0',
+      '@pocket/core': 'latest',
+      '@pocket/react': 'latest',
+      '@pocket/sync': 'latest',
+      '@pocket/storage-indexeddb': 'latest',
+    },
+    devDependencies: {
+      '@types/react': '^18.2.0',
+      '@types/react-dom': '^18.2.0',
+      typescript: '^5.3.0',
+      vite: '^5.0.0',
+      '@vitejs/plugin-react': '^4.2.0',
+    },
+  },
+  'react-with-ai': {
+    name: 'React + AI',
+    description: 'React app with AI-powered queries and vector search',
+    framework: 'react',
+    dependencies: {
+      react: '^18.2.0',
+      'react-dom': '^18.2.0',
+      '@pocket/core': 'latest',
+      '@pocket/react': 'latest',
+      '@pocket/ai': 'latest',
+      '@pocket/vectors': 'latest',
+      '@pocket/storage-indexeddb': 'latest',
+    },
+    devDependencies: {
+      '@types/react': '^18.2.0',
+      '@types/react-dom': '^18.2.0',
+      typescript: '^5.3.0',
+      vite: '^5.0.0',
+      '@vitejs/plugin-react': '^4.2.0',
+    },
+  },
 };
 
 /**
