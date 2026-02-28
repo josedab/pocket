@@ -88,7 +88,8 @@ export default tseslint.config(
     },
   },
   {
-    // Test files - relaxed rules
+    // Test files - relaxed rules: type-safety and async rules are overly strict
+    // in tests where mocks and dynamic assertions are common.
     files: ['**/*.test.ts', '**/*.test.tsx', '**/*.spec.ts', '**/*.spec.tsx'],
     rules: {
       '@typescript-eslint/no-explicit-any': 'off',
@@ -112,9 +113,6 @@ export default tseslint.config(
       'docs/**',
       'benchmarks/**',
       'website/**',
-      '**/*.test.ts',
-      '**/*.test.tsx',
-      '**/*.integration.test.ts',
     ],
   }
 );
