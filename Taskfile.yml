@@ -109,7 +109,7 @@ tasks:
   docs:serve:
     desc: Serve documentation locally
     cmds:
-      - pnpm docs:serve
+      - pnpm docs:dev
 
   bench:
     desc: Run performance benchmarks
