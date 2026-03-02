@@ -248,7 +248,7 @@ New to the project? See **[QUICKSTART.md](./QUICKSTART.md)** for a 5-minute guid
 | RAM | 8 GB | 16 GB (for full test suite) |
 | Disk | 2 GB | 4 GB (with node_modules + build artifacts) |
 
-> **Memory tip:** If you hit out-of-memory errors, set `NODE_OPTIONS="--max-old-space-size=8192"` before running commands. See [DEVELOPMENT.md](./DEVELOPMENT.md) for details.
+> **Memory tip:** If you hit out-of-memory errors, set `NODE_OPTIONS="--max-old-space-size=8192"` before running commands. See [DEVELOPMENT.md](./DEVELOPMENT.md) for details and the [Development Troubleshooting](./website/docs/guides/troubleshooting.md) guide for more solutions.
 
 ## Development
 

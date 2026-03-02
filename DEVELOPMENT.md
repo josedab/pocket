@@ -17,6 +17,8 @@ This guide covers advanced development topics for contributors working on Pocket
 > ```
 > Add this to your shell profile (`.bashrc`, `.zshrc`) for persistent configuration.
 > For targeted testing, run tests per-package: `npx vitest run --project unit packages/<name>/src/__tests__/`
+>
+> 📖 **[Development Troubleshooting →](website/docs/guides/troubleshooting.md)** for OOM fixes, build order issues, and pnpm version mismatches.
 
 ## Table of Contents
 
