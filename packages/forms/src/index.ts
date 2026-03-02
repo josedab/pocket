@@ -72,3 +72,23 @@ export { FormManager, createFormManager } from './form-manager.js';
 export type { FieldProps, ReactHooks, UseFieldReturn, UseFormReturn } from './hooks.js';
 
 export { createUseFieldHook, createUseFormEventsHook, createUseFormHook } from './hooks.js';
+
+// Offline Forms (CRDT-backed)
+export type {
+  CRDTFieldConfig,
+  CRDTFieldType,
+  ConflictResolutionStrategy,
+  FieldConflict,
+  MergeResult,
+  MergeUIState,
+  NodeId,
+  OfflineFormConfig,
+  OfflineFormSnapshot,
+  OfflineFormState,
+  UseOfflineFormReturn,
+  VectorClock,
+} from './offline-form-types.js';
+
+export { OfflineFormManager, createOfflineFormManager } from './offline-form-manager.js';
+
+export { createUseConflictResolutionHook, createUseOfflineFormHook } from './offline-form-hooks.js';
