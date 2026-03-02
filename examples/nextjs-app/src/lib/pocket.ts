@@ -1,5 +1,5 @@
-import type { ServerLoaderConfig } from '@pocket/next';
 import { Database } from '@pocket/core';
+import type { ServerLoaderConfig } from '@pocket/next';
 import { createMemoryStorage } from '@pocket/storage-memory';
 
 /** Server loader configuration for fetching initial data during SSR. */
@@ -10,7 +10,7 @@ export const serverLoaderConfig: ServerLoaderConfig = {
 };
 
 export interface Todo {
-  id: string;
+  _id: string;
   text: string;
   completed: boolean;
   createdAt: number;

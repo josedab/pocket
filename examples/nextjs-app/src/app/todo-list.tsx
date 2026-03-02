@@ -1,9 +1,9 @@
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
-import { PocketProvider, useLiveQuery, useMutation } from '@pocket/react';
-import type { Database } from '@pocket/core';
 import { createClientDatabase, type Todo } from '@/lib/pocket';
+import type { Database } from '@pocket/core';
+import { PocketProvider, useLiveQuery, useMutation } from '@pocket/react';
+import { useCallback, useEffect, useState } from 'react';
 
 // ---------------------------------------------------------------------------
 // Inner component – uses Pocket hooks inside the PocketProvider
@@ -34,7 +34,6 @@ function TodoApp({ initialTodos }: { initialTodos: Todo[] }) {
     if (!trimmed) return;
 
     await insert({
-      id: crypto.randomUUID(),
       text: trimmed,
       completed: false,
       createdAt: Date.now(),
@@ -45,16 +44,16 @@ function TodoApp({ initialTodos }: { initialTodos: Todo[] }) {
 
   const handleToggle = useCallback(
     async (todo: Todo) => {
-      await update(todo.id, { completed: !todo.completed });
+      await update(todo._id, { completed: !todo.completed });
     },
-    [update],
+    [update]
   );
 
   const handleDelete = useCallback(
-    async (id: string) => {
-      await remove(id);
+    async (_id: string) => {
+      await remove(_id);
     },
-    [remove],
+    [remove]
   );
 
   if (isLoading && !seeded) {
@@ -107,7 +106,7 @@ function TodoApp({ initialTodos }: { initialTodos: Todo[] }) {
         <ul style={{ listStyle: 'none', padding: 0 }}>
           {items.map((todo) => (
             <li
-              key={todo.id}
+              key={todo._id}
               style={{
                 display: 'flex',
                 alignItems: 'center',
@@ -116,11 +115,7 @@ function TodoApp({ initialTodos }: { initialTodos: Todo[] }) {
                 borderBottom: '1px solid #eee',
               }}
             >
-              <input
-                type="checkbox"
-                checked={todo.completed}
-                onChange={() => handleToggle(todo)}
-              />
+              <input type="checkbox" checked={todo.completed} onChange={() => handleToggle(todo)} />
               <span
                 style={{
                   flex: 1,
@@ -131,7 +126,7 @@ function TodoApp({ initialTodos }: { initialTodos: Todo[] }) {
                 {todo.text}
               </span>
               <button
-                onClick={() => handleDelete(todo.id)}
+                onClick={() => handleDelete(todo._id)}
                 style={{
                   background: 'none',
                   border: 'none',
