@@ -88,10 +88,13 @@ export default tseslint.config(
     },
   },
   {
-    // Test files - relaxed rules: type-safety and async rules are overly strict
-    // in tests where mocks and dynamic assertions are common.
+    // Test files - disable type-aware linting since test files are excluded
+    // from package tsconfigs (to keep build output clean). Also relax rules
+    // where mocks and dynamic assertions make strict typing impractical.
     files: ['**/*.test.ts', '**/*.test.tsx', '**/*.spec.ts', '**/*.spec.tsx'],
+    ...tseslint.configs.disableTypeChecked,
     rules: {
+      ...tseslint.configs.disableTypeChecked.rules,
       '@typescript-eslint/no-explicit-any': 'off',
       '@typescript-eslint/no-unsafe-assignment': 'off',
       '@typescript-eslint/no-unsafe-member-access': 'off',
