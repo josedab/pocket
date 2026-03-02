@@ -127,3 +127,26 @@ export type {
   VaultInfo,
   VaultableDatabase,
 } from './data-vault.js';
+
+// Format Adapters
+export {
+  CsvAdapter,
+  JsonAdapter,
+  NdjsonAdapter,
+  SqlAdapter,
+  getFormatAdapter,
+} from './format-adapters.js';
+export type { FormatAdapter, FormatOptions } from './format-adapters.js';
+
+// Streaming Pipeline
+export { StreamingPipeline, createStreamingPipeline } from './streaming-pipeline.js';
+export type { PipelineProgress, StreamingPipelineConfig } from './streaming-pipeline.js';
+
+// Portable API
+export { PortableAPI, createPortableAPI } from './portable-api.js';
+export type {
+  ExportOutput,
+  ImportOutput,
+  PortableExportOptions,
+  PortableImportOptions,
+} from './portable-api.js';
