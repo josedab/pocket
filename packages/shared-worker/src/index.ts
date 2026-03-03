@@ -63,3 +63,13 @@ export {
   type TabHealth,
   type TabRole,
 } from './multi-tab-middleware.js';
+
+// Cross-Tab Reactivity for find$()
+export {
+  CrossTabReactivity,
+  createCrossTabReactivity,
+  type ChangeNotification,
+  type CrossTabReactivityConfig,
+  type CrossTabReactivityState,
+  type ReactiveSubscription,
+} from './cross-tab-reactivity.js';
