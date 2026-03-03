@@ -40,3 +40,25 @@ export type {
   GDPRExportResult,
   RetentionResult,
 } from './compliance-engine.js';
+
+// HIPAA Audit Logging
+export {
+  HIPAAAuditLogger,
+  createHIPAAAuditLogger,
+  type HIPAAAnomaly,
+  type HIPAAConfig,
+  type HIPAAReport,
+  type PHIAccessLog,
+} from './hipaa-audit.js';
+
+// SOC 2 Evidence Collection
+export {
+  SOC2EvidenceCollector,
+  createSOC2Collector,
+  type EvidenceStatus,
+  type SOC2Category,
+  type SOC2Config,
+  type SOC2ControlCheck,
+  type SOC2Evidence,
+  type SOC2Report,
+} from './soc2-evidence.js';
