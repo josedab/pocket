@@ -12,5 +12,20 @@ export {
   type TauriSQLiteConfig,
 } from './storage/tauri-sqlite-adapter.js';
 
+// Studio Desktop App
+export {
+  StudioDesktopApp,
+  createStudioDesktop,
+  type DatabaseConnection,
+  type ExplainPlan,
+  type ProfilerSnapshot,
+  type QueryResult,
+  type StudioDesktopConfig,
+  type StudioDesktopState,
+  type SyncConflict,
+  type SyncDashboardState,
+  type SyncEvent,
+} from './studio-desktop.js';
+
 // Re-export core types
 export type { Collection, Database, Document, QueryBuilder, StorageAdapter } from '@pocket/core';
