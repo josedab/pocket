@@ -75,10 +75,10 @@ export {
 
 // Retention Engine & Range Index
 export {
-  RetentionEngine,
   RangeIndex,
-  createTimeSeriesRetention,
+  RetentionEngine,
   createRangeIndex,
+  createTimeSeriesRetention,
 } from './retention-engine.js';
 export type {
   RetentionEngineConfig,
@@ -86,3 +86,24 @@ export type {
   RetentionTier,
   TieredData,
 } from './retention-engine.js';
+
+// Ingestion Engine
+export { IngestionEngine, createIngestionEngine } from './ingestion-engine.js';
+export type { IngestionConfig, IngestionPoint, IngestionStats } from './ingestion-engine.js';
+
+// Downsampler
+export { Downsampler, createDownsampler } from './downsampler.js';
+export type {
+  CompressedSeries,
+  DownsampleConfig,
+  TimeSeriesPoint as DownsamplerPoint,
+} from './downsampler.js';
+
+// Time Range Query
+export { TimeRangeQueryExecutor, createTimeRangeQueryExecutor } from './time-range-query.js';
+export type {
+  TimeRangeQuery,
+  QueryResult as TimeRangeQueryResult,
+  WindowConfig as TimeRangeWindowConfig,
+  WindowResult,
+} from './time-range-query.js';
