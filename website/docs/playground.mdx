@@ -8,18 +8,38 @@ description: Try Pocket in your browser — no installation required
 
 Try Pocket directly in your browser. Edit the code, see live results — no installation required.
 
+import LivePlayground from '@site/src/components/LivePlayground';
 import StackBlitzEmbed from '@site/src/components/StackBlitzEmbed';
+
+## 🔬 Live REPL
+
+Write code in the editor and press **Shift+Enter** to execute. Select a pre-loaded dataset from the dropdown to get sample data instantly. Share your snippets using the **Share** button — the URL encodes your code and dataset selection.
+
+<LivePlayground height="500px" />
+
+## StackBlitz Playground
+
+For a full-featured IDE experience with React components and imports, use the StackBlitz-powered playground:
 
 <StackBlitzEmbed />
 
 ## What's in the Playground
 
-The playground includes a complete todo app demonstrating:
+The playground includes pre-loaded datasets demonstrating:
 
 - **Database creation** with in-memory storage
 - **CRUD operations** — insert, update, delete documents
 - **Reactive queries** — live-updating query results
 - **Query explorer** — write filter JSON and see results in real time
+- **Shareable URLs** — encode your code snippets and share them via URL
+
+## Pre-loaded Datasets
+
+| Dataset | Contents | Use Case |
+|---------|----------|----------|
+| **E-Commerce** | Products, orders, users | Filtering, aggregation, joins |
+| **Task Manager** | Tasks, projects | Status filtering, priority sorting |
+| **Blog** | Posts, authors, comments | Relationships, content queries |
 
 ## Run Locally
 
