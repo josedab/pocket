@@ -147,3 +147,16 @@ export type {
 } from './apollo-adapter.js';
 
 export { ApolloCacheAdapter, createApolloCacheAdapter } from './apollo-adapter.js';
+
+// Auto-Schema Generator
+export { AutoSchemaGenerator, createAutoSchemaGenerator } from './auto-schema.js';
+export type { AutoSchemaConfig, CollectionSchema, FieldDefinition } from './auto-schema.js';
+
+// Subscription Bridge
+export { SubscriptionBridge, createSubscriptionBridge } from './subscription-bridge.js';
+export type {
+  SubscriptionEvent as BridgeSubscriptionEvent,
+  ClientSubscription,
+  DataSourceFactory,
+  SubscriptionBridgeConfig,
+} from './subscription-bridge.js';
