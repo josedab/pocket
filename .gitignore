@@ -47,3 +47,7 @@ docs/api/
 
 # Local development
 *.local
+
+# Next.js
+.next/
+next-env.d.ts
