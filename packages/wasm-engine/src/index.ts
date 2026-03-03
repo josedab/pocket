@@ -32,3 +32,14 @@ export {
 export { WasmQueryOrchestrator, createWasmEngine } from './wasm-engine.js';
 
 export { isWasmSupported, loadWasmModule } from './wasm-bindings.js';
+
+// Adaptive threshold engine
+export {
+  AdaptiveThresholdEngine,
+  computeQueryComplexity,
+  createAdaptiveThresholdEngine,
+  type AdaptiveConfig,
+  type AdaptiveState,
+  type EngineDecision,
+  type QueryMetric,
+} from './adaptive-threshold.js';
