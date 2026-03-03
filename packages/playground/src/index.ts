@@ -43,3 +43,30 @@ export {
   type TutorialProgress,
   type TutorialStep,
 } from './tutorial-engine.js';
+
+// REPL engine (interactive)
+export {
+  createReplSession,
+  type ReplConfig,
+  type ReplEntry,
+  type ReplSession,
+  type ReplState,
+} from './repl.js';
+
+// Dataset loader (pre-loaded datasets)
+export {
+  buildDatasetContext,
+  getAvailableDatasets,
+  getDatasetByName,
+  type Dataset,
+} from './dataset-loader.js';
+
+// Monaco editor configuration
+export {
+  getDefaultEditorConfig,
+  pocketDarkTheme,
+  pocketLightTheme,
+  pocketTypeDefinitions,
+  replKeyboardShortcuts,
+  type MonacoEditorConfig,
+} from './monaco-config.js';
