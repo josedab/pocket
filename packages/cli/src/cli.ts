@@ -17,6 +17,7 @@ import {
   functionsListCommand,
   functionsRemoveCommand,
 } from './commands/functions.js';
+import { generateAll } from './commands/generate/all.js';
 import { generateTypes } from './commands/generate/types.js';
 import { importData } from './commands/import.js';
 import { init } from './commands/init.js';
@@ -73,7 +74,7 @@ function parseArgs(args: string[]): {
       }
     } else if (!command) {
       command = arg;
-    } else if (!subcommand && ['migrate', 'generate'].includes(command)) {
+    } else if (!subcommand && ['migrate', 'generate', 'functions'].includes(command)) {
       subcommand = arg;
     } else {
       positional.push(arg);
@@ -107,6 +108,10 @@ Commands:
   export [collection]     Export data to JSON/NDJSON
   import <file>           Import data from JSON/NDJSON
   generate types          Generate TypeScript types from schema
+  generate all            Generate types, hooks, validators, CRUD (default)
+  generate hooks          Generate React hooks from schema
+  generate zod            Generate Zod validators from schema
+  generate crud           Generate CRUD operations from schema
   functions:init          Initialize a starter functions config
   functions:deploy <cfg>  Deploy functions from config file
   functions:list <cfg>    List defined functions
@@ -133,6 +138,8 @@ Examples:
   pocket export users                   Export users collection
   pocket import ./backup.json           Import from file
   pocket generate types                 Generate TypeScript types
+  pocket generate all --watch           Generate all with watch mode
+  pocket generate --schema my.json      Generate from specific schema
   pocket new my-app --template react    Scaffold a new React project
   pocket health                         Check project configuration
   pocket bench                          Run performance benchmarks
@@ -319,9 +326,45 @@ async function main(): Promise<void> {
             });
             break;
 
+          case 'all':
+          case undefined:
+            await generateAll({
+              schema: args.flags.schema as string | undefined,
+              output: (args.flags.output as string) ?? (args.flags.o as string),
+              generators: args.flags.generators
+                ? (args.flags.generators as string).split(',').map((g) => g.trim())
+                : undefined,
+              watch: args.flags.watch === true,
+            });
+            break;
+
+          case 'hooks':
+            await generateAll({
+              schema: args.flags.schema as string | undefined,
+              output: (args.flags.output as string) ?? (args.flags.o as string),
+              generators: ['types', 'hooks'],
+            });
+            break;
+
+          case 'zod':
+            await generateAll({
+              schema: args.flags.schema as string | undefined,
+              output: (args.flags.output as string) ?? (args.flags.o as string),
+              generators: ['types', 'zod'],
+            });
+            break;
+
+          case 'crud':
+            await generateAll({
+              schema: args.flags.schema as string | undefined,
+              output: (args.flags.output as string) ?? (args.flags.o as string),
+              generators: ['types', 'crud'],
+            });
+            break;
+
           default:
             console.error(`Unknown generate command: ${args.subcommand}`);
-            console.error('Available commands: types');
+            console.error('Available commands: all, types, hooks, zod, crud');
             process.exit(1);
         }
         break;
