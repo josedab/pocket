@@ -3,8 +3,8 @@ export type {
   AggregateClause,
   AggregateOperation,
   AggregateResult,
-  CompiledQuery,
   ComparisonOperator,
+  CompiledQuery,
   GroupByClause,
   JoinClause,
   JoinedResult,
@@ -30,3 +30,21 @@ export type { QueryCompiler } from './query-compiler.js';
 // Query Executor
 export { createPocketQLExecutor } from './query-executor.js';
 export type { QueryExecutor } from './query-executor.js';
+
+// PQL Parser
+export { Lexer, Parser, parsePQL } from './parser.js';
+export type {
+  ASTNode,
+  ASTNodeType,
+  OrderByClause,
+  JoinClause as PQLJoinClause,
+  PQLQuery,
+  ParseError,
+  ParseResult,
+  SelectColumn,
+  WhereCondition,
+} from './parser.js';
+
+// Execution Bridge
+export { ExecutionBridge, createExecutionBridge } from './execution-bridge.js';
+export type { CollectionQueryFn, ExecutionPlan, ExecutionResult } from './execution-bridge.js';
