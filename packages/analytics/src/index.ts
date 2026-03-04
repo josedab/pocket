@@ -163,3 +163,6 @@ export {
   type VariantAssignment,
   type VariantMetrics,
 } from './ab-testing.js';
+
+// OLAP Analytics Engine
+export * from './olap/index.js';
