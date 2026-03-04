@@ -26,11 +26,31 @@ export type { ViewCache, ViewCacheConfig, ViewCacheStats } from './lru-cache.js'
 // Materialized view manager
 export { createMaterializedViewManager } from './materialized-view-manager.js';
 export type {
-  MaterializedViewManager,
   ManagedView,
+  MaterializedViewManager,
   ViewManagerConfig as MvManagerConfig,
   ViewDefinition as MvViewDefinition,
   ViewAggregation,
-  ViewResult,
   ViewManagerStats,
+  ViewResult,
 } from './materialized-view-manager.js';
+
+// View DSL
+export { ViewDefinitionBuilder, defineView } from './view-dsl.js';
+export type {
+  DslViewAggregation,
+  ViewColumn,
+  ViewDefinitionConfig,
+  ViewFilter,
+  ViewGroupBy,
+  ViewJoin,
+  ViewSort,
+} from './view-dsl.js';
+
+// Incremental Engine
+export { IncrementalEngine, createIncrementalEngine } from './incremental-engine.js';
+export type {
+  DeltaChange,
+  IncrementalEngineConfig,
+  IncrementalViewResult,
+} from './incremental-engine.js';
