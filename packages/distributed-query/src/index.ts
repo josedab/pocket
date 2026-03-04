@@ -100,3 +100,15 @@ export type {
 } from './sync-mesh.js';
 
 export { SyncMesh, createSyncMesh } from './sync-mesh.js';
+
+// Query Planner
+export { QueryPlanner, createQueryPlanner } from './query-planner.js';
+export type { PlannerConfig, QueryPlan, SubPlan } from './query-planner.js';
+
+// P2P Channel
+export { P2PChannel, createP2PChannel } from './p2p-channel.js';
+export type { P2PChannelConfig, P2PMessage } from './p2p-channel.js';
+
+// Result Merger
+export { ResultMerger, createResultMerger } from './result-merger.js';
+export type { MergedResult, MergerConfig, PartialResult } from './result-merger.js';
