@@ -111,3 +111,6 @@ export type {
   ObservabilityMetricPoint,
   ObservabilityMetricSeries,
 } from './observability-dashboard.js';
+
+// Observability Platform
+export * from './observability/index.js';
