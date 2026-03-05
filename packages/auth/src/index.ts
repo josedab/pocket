@@ -78,3 +78,18 @@ export type { AuthMiddleware, AuthRequest, AuthResponse, NextFunction } from './
 // Offline RBAC
 export { OfflineRBAC, createOfflineRBAC } from './offline-rbac.js';
 export type { PermissionCheck, RBACConfig, RBACState } from './offline-rbac.js';
+
+// Offline-First Auth
+export {
+  InMemoryCredentialStorage,
+  OfflineAuthManager,
+  createOfflineAuth,
+} from './offline-auth.js';
+export type {
+  CachedCredential,
+  OfflineAuthConfig,
+  OfflineAuthEvent,
+  OfflineAuthState,
+  OfflineCredentialStorage,
+  OfflineSession,
+} from './offline-auth.js';
