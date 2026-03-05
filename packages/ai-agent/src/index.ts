@@ -86,3 +86,20 @@ export type {
 // Inference cache
 export { InferenceCache, createInferenceCache } from './inference-cache.js';
 export type { InferenceCacheConfig, InferenceCacheStats } from './inference-cache.js';
+
+// Collection Tools
+export { createCollectionTools } from './collection-tools.js';
+export type {
+  CollectionCountFn,
+  CollectionInsertFn,
+  CollectionQueryFn,
+  CollectionToolsConfig,
+} from './collection-tools.js';
+
+// Streaming Agent
+export { StreamingAgent, createStreamingAgent } from './streaming-agent.js';
+export type {
+  AgentStreamEvent,
+  OfflineInferenceConfig,
+  StreamingAgentConfig,
+} from './streaming-agent.js';
