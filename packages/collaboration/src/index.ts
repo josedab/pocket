@@ -238,3 +238,13 @@ export type {
   TextOperation,
   TextState,
 } from './collaborative-text.js';
+
+// Live Cursor Manager
+export { LiveCursorManager, createLiveCursorManager } from './live-cursors.js';
+export type {
+  LiveCursor,
+  LiveCursorConfig,
+  LiveCursorEvent,
+  LiveCursorState,
+  PresenceUser,
+} from './live-cursors.js';
