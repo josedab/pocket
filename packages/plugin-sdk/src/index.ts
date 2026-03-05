@@ -189,3 +189,6 @@ export type {
 // Template Scaffold
 export { PluginTemplateScaffold, createTemplateScaffold } from './template-scaffold.js';
 export type { ScaffoldResult, TemplateConfig } from './template-scaffold.js';
+
+// Marketplace Registry
+export * from './marketplace/index.js';
