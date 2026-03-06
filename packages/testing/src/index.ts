@@ -79,6 +79,29 @@ export type {
   MemoryLeakSuspect,
 } from './stability-suite.js';
 
+// Data Fixtures
+export {
+  FixtureManager,
+  InMemoryFixtureStorage,
+  createFixtureManager,
+  createTestFixtures,
+  defineFixtureFactory,
+  resetSequence,
+  sequence,
+} from './data-fixtures.js';
+export type {
+  FixtureCollection,
+  FixtureData,
+  FixtureEvent,
+  FixtureFactory,
+  FixtureFactoryDefinition,
+  FixtureIndex,
+  FixtureManagerConfig,
+  FixtureMeta,
+  FixtureStorage,
+  TestFixtureContext,
+} from './data-fixtures.js';
+
 // Offline-First Testing Toolkit (next-gen)
 export {
   assertConvergence,
