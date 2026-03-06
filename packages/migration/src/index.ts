@@ -136,3 +136,9 @@ export {
   type LazyMigrationProgress,
   type LazyMigrationStep,
 } from './lazy-migration.js';
+
+// Migration Bridges
+export * from './bridges/index.js';
+
+// Compatibility Layers
+export * from './compat/index.js';
