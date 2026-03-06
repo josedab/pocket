@@ -49,7 +49,8 @@
     "clean": "rm -rf dist"
   },
   "dependencies": {
-    "@pocket/core": "workspace:*"
+    "@pocket/core": "workspace:*",
+    "rxjs": "^7.8.1"
   },
   "peerDependencies": {
     "@opentelemetry/api": ">=1.0.0"
