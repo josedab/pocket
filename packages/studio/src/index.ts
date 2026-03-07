@@ -317,3 +317,6 @@ export type {
 // React Panel Renderer
 export { generateReactPanelApp, getReactPanelFileCount } from './react-panel-renderer.js';
 export type { ReactPanelConfig, ReactPanelFile, ReactPanelTab } from './react-panel-renderer.js';
+
+// Visual Schema & Query Designer
+export * from './visual-schema/index.js';
