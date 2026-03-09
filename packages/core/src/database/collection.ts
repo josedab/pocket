@@ -1,6 +1,10 @@
 import { BehaviorSubject, Observable, Subject } from 'rxjs';
 import { filter, map } from 'rxjs/operators';
-import { DocumentDeletedError, DocumentNotFoundError } from '../errors/pocket-error.js';
+import {
+  DocumentDeletedError,
+  DocumentNotFoundError,
+  PocketError,
+} from '../errors/pocket-error.js';
 import { LiveQuery, type LiveQueryOptions } from '../observable/live-query.js';
 import { QueryBuilder } from '../query/query-builder.js';
 import { Schema, type CollectionConfig, type ValidationResult } from '../schema/schema.js';
@@ -805,7 +809,7 @@ export class Collection<T extends Document = Document> {
  * @see {@link ValidationResult}
  * @see {@link Schema.validate}
  */
-export class ValidationError extends Error {
+export class ValidationError extends PocketError {
   /** The full validation result with all errors */
   readonly validation: ValidationResult;
 
@@ -816,7 +820,11 @@ export class ValidationError extends Error {
    */
   constructor(validation: ValidationResult) {
     const messages = validation.errors.map((e) => `${e.path}: ${e.message}`).join('; ');
-    super(`Validation failed: ${messages}`);
+    super({
+      code: 'POCKET_V100',
+      message: `Validation failed: ${messages}`,
+      context: { fieldErrors: validation.errors },
+    });
     this.name = 'ValidationError';
     this.validation = validation;
   }

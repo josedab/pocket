@@ -8,7 +8,8 @@
  * @module validation
  */
 
-import { ValidationError, type FieldValidationError } from '../errors/pocket-error.js';
+import { ValidationError } from '../database/collection.js';
+import type { ValidationResult } from '../schema/schema.js';
 
 /** Validation result */
 export interface InputValidationResult {
@@ -16,8 +17,11 @@ export interface InputValidationResult {
   readonly errors: readonly string[];
 }
 
-function toFieldErrors(errors: string[]): FieldValidationError[] {
-  return errors.map((msg) => ({ path: '', message: msg, value: undefined }));
+function toValidationResult(errors: string[]): ValidationResult {
+  return {
+    valid: false,
+    errors: errors.map((msg) => ({ path: '', message: msg })),
+  };
 }
 
 // ── Collection Name Validation ───────────────────────────────────────────────
@@ -36,7 +40,9 @@ export function validateCollectionName(name: unknown): InputValidationResult {
   } else if (name.length > 64) {
     errors.push(`Collection name too long (${name.length} chars, max 64)`);
   } else if (!COLLECTION_NAME_PATTERN.test(name)) {
-    errors.push('Collection name must start with a letter or underscore and contain only alphanumeric characters, underscores, or hyphens');
+    errors.push(
+      'Collection name must start with a letter or underscore and contain only alphanumeric characters, underscores, or hyphens'
+    );
   }
   if (RESERVED_COLLECTIONS.has(name)) {
     errors.push(`"${name}" is a reserved collection name`);
@@ -48,7 +54,7 @@ export function validateCollectionName(name: unknown): InputValidationResult {
 export function assertCollectionName(name: unknown): asserts name is string {
   const result = validateCollectionName(name);
   if (!result.valid) {
-    throw new ValidationError(toFieldErrors([...result.errors]));
+    throw new ValidationError(toValidationResult([...result.errors]));
   }
 }
 
@@ -69,7 +75,7 @@ export function validateDocumentId(id: unknown): InputValidationResult {
 /** Assert a document ID is valid */
 export function assertDocumentId(id: unknown): asserts id is string {
   const result = validateDocumentId(id);
-  if (!result.valid) throw new ValidationError(toFieldErrors([...result.errors]));
+  if (!result.valid) throw new ValidationError(toValidationResult([...result.errors]));
 }
 
 // ── Field Path Validation ────────────────────────────────────────────────────
@@ -96,7 +102,7 @@ export function validateFieldPath(path: unknown): InputValidationResult {
 /** Assert a field path is valid */
 export function assertFieldPath(path: unknown): asserts path is string {
   const result = validateFieldPath(path);
-  if (!result.valid) throw new ValidationError(toFieldErrors([...result.errors]));
+  if (!result.valid) throw new ValidationError(toValidationResult([...result.errors]));
 }
 
 // ── Pagination Validation ────────────────────────────────────────────────────
@@ -105,7 +111,8 @@ export function assertFieldPath(path: unknown): asserts path is string {
 export function validatePagination(limit?: unknown, skip?: unknown): InputValidationResult {
   const errors: string[] = [];
   if (limit !== undefined) {
-    if (typeof limit !== 'number' || !Number.isInteger(limit)) errors.push('Limit must be an integer');
+    if (typeof limit !== 'number' || !Number.isInteger(limit))
+      errors.push('Limit must be an integer');
     else if (limit < 0) errors.push('Limit cannot be negative');
     else if (limit > 10_000) errors.push('Limit exceeds maximum of 10,000');
   }

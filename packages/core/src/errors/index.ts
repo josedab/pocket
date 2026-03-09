@@ -40,9 +40,6 @@ export {
 } from './error-codes.js';
 
 // Error classes
-// Note: ValidationError and FieldValidationError are not re-exported here
-// to avoid conflicts with schema/schema.ts. Import directly from
-// './errors/pocket-error.js' if you need the PocketError-based ValidationError.
 export {
   ConnectionError,
   DocumentDeletedError,
@@ -56,3 +53,6 @@ export {
   type PocketErrorOptions,
   type SerializedPocketError,
 } from './pocket-error.js';
+
+// Re-export collection's ValidationError (the canonical version, extends PocketError)
+export { ValidationError } from '../database/collection.js';
