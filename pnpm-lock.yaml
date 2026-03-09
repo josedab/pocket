@@ -623,6 +623,28 @@ importers:
         specifier: ^3.0.0
         version: 3.2.4(@types/node@20.19.30)(happy-dom@12.10.3)(jsdom@27.4.0)
 
+  packages/computed:
+    dependencies:
+      '@pocket/core':
+        specifier: workspace:*
+        version: link:../core
+      rxjs:
+        specifier: ^7.8.1
+        version: 7.8.2
+    devDependencies:
+      '@types/node':
+        specifier: ^20.10.0
+        version: 20.19.30
+      tsup:
+        specifier: ^8.0.0
+        version: 8.5.1(typescript@5.6.3)
+      typescript:
+        specifier: ^5.3.0
+        version: 5.6.3
+      vitest:
+        specifier: ^3.0.0
+        version: 3.2.4(@types/node@20.19.30)(happy-dom@12.10.3)(jsdom@27.4.0)
+
   packages/conflict-resolution:
     dependencies:
       '@pocket/core':
@@ -1364,6 +1386,28 @@ importers:
         specifier: ^3.0.0
         version: 3.2.4(@types/node@20.19.30)(happy-dom@12.10.3)(jsdom@27.4.0)
 
+  packages/query-advisor:
+    dependencies:
+      '@pocket/core':
+        specifier: workspace:*
+        version: link:../core
+      rxjs:
+        specifier: ^7.8.1
+        version: 7.8.2
+    devDependencies:
+      '@types/node':
+        specifier: ^20.10.0
+        version: 20.19.30
+      tsup:
+        specifier: ^8.0.0
+        version: 8.5.1(typescript@5.6.3)
+      typescript:
+        specifier: ^5.3.0
+        version: 5.6.3
+      vitest:
+        specifier: ^3.0.0
+        version: 3.2.4(@types/node@20.19.30)(happy-dom@12.10.3)(jsdom@27.4.0)
+
   packages/query-builder:
     dependencies:
       '@pocket/core':
@@ -1480,6 +1524,28 @@ importers:
         version: 3.2.4(@types/node@20.19.30)(happy-dom@12.10.3)(jsdom@27.4.0)
 
   packages/schema-inference:
+    dependencies:
+      '@pocket/core':
+        specifier: workspace:*
+        version: link:../core
+      rxjs:
+        specifier: ^7.8.1
+        version: 7.8.2
+    devDependencies:
+      '@types/node':
+        specifier: ^20.10.0
+        version: 20.19.30
+      tsup:
+        specifier: ^8.0.0
+        version: 8.5.1(typescript@5.6.3)
+      typescript:
+        specifier: ^5.3.0
+        version: 5.6.3
+      vitest:
+        specifier: ^3.0.0
+        version: 3.2.4(@types/node@20.19.30)(happy-dom@12.10.3)(jsdom@27.4.0)
+
+  packages/schema-migration:
     dependencies:
       '@pocket/core':
         specifier: workspace:*
@@ -1732,6 +1798,28 @@ importers:
         specifier: ^3.0.0
         version: 3.2.4(@types/node@20.19.30)(happy-dom@12.10.3)(jsdom@27.4.0)
 
+  packages/storage-tiering:
+    dependencies:
+      '@pocket/core':
+        specifier: workspace:*
+        version: link:../core
+      rxjs:
+        specifier: ^7.8.1
+        version: 7.8.2
+    devDependencies:
+      '@types/node':
+        specifier: ^20.10.0
+        version: 20.19.30
+      tsup:
+        specifier: ^8.0.0
+        version: 8.5.1(typescript@5.6.3)
+      typescript:
+        specifier: ^5.3.0
+        version: 5.6.3
+      vitest:
+        specifier: ^3.0.0
+        version: 3.2.4(@types/node@20.19.30)(happy-dom@12.10.3)(jsdom@27.4.0)
+
   packages/storage-wa-sqlite:
     dependencies:
       '@pocket/core':
@@ -1877,6 +1965,28 @@ importers:
         version: 3.2.4(@types/node@20.19.30)(happy-dom@12.10.3)(jsdom@27.4.0)
 
   packages/sync-blockchain:
+    dependencies:
+      '@pocket/core':
+        specifier: workspace:*
+        version: link:../core
+      rxjs:
+        specifier: ^7.8.1
+        version: 7.8.2
+    devDependencies:
+      '@types/node':
+        specifier: ^20.10.0
+        version: 20.19.30
+      tsup:
+        specifier: ^8.0.0
+        version: 8.5.1(typescript@5.6.3)
+      typescript:
+        specifier: ^5.3.0
+        version: 5.6.3
+      vitest:
+        specifier: ^3.0.0
+        version: 3.2.4(@types/node@20.19.30)(happy-dom@12.10.3)(jsdom@27.4.0)
+
+  packages/sync-policies:
     dependencies:
       '@pocket/core':
         specifier: workspace:*
@@ -2137,6 +2247,28 @@ importers:
         version: 3.5.26(typescript@5.9.3)
 
   packages/wasm-engine:
+    dependencies:
+      '@pocket/core':
+        specifier: workspace:*
+        version: link:../core
+      rxjs:
+        specifier: ^7.8.1
+        version: 7.8.2
+    devDependencies:
+      '@types/node':
+        specifier: ^20.10.0
+        version: 20.19.30
+      tsup:
+        specifier: ^8.0.0
+        version: 8.5.1(typescript@5.6.3)
+      typescript:
+        specifier: ^5.3.0
+        version: 5.6.3
+      vitest:
+        specifier: ^3.0.0
+        version: 3.2.4(@types/node@20.19.30)(happy-dom@12.10.3)(jsdom@27.4.0)
+
+  packages/web-component:
     dependencies:
       '@pocket/core':
         specifier: workspace:*
