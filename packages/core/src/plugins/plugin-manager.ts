@@ -180,8 +180,11 @@ export class PluginManager {
     if (plugin.definition.onDestroy && plugin.state === 'initialized') {
       try {
         await plugin.definition.onDestroy();
-      } catch {
-        // Ignore destroy errors
+      } catch (err) {
+        console.warn(
+          `[Pocket] Plugin "${name}" threw during onDestroy:`,
+          err instanceof Error ? err.message : err
+        );
       }
     }
 
