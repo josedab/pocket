@@ -139,6 +139,25 @@ export interface ServerConfig {
    * @default createMemoryChangeLog()
    */
   changeLog?: ChangeLog;
+
+  /**
+   * Optional error callback for server-side error reporting.
+   * Invoked for socket errors, broadcast failures, and other server issues.
+   */
+  onError?: (message: string) => void;
+
+  /**
+   * Maximum messages per client per window for rate limiting.
+   * Set to 0 to disable rate limiting.
+   * @default 100
+   */
+  rateLimitMessages?: number;
+
+  /**
+   * Rate limit window in milliseconds.
+   * @default 10000 (10 seconds)
+   */
+  rateLimitWindowMs?: number;
 }
 
 /**
@@ -201,9 +220,12 @@ export interface ServerConfig {
  */
 export class PocketServer {
   /** Resolved configuration with defaults applied */
-  private readonly config: Required<Omit<ServerConfig, 'authenticate' | 'changeLog'>> & {
+  private readonly config: Required<
+    Omit<ServerConfig, 'authenticate' | 'changeLog' | 'onError'>
+  > & {
     authenticate?: ServerConfig['authenticate'];
     changeLog: ChangeLog;
+    onError?: ServerConfig['onError'];
   };
 
   /** WebSocket server instance, null when not running */
@@ -217,6 +239,9 @@ export class PocketServer {
 
   /** Resolves conflicts between concurrent client modifications */
   private readonly conflictResolver: ConflictResolver<Document>;
+
+  /** Rate limit tracking per client: clientId → { count, windowStart } */
+  private readonly rateLimitState = new Map<string, { count: number; windowStart: number }>();
 
   /**
    * In-memory document storage.
@@ -244,6 +269,9 @@ export class PocketServer {
       maxClientsPerUser: config.maxClientsPerUser ?? 10,
       clientTimeout: config.clientTimeout ?? 60000,
       changeLog: config.changeLog ?? createMemoryChangeLog(),
+      onError: config.onError,
+      rateLimitMessages: config.rateLimitMessages ?? 100,
+      rateLimitWindowMs: config.rateLimitWindowMs ?? 10000,
     };
 
     this.clientManager = new ClientManager();
@@ -396,6 +424,12 @@ export class PocketServer {
 
     // Set up message handler
     socket.on('message', (data) => {
+      // Rate limiting check
+      if (!this.checkRateLimit(clientId)) {
+        this.sendError(socket, 'RATE_LIMITED', 'Too many requests. Please slow down.', true);
+        return;
+      }
+
       try {
         // Handle various RawData types from ws library
         let dataStr: string;
@@ -408,19 +442,29 @@ export class PocketServer {
         } else {
           dataStr = data as string;
         }
+
+        // Respond to heartbeat pings
+        if (dataStr === 'ping') {
+          socket.send('pong');
+          return;
+        }
         const message = JSON.parse(dataStr) as SyncProtocolMessage;
         void this.handleMessage(client, message);
-      } catch {
-        this.sendError(socket, 'PARSE_ERROR', 'Invalid message format', true);
+      } catch (parseError: unknown) {
+        const detail = parseError instanceof Error ? parseError.message : 'Unknown parse error';
+        this.sendError(socket, 'PARSE_ERROR', `Invalid message format: ${detail}`, true);
       }
     });
 
     // Handle disconnection
     socket.on('close', () => {
+      this.rateLimitState.delete(clientId);
       this.clientManager.remove(clientId);
     });
 
-    socket.on('error', () => {
+    socket.on('error', (err) => {
+      const message = err instanceof Error ? err.message : 'Unknown socket error';
+      this.config.onError?.(`Client ${clientId} socket error: ${message}`);
       this.clientManager.remove(clientId);
     });
   }
@@ -710,6 +754,33 @@ export class PocketServer {
    */
   private generateClientId(): string {
     return `${Date.now().toString(36)}_${Math.random().toString(36).substring(2, 10)}`;
+  }
+
+  /**
+   * Check if a client is within the rate limit.
+   * Uses a sliding window counter per client.
+   * @returns true if allowed, false if rate limited
+   */
+  private checkRateLimit(clientId: string): boolean {
+    if (this.config.rateLimitMessages <= 0) return true;
+
+    const now = Date.now();
+    const state = this.rateLimitState.get(clientId);
+
+    if (!state || now - state.windowStart >= this.config.rateLimitWindowMs) {
+      this.rateLimitState.set(clientId, { count: 1, windowStart: now });
+      return true;
+    }
+
+    state.count++;
+    if (state.count > this.config.rateLimitMessages) {
+      this.config.onError?.(
+        `Client ${clientId} rate limited (${state.count}/${this.config.rateLimitMessages} in ${this.config.rateLimitWindowMs}ms)`
+      );
+      return false;
+    }
+
+    return true;
   }
 
   /**
