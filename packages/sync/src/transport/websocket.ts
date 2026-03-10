@@ -77,6 +77,8 @@ export class WebSocketTransport implements SyncTransport {
 
   private reconnectAttempts = 0;
   private isReconnecting = false;
+  private heartbeatTimer: ReturnType<typeof setInterval> | null = null;
+  private heartbeatTimeout: ReturnType<typeof setTimeout> | null = null;
 
   constructor(config: TransportConfig) {
     this.config = {
@@ -86,6 +88,8 @@ export class WebSocketTransport implements SyncTransport {
       autoReconnect: config.autoReconnect ?? true,
       reconnectDelay: config.reconnectDelay ?? 1000,
       maxReconnectAttempts: config.maxReconnectAttempts ?? 10,
+      heartbeatIntervalMs: config.heartbeatIntervalMs ?? 30000,
+      heartbeatTimeoutMs: config.heartbeatTimeoutMs ?? 10000,
     };
   }
 
@@ -103,6 +107,7 @@ export class WebSocketTransport implements SyncTransport {
       this.socket.onopen = () => {
         this.reconnectAttempts = 0;
         this.isReconnecting = false;
+        this.startHeartbeat();
         resolve();
       };
 
@@ -111,7 +116,9 @@ export class WebSocketTransport implements SyncTransport {
       };
 
       this.socket.onerror = (_event) => {
-        const error = new Error('WebSocket error');
+        const error = new ConnectionError('POCKET_C502', 'WebSocket connection error', {
+          transport: 'websocket',
+        });
         if (this.socket?.readyState !== WebSocket.OPEN) {
           reject(error);
         }
@@ -120,6 +127,11 @@ export class WebSocketTransport implements SyncTransport {
 
       this.socket.onmessage = (event) => {
         try {
+          // Handle heartbeat pong responses
+          if (event.data === 'pong') {
+            this.handlePong();
+            return;
+          }
           const message = JSON.parse(event.data) as SyncProtocolMessage;
           this.handleMessage(message);
         } catch (error) {
@@ -130,7 +142,8 @@ export class WebSocketTransport implements SyncTransport {
   }
 
   async disconnect(): Promise<void> {
-    this.config.autoReconnect = false; // Prevent auto-reconnect
+    this.config.autoReconnect = false;
+    this.stopHeartbeat();
 
     if (this.socket) {
       this.socket.close();
@@ -140,7 +153,11 @@ export class WebSocketTransport implements SyncTransport {
     // Reject all pending requests
     for (const [, pending] of this.pendingRequests) {
       clearTimeout(pending.timeout);
-      pending.reject(new Error('Connection closed'));
+      pending.reject(
+        new ConnectionError('POCKET_C503', 'Connection closed while request pending', {
+          transport: 'websocket',
+        })
+      );
     }
     this.pendingRequests.clear();
   }
@@ -161,7 +178,12 @@ export class WebSocketTransport implements SyncTransport {
       // Set up request tracking
       const timeout = setTimeout(() => {
         this.pendingRequests.delete(message.id);
-        reject(new Error('Request timeout'));
+        reject(
+          new ConnectionError('POCKET_C504', 'Request timeout', {
+            transport: 'websocket',
+            timeout: this.config.timeout,
+          })
+        );
       }, this.config.timeout);
 
       this.pendingRequests.set(message.id, {
@@ -224,6 +246,7 @@ export class WebSocketTransport implements SyncTransport {
 
   private handleDisconnect(): void {
     this.socket = null;
+    this.stopHeartbeat();
     this.disconnectHandler?.();
 
     // Attempt reconnection if enabled
@@ -253,12 +276,66 @@ export class WebSocketTransport implements SyncTransport {
               this.attemptReconnect();
             } else {
               this.isReconnecting = false;
-              this.errorHandler?.(new Error('Max reconnection attempts reached'));
+              this.errorHandler?.(
+                new ConnectionError('POCKET_C500', 'Max reconnection attempts reached', {
+                  transport: 'websocket',
+                  attempts: this.config.maxReconnectAttempts,
+                })
+              );
             }
           });
       },
       Math.min(delay, 30000)
     );
+  }
+
+  private startHeartbeat(): void {
+    if (this.config.heartbeatIntervalMs <= 0) return;
+    this.stopHeartbeat();
+
+    this.heartbeatTimer = setInterval(() => {
+      if (!this.isConnected()) return;
+
+      try {
+        this.socket?.send('ping');
+      } catch (err) {
+        console.warn(
+          '[Pocket Sync] Heartbeat ping failed — connection may be dead:',
+          err instanceof Error ? err.message : err
+        );
+        return;
+      }
+
+      // Set a timeout — if no pong received, consider connection dead
+      this.heartbeatTimeout = setTimeout(() => {
+        this.errorHandler?.(
+          new ConnectionError('POCKET_C500', 'Heartbeat timeout — no pong received', {
+            transport: 'websocket',
+            timeoutMs: this.config.heartbeatTimeoutMs,
+          })
+        );
+        // Force close to trigger reconnect
+        this.socket?.close();
+      }, this.config.heartbeatTimeoutMs);
+    }, this.config.heartbeatIntervalMs);
+  }
+
+  private stopHeartbeat(): void {
+    if (this.heartbeatTimer) {
+      clearInterval(this.heartbeatTimer);
+      this.heartbeatTimer = null;
+    }
+    if (this.heartbeatTimeout) {
+      clearTimeout(this.heartbeatTimeout);
+      this.heartbeatTimeout = null;
+    }
+  }
+
+  private handlePong(): void {
+    if (this.heartbeatTimeout) {
+      clearTimeout(this.heartbeatTimeout);
+      this.heartbeatTimeout = null;
+    }
   }
 }
 

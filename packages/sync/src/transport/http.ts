@@ -64,6 +64,8 @@ export class HttpTransport implements SyncTransport {
       autoReconnect: config.autoReconnect ?? true,
       reconnectDelay: config.reconnectDelay ?? 1000,
       maxReconnectAttempts: config.maxReconnectAttempts ?? 10,
+      heartbeatIntervalMs: config.heartbeatIntervalMs ?? 0,
+      heartbeatTimeoutMs: config.heartbeatTimeoutMs ?? 10000,
     };
   }
 

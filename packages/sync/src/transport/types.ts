@@ -185,6 +185,10 @@ export interface TransportConfig {
   reconnectDelay?: number;
   /** Maximum reconnection attempts. @default 10 */
   maxReconnectAttempts?: number;
+  /** Interval in ms for heartbeat pings. 0 to disable. @default 30000 */
+  heartbeatIntervalMs?: number;
+  /** Time in ms to wait for a pong before considering the connection dead. @default 10000 */
+  heartbeatTimeoutMs?: number;
 }
 
 /**
