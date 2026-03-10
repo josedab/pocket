@@ -8,8 +8,12 @@ interface SendResult {
 
 export class WebhookExecutor {
   private readonly config: Required<
-    Pick<WebhookConfig, 'url' | 'method' | 'retries' | 'retryDelayMs' | 'batchSize' | 'batchIntervalMs'>
-  > & WebhookConfig;
+    Pick<
+      WebhookConfig,
+      'url' | 'method' | 'retries' | 'retryDelayMs' | 'batchSize' | 'batchIntervalMs'
+    >
+  > &
+    WebhookConfig;
   private pendingBatch: unknown[] = [];
   private batchTimer: ReturnType<typeof setTimeout> | null = null;
   private destroyed = false;
@@ -33,9 +37,11 @@ export class WebhookExecutor {
     return this.doSend(payload);
   }
 
-  async sendBatch(payloads: unknown[]): Promise<{ results: Array<{ success: boolean; error?: string }> }> {
+  async sendBatch(
+    payloads: unknown[]
+  ): Promise<{ results: { success: boolean; error?: string }[] }> {
     this.ensureNotDestroyed();
-    const results: Array<{ success: boolean; error?: string }> = [];
+    const results: { success: boolean; error?: string }[] = [];
     for (const payload of payloads) {
       const result = await this.doSend(payload);
       results.push({ success: result.success, error: result.error });
@@ -83,7 +89,19 @@ export class WebhookExecutor {
         this.batchTimer = null;
         if (this.pendingBatch.length > 0) {
           const batch = this.pendingBatch.splice(0);
-          this.doSend(batch).catch(() => {});
+          this.doSend(batch)
+            .then((result) => {
+              if (!result.success) {
+                this.config.onError?.(
+                  `Webhook batch delivery failed: ${result.error ?? 'unknown'}`
+                );
+              }
+            })
+            .catch((err: unknown) => {
+              this.config.onError?.(
+                `Webhook batch delivery error: ${err instanceof Error ? err.message : String(err)}`
+              );
+            });
         }
       }, this.config.batchIntervalMs);
     }
@@ -92,12 +110,19 @@ export class WebhookExecutor {
   }
 
   private async doSend(payload: unknown): Promise<SendResult> {
+    const body = JSON.stringify(payload);
     const headers: Record<string, string> = {
       'Content-Type': 'application/json',
       ...this.config.headers,
     };
     if (this.config.authHeader) {
-      headers['Authorization'] = this.config.authHeader;
+      headers.Authorization = this.config.authHeader;
+    }
+
+    // Compute HMAC-SHA256 signature if a secret is configured
+    if (this.config.secret) {
+      const signature = await this.computeHmac(body, this.config.secret);
+      headers['X-Webhook-Signature'] = `sha256=${signature}`;
     }
 
     let lastError: string | undefined;
@@ -106,7 +131,7 @@ export class WebhookExecutor {
         const response = await fetch(this.config.url, {
           method: this.config.method,
           headers,
-          body: JSON.stringify(payload),
+          body,
         });
 
         if (response.ok) {
@@ -131,6 +156,30 @@ export class WebhookExecutor {
   private ensureNotDestroyed(): void {
     if (this.destroyed) {
       throw new Error('WebhookExecutor has been destroyed');
+    }
+  }
+
+  private async computeHmac(body: string, secret: string): Promise<string> {
+    if (typeof globalThis.crypto.subtle !== 'undefined') {
+      const encoder = new TextEncoder();
+      const key = await crypto.subtle.importKey(
+        'raw',
+        encoder.encode(secret),
+        { name: 'HMAC', hash: 'SHA-256' },
+        false,
+        ['sign']
+      );
+      const sig = await crypto.subtle.sign('HMAC', key, encoder.encode(body));
+      return Array.from(new Uint8Array(sig))
+        .map((b) => b.toString(16).padStart(2, '0'))
+        .join('');
+    }
+    // Fallback for Node.js environments without Web Crypto
+    try {
+      const { createHmac } = await import('node:crypto');
+      return createHmac('sha256', secret).update(body).digest('hex');
+    } catch {
+      throw new Error('HMAC signing unavailable: neither Web Crypto nor node:crypto found');
     }
   }
 }

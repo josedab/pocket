@@ -29,8 +29,9 @@ export interface BeforeTriggerResult<T extends Document = Document> {
 }
 
 /** Trigger handler function */
-export type TriggerHandler<T extends Document = Document> =
-  (context: TriggerContext<T>) => Promise<BeforeTriggerResult<T> | void> | BeforeTriggerResult<T> | void;
+export type TriggerHandler<T extends Document = Document> = (
+  context: TriggerContext<T>
+) => Promise<BeforeTriggerResult<T> | undefined> | BeforeTriggerResult<T> | undefined;
 
 /** Trigger definition */
 export interface TriggerDefinition<T extends Document = Document> {
@@ -60,6 +61,10 @@ export interface WebhookConfig {
   retryDelayMs?: number;
   deadLetterQueue?: boolean;
   authHeader?: string;
+  /** Secret for HMAC-SHA256 signature verification (X-Webhook-Signature header) */
+  secret?: string;
+  /** Callback for delivery error reporting */
+  onError?: (message: string) => void;
 }
 
 /** Trigger execution log entry */
@@ -101,9 +106,15 @@ export interface TriggerEngineConfig {
 
 /** Trigger engine event types */
 export type TriggerEventType =
-  | 'trigger_registered' | 'trigger_removed' | 'trigger_enabled' | 'trigger_disabled'
-  | 'execution_started' | 'execution_completed' | 'execution_failed'
-  | 'cycle_detected' | 'dead_letter_added';
+  | 'trigger_registered'
+  | 'trigger_removed'
+  | 'trigger_enabled'
+  | 'trigger_disabled'
+  | 'execution_started'
+  | 'execution_completed'
+  | 'execution_failed'
+  | 'cycle_detected'
+  | 'dead_letter_added';
 
 /** Trigger engine event */
 export interface TriggerEvent {
