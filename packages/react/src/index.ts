@@ -65,6 +65,9 @@ export * from './context/provider.js';
 // Hooks
 export * from './hooks/index.js';
 
+// Error Boundary
+export { PocketErrorBoundary, type PocketErrorBoundaryProps } from './error-boundary.js';
+
 // React Server Components Bridge
 export {
   createHydrationPayload,
