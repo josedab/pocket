@@ -1,6 +1,32 @@
 /**
  * Promise-based wrapper for IndexedDB transactions
  */
+
+import { StorageError } from '@pocket/core';
+
+/** Check if an error is a QuotaExceededError */
+function isQuotaExceeded(error: unknown): boolean {
+  if (error instanceof DOMException) {
+    return error.name === 'QuotaExceededError';
+  }
+  if (error instanceof Error) {
+    return error.name === 'QuotaExceededError';
+  }
+  return false;
+}
+
+/** Wrap a low-level IDB error into a StorageError with a helpful message */
+function wrapStorageError(error: unknown, operation: string): Error {
+  if (isQuotaExceeded(error)) {
+    return new StorageError(
+      'POCKET_S300',
+      `Storage quota exceeded during ${operation}. Free up space or request more storage via navigator.storage.persist().`,
+      { operation, originalError: error instanceof Error ? error.message : String(error) }
+    );
+  }
+  return error instanceof Error ? error : new Error(String(error));
+}
+
 export class IDBTransactionWrapper {
   private readonly transaction: IDBTransaction;
   private readonly promise: Promise<void>;
@@ -49,7 +75,7 @@ export class IDBTransactionWrapper {
 export function promisifyRequest<T>(request: IDBRequest<T>): Promise<T> {
   return new Promise((resolve, reject) => {
     request.onsuccess = () => resolve(request.result);
-    request.onerror = () => reject(new Error(request.error?.message ?? 'Request failed'));
+    request.onerror = () => reject(wrapStorageError(request.error, 'request'));
   });
 }
 
@@ -75,7 +101,7 @@ export async function iterateCursor(
       }
     };
     request.onerror = (): void => {
-      reject(new Error(request.error?.message ?? 'Cursor iteration failed'));
+      reject(wrapStorageError(request.error, 'cursor iteration'));
     };
   });
 }
