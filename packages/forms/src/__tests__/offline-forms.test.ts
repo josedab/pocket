@@ -79,6 +79,9 @@ describe('OfflineFormManager', () => {
     manager.setValue('title', 'Local');
 
     const remoteSnapshot: OfflineFormSnapshot = {
+      formId: 'test-form',
+      nodeId: 'node-b',
+      values: { title: 'Remote' },
       fieldStates: {},
       vectorClock: { 'node-b': 1 },
       timestamp: Date.now(),

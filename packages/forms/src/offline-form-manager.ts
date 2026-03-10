@@ -187,7 +187,7 @@ export class OfflineFormManager {
     const conflicts: FieldConflict[] = [];
     let hadConflict = false;
 
-    for (const [name, remoteValue] of Object.entries(snapshot.values)) {
+    for (const [name, remoteValue] of Object.entries(snapshot.values ?? {})) {
       const local = this.fields.get(name);
       const fieldType = this.fieldTypes[name]?.type ?? 'lww';
 
