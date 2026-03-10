@@ -85,6 +85,7 @@
  */
 
 export * from './checkpoint.js';
+export * from './circuit-breaker.js';
 export * from './conflict.js';
 export * from './logger.js';
 export * from './optimistic.js';
