@@ -240,9 +240,7 @@ export class GlobalSyncMesh {
   /** Route a read request to the optimal region */
   routeRead(clientRegion?: EdgeRegion): RoutingDecision {
     // Find closest active region
-    const activeRegions = Array.from(this.regions.values()).filter(
-      (r) => r.status === 'active',
-    );
+    const activeRegions = Array.from(this.regions.values()).filter((r) => r.status === 'active');
 
     if (activeRegions.length === 0) {
       return {
@@ -265,7 +263,7 @@ export class GlobalSyncMesh {
 
     // Find lowest latency
     const sorted = [...activeRegions].sort((a, b) => a.latencyMs - b.latencyMs);
-    const best = sorted[0]!;
+    const best = sorted[0];
     const fallback = sorted.length > 1 ? sorted[1] : undefined;
 
     return {
@@ -373,7 +371,14 @@ export class GlobalSyncMesh {
 
   /** Destroy the mesh and release resources */
   destroy(): void {
-    this.stop().catch(() => {});
+    this.stop().catch((err: unknown) => {
+      const msg = err instanceof Error ? err.message : String(err);
+      this.events$$?.next?.({
+        type: 'error',
+        peerId: this.config.primaryRegion,
+        error: `Destroy stop failed: ${msg}`,
+      } as never);
+    });
     this.destroy$.next();
     this.destroy$.complete();
     this.events$$.complete();

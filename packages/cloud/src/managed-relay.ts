@@ -79,9 +79,7 @@ export interface RelayEvent {
   readonly details?: Record<string, unknown>;
 }
 
-const DEFAULT_CONFIG: Required<
-  Omit<ManagedRelayConfig, 'port' | 'tls' | 'tierLimits'>
-> = {
+const DEFAULT_CONFIG: Required<Omit<ManagedRelayConfig, 'port' | 'tls' | 'tierLimits'>> = {
   maxConnectionsPerTenant: 100,
   messageBufferSize: 10 * 1024 * 1024, // 10MB
   idleTimeoutMs: 300_000, // 5 minutes
@@ -100,7 +98,7 @@ interface TenantState {
   connections: Map<string, ConnectionState>;
   messagesRelayed: number;
   bytesRelayed: number;
-  bufferedMessages: Array<{ target: string; payload: string; timestamp: number }>;
+  bufferedMessages: { target: string; payload: string; timestamp: number }[];
   lastActivityAt: number | null;
 }
 
@@ -134,7 +132,8 @@ interface ConnectionState {
  * ```
  */
 export class ManagedRelay {
-  private readonly config: Required<Omit<ManagedRelayConfig, 'tls'>> & Pick<ManagedRelayConfig, 'tls'>;
+  private readonly config: Required<Omit<ManagedRelayConfig, 'tls'>> &
+    Pick<ManagedRelayConfig, 'tls'>;
   private readonly tenants = new Map<string, TenantState>();
   private readonly status$: BehaviorSubject<RelayStatus>;
   private readonly events$$ = new Subject<RelayEvent>();
@@ -300,7 +299,7 @@ export class ManagedRelay {
     tenantId: string,
     senderConnectionId: string,
     payload: string,
-    targetConnectionId?: string,
+    targetConnectionId?: string
   ): boolean {
     const tenant = this.tenants.get(tenantId);
     if (!tenant) return false;
@@ -380,7 +379,14 @@ export class ManagedRelay {
 
   /** Destroy the relay and release all resources */
   destroy(): void {
-    this.stop().catch(() => {});
+    this.stop().catch((err: unknown) => {
+      const msg = err instanceof Error ? err.message : String(err);
+      this.events$$.next({
+        type: 'error',
+        relayId: '',
+        error: `Destroy stop failed: ${msg}`,
+      } as never);
+    });
     this.destroy$.next();
     this.destroy$.complete();
     this.status$.complete();
@@ -393,7 +399,7 @@ export class ManagedRelay {
   private bufferMessage(tenant: TenantState, target: string, payload: string): void {
     const totalBuffered = tenant.bufferedMessages.reduce(
       (sum, m) => sum + new TextEncoder().encode(m.payload).length,
-      0,
+      0
     );
     const payloadSize = new TextEncoder().encode(payload).length;
 
@@ -415,9 +421,7 @@ export class ManagedRelay {
     if (!tenant) return;
 
     const toFlush = tenant.bufferedMessages.filter((m) => m.target === connectionId);
-    tenant.bufferedMessages = tenant.bufferedMessages.filter(
-      (m) => m.target !== connectionId,
-    );
+    tenant.bufferedMessages = tenant.bufferedMessages.filter((m) => m.target !== connectionId);
 
     // In a real implementation, messages would be delivered over WebSocket.
     // Here we track that they were flushed.
@@ -448,21 +452,17 @@ export class ManagedRelay {
       }
     }
 
-    const totalBufferCapacity =
-      this.tenants.size * this.config.messageBufferSize || 1;
+    const totalBufferCapacity = this.tenants.size * this.config.messageBufferSize || 1;
 
     return {
       status: this.status$.value,
       totalConnections,
       totalTenants: this.tenants.size,
-      messagesPerSecond:
-        this.msgCountWindow.length / Math.max(windowMs / 1000, 1),
+      messagesPerSecond: this.msgCountWindow.length / Math.max(windowMs / 1000, 1),
       bytesPerSecond:
-        this.byteCountWindow.reduce((a, b) => a + b, 0) /
-        Math.max(windowMs / 1000, 1),
+        this.byteCountWindow.reduce((a, b) => a + b, 0) / Math.max(windowMs / 1000, 1),
       uptimeMs: this.startedAt ? now - this.startedAt : 0,
-      bufferUtilizationPercent:
-        Math.round((totalBufferBytes / totalBufferCapacity) * 10000) / 100,
+      bufferUtilizationPercent: Math.round((totalBufferBytes / totalBufferCapacity) * 10000) / 100,
     };
   }
 }
