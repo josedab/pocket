@@ -8,6 +8,7 @@
 
 import type { Signal, WritableSignal } from '@angular/core';
 import type { Collection, Database, Document, QueryBuilder } from '@pocket/core';
+import type { SyncEngineAdapter } from '../observables/live-query.observable.js';
 
 /**
  * Live query signal result
@@ -223,9 +224,16 @@ export function liveDocument<T extends Document>(
 /**
  * Create a sync status signal.
  *
+ * Accepts a sync engine instance (from @pocket/sync) and returns signals
+ * reflecting real-time sync state. When no sync engine is provided,
+ * returns static disconnected signals.
+ *
+ * @param syncEngine - The sync engine instance, or null if sync is not configured
+ * @returns A {@link SyncStatusSignal} with reactive sync state
+ *
  * @example
  * ```typescript
- * sync = syncStatus(this.db);
+ * sync = syncStatus(this.syncEngine);
  *
  * // In template:
  * @if (sync.isSyncing()) {
@@ -233,7 +241,7 @@ export function liveDocument<T extends Document>(
  * }
  * ```
  */
-export function syncStatus(db: Database): SyncStatusSignal {
+export function syncStatus(syncEngine: SyncEngineAdapter | null): SyncStatusSignal {
   let signal: <T>(value: T) => WritableSignal<T>;
 
   try {
@@ -261,9 +269,29 @@ export function syncStatus(db: Database): SyncStatusSignal {
   const pendingChanges = signal(0);
   const error = signal<Error | null>(null);
 
-  // Would connect to actual sync status from database
-  // This is a placeholder implementation
-  void db;
+  if (syncEngine) {
+    const statusSub = syncEngine.getStatus().subscribe({
+      next: (status) => {
+        isSyncing.set(status === 'syncing');
+        isConnected.set(status !== 'offline' && status !== 'error');
+        if (status === 'error') {
+          // error will be updated from stats subscription
+        }
+      },
+    });
+
+    const statsSub = syncEngine.getStats().subscribe({
+      next: (stats) => {
+        lastSyncAt.set(stats.lastSyncAt ? new Date(stats.lastSyncAt) : null);
+        pendingChanges.set(stats.pushCount);
+        error.set(stats.lastError);
+      },
+    });
+
+    // Store subscriptions for potential cleanup
+    void statusSub;
+    void statsSub;
+  }
 
   return {
     isConnected: isConnected as Signal<boolean>,

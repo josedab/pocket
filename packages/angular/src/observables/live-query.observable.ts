@@ -7,7 +7,17 @@
  */
 
 import type { Collection, Database, Document, QueryBuilder } from '@pocket/core';
-import { catchError, Observable, of, shareReplay, startWith, switchMap } from 'rxjs';
+import {
+  BehaviorSubject,
+  catchError,
+  combineLatest,
+  Observable,
+  of,
+  shareReplay,
+  startWith,
+  switchMap,
+} from 'rxjs';
+import { map } from 'rxjs/operators';
 
 /**
  * Live query observable result
@@ -137,32 +147,96 @@ export function fromDocument<T extends Document>(
 }
 
 /**
- * Create an observable for sync status.
- *
- * @example
- * ```typescript
- * syncStatus$ = fromSyncStatus(this.db);
- *
- * // In template:
- * <p *ngIf="(syncStatus$ | async)?.isSyncing">Syncing...</p>
- * ```
+ * Sync engine interface matching @pocket/sync's SyncEngine public API.
  */
-export function fromSyncStatus(_db: Database): Observable<{
+export interface SyncEngineAdapter {
+  getStatus(): Observable<'idle' | 'syncing' | 'error' | 'offline'>;
+  getStats(): Observable<{
+    pushCount: number;
+    pullCount: number;
+    conflictCount: number;
+    lastSyncAt: number | null;
+    lastError: Error | null;
+  }>;
+}
+
+/**
+ * Sync status state emitted by fromSyncStatus.
+ */
+export interface SyncStatusState {
   isConnected: boolean;
   isSyncing: boolean;
   lastSyncAt: Date | null;
   pendingChanges: number;
   error: Error | null;
-}> {
-  // Placeholder implementation
-  // Would connect to actual sync status observable from database
-  return of({
-    isConnected: false,
-    isSyncing: false,
-    lastSyncAt: null,
-    pendingChanges: 0,
-    error: null,
-  });
+}
+
+/**
+ * Create an observable for sync status.
+ *
+ * Accepts a sync engine instance (from @pocket/sync) and returns a combined
+ * observable of sync state. When no sync engine is provided (null), returns
+ * a static disconnected state.
+ *
+ * @param syncEngine - The sync engine instance, or null if sync is not configured
+ * @returns Observable of sync status state
+ *
+ * @example
+ * ```typescript
+ * // With sync engine
+ * syncStatus$ = fromSyncStatus(this.syncEngine);
+ *
+ * // Without sync engine (returns static disconnected state)
+ * syncStatus$ = fromSyncStatus(null);
+ *
+ * // In template:
+ * <p *ngIf="(syncStatus$ | async)?.isSyncing">Syncing...</p>
+ * ```
+ */
+export function fromSyncStatus(syncEngine: SyncEngineAdapter | null): Observable<SyncStatusState> {
+  if (!syncEngine) {
+    return of({
+      isConnected: false,
+      isSyncing: false,
+      lastSyncAt: null,
+      pendingChanges: 0,
+      error: null,
+    });
+  }
+
+  const status$ = syncEngine.getStatus().pipe(catchError(() => of('error' as const)));
+
+  const stats$ = syncEngine.getStats().pipe(
+    catchError(() =>
+      of({
+        pushCount: 0,
+        pullCount: 0,
+        conflictCount: 0,
+        lastSyncAt: null as number | null,
+        lastError: null as Error | null,
+      })
+    )
+  );
+
+  const online$ = new BehaviorSubject<boolean>(
+    typeof navigator !== 'undefined' ? navigator.onLine : true
+  );
+
+  if (typeof window !== 'undefined') {
+    window.addEventListener('online', () => online$.next(true));
+    window.addEventListener('offline', () => online$.next(false));
+  }
+
+  return combineLatest([status$, stats$, online$]).pipe(
+    map(([status, stats, isOnline]) => ({
+      isConnected: isOnline && status !== 'offline' && status !== 'error',
+      isSyncing: status === 'syncing',
+      lastSyncAt: stats.lastSyncAt ? new Date(stats.lastSyncAt) : null,
+      pendingChanges: stats.pushCount,
+      error: stats.lastError,
+    })),
+    shareReplay(1)
+  );
 }
 
 /**

@@ -18,7 +18,9 @@ export {
   liveDocument,
   liveQuery,
   syncStatus,
+  type LiveDocumentSignal,
   type LiveQuerySignal,
+  type SyncStatusSignal,
 } from './signals/live-query.signal.js';
 
 // Observables
@@ -27,6 +29,8 @@ export {
   fromLiveQuery,
   fromSyncStatus,
   type LiveQueryObservable,
+  type SyncEngineAdapter,
+  type SyncStatusState,
 } from './observables/live-query.observable.js';
 
 // Types
