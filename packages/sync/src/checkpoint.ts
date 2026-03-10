@@ -148,8 +148,11 @@ export class CheckpointManager {
       if (stored) {
         return JSON.parse(stored);
       }
-    } catch {
-      // Ignore errors
+    } catch (err) {
+      console.warn(
+        `[Pocket Sync] Failed to load checkpoint from localStorage (key: ${this.storageKey}):`,
+        err instanceof Error ? err.message : err
+      );
     }
     return null;
   }
@@ -162,8 +165,11 @@ export class CheckpointManager {
 
     try {
       localStorage.setItem(this.storageKey, JSON.stringify(this.checkpoint));
-    } catch {
-      // Ignore errors
+    } catch (err) {
+      console.warn(
+        `[Pocket Sync] Failed to save checkpoint to localStorage (key: ${this.storageKey}):`,
+        err instanceof Error ? err.message : err
+      );
     }
   }
 }

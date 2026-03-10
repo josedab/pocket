@@ -174,8 +174,12 @@ export class SyncMesh {
         collections: this.config.collections,
         checkpoint: Object.fromEntries(this.checkpoints),
       })
-      .catch(() => {
-        /* best effort */
+      .catch((err: unknown) => {
+        this.eventsSubject.next({
+          type: 'sync:error',
+          peerId,
+          error: err instanceof Error ? err.message : 'Failed to send hello',
+        });
       });
   }
 
@@ -324,7 +328,13 @@ export class SyncMesh {
             changes: [],
             checkpoint,
           })
-          .catch(() => {});
+          .catch((err: unknown) => {
+            this.eventsSubject.next({
+              type: 'sync:error',
+              peerId: from,
+              error: err instanceof Error ? err.message : 'Failed to send sync response',
+            });
+          });
         break;
       }
 
@@ -356,7 +366,13 @@ export class SyncMesh {
             nodeId: this.config.nodeId,
             timestamp: Date.now(),
           })
-          .catch(() => {});
+          .catch((err: unknown) => {
+            this.eventsSubject.next({
+              type: 'sync:error',
+              peerId: peer.nodeId,
+              error: err instanceof Error ? err.message : 'Failed to send heartbeat',
+            });
+          });
       }
 
       // Detect disconnected peers
@@ -381,7 +397,13 @@ export class SyncMesh {
   private startSyncLoop(): void {
     this.syncTimer = setInterval(() => {
       if (this.destroyed) return;
-      this.sync().catch(() => {});
+      this.sync().catch((err: unknown) => {
+        this.eventsSubject.next({
+          type: 'sync:error',
+          peerId: this.config.nodeId,
+          error: err instanceof Error ? err.message : 'Sync loop iteration failed',
+        });
+      });
     }, this.config.syncIntervalMs);
   }
 }
