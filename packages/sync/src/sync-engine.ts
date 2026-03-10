@@ -4,6 +4,7 @@ import { CheckpointManager } from './checkpoint.js';
 import { ConflictResolver, detectConflict, type ConflictStrategy } from './conflict.js';
 import { createLogger, noopLogger, type Logger, type LoggerOptions } from './logger.js';
 import { OptimisticUpdateManager } from './optimistic.js';
+import { SyncRetryMonitor, type RetryEvent, type RetryMetrics } from './retry-metrics.js';
 import { createHttpTransport } from './transport/http.js';
 import type {
   PullMessage,
@@ -204,6 +205,7 @@ export class SyncEngine {
   private pullIntervalId: ReturnType<typeof setInterval> | null = null;
   private isRunning = false;
   private retryCount = 0;
+  private readonly retryMonitor: SyncRetryMonitor;
 
   constructor(database: Database, config: SyncConfig) {
     this.database = database;
@@ -250,6 +252,10 @@ export class SyncEngine {
     this.checkpointManager = new CheckpointManager(database.nodeId);
     this.conflictResolver = new ConflictResolver(this.config.conflictStrategy);
     this.optimisticManager = new OptimisticUpdateManager();
+    this.retryMonitor = new SyncRetryMonitor({
+      failureThreshold: this.config.maxRetryAttempts,
+      resetTimeoutMs: this.config.retryDelay * Math.pow(2, this.config.maxRetryAttempts),
+    });
 
     // Set up transport handlers
     this.setupTransportHandlers();
@@ -444,6 +450,41 @@ export class SyncEngine {
    * ```
    */
   async pull(): Promise<void> {
+    const maxAttempts = this.config.autoRetry ? this.config.maxRetryAttempts : 1;
+    const baseDelay = this.config.retryDelay;
+
+    for (let attempt = 0; attempt < maxAttempts; attempt++) {
+      try {
+        await this.pullOnce();
+        return;
+      } catch (error) {
+        const isLastAttempt = attempt >= maxAttempts - 1;
+
+        if (isLastAttempt) {
+          const err = error instanceof Error ? error : new Error(String(error));
+          this.logger.error('Pull failed after max retries', err, {
+            attempts: attempt + 1,
+          });
+          this.updateStats({ lastError: err });
+          throw err;
+        }
+
+        const delay = baseDelay * Math.pow(2, attempt) + Math.random() * baseDelay * 0.5;
+        this.logger.warn('Pull failed, retrying with backoff', {
+          attempt: attempt + 1,
+          nextRetryMs: Math.round(delay),
+          error: error instanceof Error ? error.message : String(error),
+        });
+
+        await new Promise((resolve) => setTimeout(resolve, delay));
+      }
+    }
+  }
+
+  /**
+   * Execute a single pull attempt.
+   */
+  private async pullOnce(): Promise<void> {
     const collections = this.getCollectionsToSync();
 
     const message: PullMessage = {
@@ -462,7 +503,7 @@ export class SyncEngine {
 
       // Continue pulling if there's more
       if (response.hasMore) {
-        await this.pull();
+        await this.pullOnce();
       }
     }
   }
@@ -521,6 +562,26 @@ export class SyncEngine {
   }
 
   /**
+   * Get an observable of retry and circuit breaker events.
+   *
+   * Use this for monitoring sync reliability in production.
+   *
+   * @returns Observable of retry events (attempts, successes, exhaustions, circuit changes)
+   */
+  getRetryEvents(): Observable<RetryEvent> {
+    return this.retryMonitor.events$;
+  }
+
+  /**
+   * Get an observable of aggregated retry metrics.
+   *
+   * @returns Observable of retry metrics (total retries, failure rates, top failing ops)
+   */
+  getRetryMetrics(): Observable<RetryMetrics> {
+    return this.retryMonitor.retryMetrics$;
+  }
+
+  /**
    * Permanently destroy the sync engine and release all resources.
    *
    * After calling destroy(), the sync engine cannot be restarted.
@@ -534,6 +595,7 @@ export class SyncEngine {
    */
   destroy(): void {
     void this.stop();
+    this.retryMonitor.destroy();
     this.destroy$.next();
     this.destroy$.complete();
     this.status$.complete();
@@ -602,10 +664,23 @@ export class SyncEngine {
       try {
         await this.pushCollection(collectionName);
         this.retryCount = 0;
+        this.retryMonitor.recordSuccess('push', collectionName);
         return;
       } catch (error) {
         this.retryCount++;
         const isLastAttempt = attempt >= maxAttempts - 1;
+
+        // Exponential backoff with jitter: base * 2^attempt + random jitter
+        const delay = baseDelay * Math.pow(2, attempt) + Math.random() * baseDelay * 0.5;
+
+        this.retryMonitor.recordFailure(
+          'push',
+          error instanceof Error ? error.message : String(error),
+          attempt + 1,
+          maxAttempts,
+          Math.round(delay),
+          collectionName
+        );
 
         if (isLastAttempt) {
           const err = error instanceof Error ? error : new Error(String(error));
@@ -618,8 +693,6 @@ export class SyncEngine {
           return;
         }
 
-        // Exponential backoff with jitter: base * 2^attempt + random jitter
-        const delay = baseDelay * Math.pow(2, attempt) + Math.random() * baseDelay * 0.5;
         this.logger.warn('Push failed, retrying with backoff', {
           collection: collectionName,
           documentId,
