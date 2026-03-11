@@ -1,3 +1,4 @@
+import { isEqual } from '../query/operators.js';
 import type { Document, DocumentUpdate, NewDocument, VectorClock } from '../types/document.js';
 import { generateId, generateRevision, parseRevision } from '../types/document.js';
 
@@ -38,6 +39,7 @@ export function prepareNewDocument<T extends Document>(doc: NewDocument<T>, node
     ...doc,
     _id: id,
     _rev: generateRevision(1),
+    _createdAt: now,
     _updatedAt: now,
   } as T;
 
@@ -91,9 +93,13 @@ export function prepareDocumentUpdate<T extends Document>(
   const now = Date.now();
   const { sequence } = parseRevision(existing._rev ?? '0-');
 
+  // Strip any system fields that may have leaked into changes
+  const { _id, _rev, _createdAt, _updatedAt, _deleted, _vclock, ...userChanges } =
+    changes as Record<string, unknown>;
+
   const updated = {
     ...existing,
-    ...changes,
+    ...userChanges,
     _id: existing._id,
     _rev: generateRevision(sequence + 1),
     _updatedAt: now,
@@ -356,8 +362,8 @@ export function cloneDocument<T extends Document>(doc: T): T {
  */
 export function stripInternalFields<T extends Document>(
   doc: T
-): Omit<T, '_rev' | '_updatedAt' | '_vclock'> {
-  const { _rev, _updatedAt, _vclock, ...rest } = doc;
+): Omit<T, '_rev' | '_createdAt' | '_updatedAt' | '_vclock'> {
+  const { _rev, _createdAt, _updatedAt, _vclock, ...rest } = doc;
   return rest;
 }
 
@@ -387,5 +393,5 @@ export function stripInternalFields<T extends Document>(
 export function documentsEqual<T extends Document>(a: T, b: T): boolean {
   const aStripped = stripInternalFields(a);
   const bStripped = stripInternalFields(b);
-  return JSON.stringify(aStripped) === JSON.stringify(bStripped);
+  return isEqual(aStripped, bStripped);
 }
