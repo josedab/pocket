@@ -3,6 +3,7 @@ import type { CollectionConfig, DatabaseConfig } from '../schema/schema.js';
 import type { Document } from '../types/document.js';
 import { generateId } from '../types/document.js';
 import type { StorageAdapter, StorageConfig } from '../types/storage.js';
+import { assertCollectionName } from '../validation/input-validation.js';
 import { Collection } from './collection.js';
 
 /**
@@ -104,6 +105,7 @@ export class Database {
   private readonly collectionConfigs = new Map<string, CollectionConfig>();
   private isInitialized = false;
   private isClosed = false;
+  private initializePromise: Promise<void> | null = null;
 
   private constructor(options: DatabaseOptions) {
     this.name = options.name;
@@ -146,12 +148,23 @@ export class Database {
   }
 
   /**
-   * Initialize the database
+   * Initialize the database.
+   * Uses a cached promise to prevent concurrent initialization.
    */
-  private async initialize(): Promise<void> {
-    if (this.isInitialized) return;
+  private initialize(): Promise<void> {
+    if (this.isInitialized) return Promise.resolve();
+    if (this.initializePromise) return this.initializePromise;
 
-    // Check if storage is available
+    this.initializePromise = this.doInitialize().catch((error: unknown) => {
+      // Reset so initialization can be retried on failure
+      this.initializePromise = null;
+      throw error;
+    });
+
+    return this.initializePromise;
+  }
+
+  private async doInitialize(): Promise<void> {
     if (!this.storage.isAvailable()) {
       throw new StorageError(
         'POCKET_S301',
@@ -222,6 +235,7 @@ export class Database {
    */
   collection<T extends Document>(name: string): Collection<T> {
     this.ensureOpen();
+    assertCollectionName(name);
 
     const collection = this.collections.get(name);
 
