@@ -159,6 +159,12 @@ export class Collection<T extends Document = Document> {
    * ```
    */
   async getMany(ids: string[]): Promise<(T | null)[]> {
+    if (!Array.isArray(ids)) {
+      throw new PocketError({ code: 'POCKET_V100', message: 'getMany() requires an array of IDs' });
+    }
+    if (ids.length === 0) {
+      return [];
+    }
     const docs = await this.store.getMany(ids);
     return docs.map((doc) => (doc && !doc._deleted ? doc : null));
   }
@@ -231,6 +237,17 @@ export class Collection<T extends Document = Document> {
   async insert(doc: NewDocument<T>): Promise<T> {
     const prepared = this.applySchemaAndValidate(doc);
     const newDoc = prepareNewDocument<T>(prepared, this.nodeId);
+
+    // Prevent silent overwrite of existing documents
+    const existing = await this.store.get(newDoc._id);
+    if (existing && !existing._deleted) {
+      throw new PocketError({
+        code: 'POCKET_D403',
+        message: `Document with _id "${newDoc._id}" already exists in collection "${this.name}"`,
+        context: { collection: this.name, documentId: newDoc._id },
+      });
+    }
+
     const saved = await this.store.put(newDoc);
 
     this.emitChange('insert', saved._id, saved, undefined);
@@ -259,6 +276,15 @@ export class Collection<T extends Document = Document> {
    * ```
    */
   async insertMany(docs: NewDocument<T>[]): Promise<T[]> {
+    if (!Array.isArray(docs)) {
+      throw new PocketError({
+        code: 'POCKET_V100',
+        message: 'insertMany() requires an array of documents',
+      });
+    }
+    if (docs.length === 0) {
+      return [];
+    }
     const preparedDocs = docs.map((doc) => {
       const prepared = this.applySchemaAndValidate(doc);
       return prepareNewDocument<T>(prepared, this.nodeId);
@@ -374,10 +400,10 @@ export class Collection<T extends Document = Document> {
   async delete(id: string): Promise<void> {
     const existing = await this.store.get(id);
     if (!existing) {
-      return; // Already doesn't exist
+      throw new DocumentNotFoundError(this.name, id);
     }
     if (existing._deleted) {
-      return; // Already deleted
+      return; // Already deleted — idempotent
     }
 
     if (this.syncEnabled) {
@@ -403,6 +429,12 @@ export class Collection<T extends Document = Document> {
    * ```
    */
   async deleteMany(ids: string[]): Promise<void> {
+    if (!Array.isArray(ids)) {
+      throw new PocketError({
+        code: 'POCKET_V100',
+        message: 'deleteMany() requires an array of IDs',
+      });
+    }
     for (const id of ids) {
       await this.delete(id);
     }
@@ -425,11 +457,12 @@ export class Collection<T extends Document = Document> {
    */
   async hardDelete(id: string): Promise<void> {
     const existing = await this.store.get(id);
-    await this.store.delete(id);
-
-    if (existing) {
-      this.emitChange('delete', id, null, existing);
+    if (!existing) {
+      throw new DocumentNotFoundError(this.name, id);
     }
+
+    await this.store.delete(id);
+    this.emitChange('delete', id, null, existing);
   }
 
   /**
