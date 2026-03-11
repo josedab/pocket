@@ -195,6 +195,13 @@ export function matchesCondition<T>(value: T, condition: QueryCondition<T>): boo
     if (ops.$nin?.some((v) => isEqual(value, v))) return false;
   }
 
+  // $exists - field existence check
+  if ('$exists' in ops) {
+    const exists = value !== null && value !== undefined;
+    if (ops.$exists && !exists) return false;
+    if (!ops.$exists && exists) return false;
+  }
+
   // String operators
   if (typeof value === 'string') {
     // $regex - regular expression
@@ -244,6 +251,11 @@ export function matchesCondition<T>(value: T, condition: QueryCondition<T>): boo
     if ('$elemMatch' in ops && ops.$elemMatch) {
       const elemCondition = ops.$elemMatch as QueryCondition<unknown>;
       if (!value.some((item) => matchesCondition(item, elemCondition))) return false;
+    }
+  } else {
+    // Array operators on non-array values never match
+    if ('$all' in ops || '$size' in ops || '$elemMatch' in ops) {
+      return false;
     }
   }
 

@@ -12,6 +12,7 @@ export interface ComparisonOperators<T> {
   $lte?: T;
   $in?: T[];
   $nin?: T[];
+  $exists?: boolean;
 }
 
 /**
