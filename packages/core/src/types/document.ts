@@ -13,6 +13,8 @@ export interface Document {
   _rev?: string;
   /** Soft delete marker */
   _deleted?: boolean;
+  /** Creation timestamp (Unix ms) */
+  _createdAt?: number;
   /** Last update timestamp (Unix ms) */
   _updatedAt?: number;
   /** Vector clock for sync */
@@ -25,13 +27,17 @@ export interface Document {
 export interface StoredDocument extends Document {
   _id: string;
   _rev: string;
+  _createdAt: number;
   _updatedAt: number;
 }
 
 /**
  * Input type for creating new documents (without _id)
  */
-export type NewDocument<T extends Document> = Omit<T, '_id' | '_rev' | '_updatedAt' | '_vclock'> & {
+export type NewDocument<T extends Document> = Omit<
+  T,
+  '_id' | '_rev' | '_createdAt' | '_updatedAt' | '_vclock'
+> & {
   _id?: string;
 };
 
@@ -39,7 +45,7 @@ export type NewDocument<T extends Document> = Omit<T, '_id' | '_rev' | '_updated
  * Input type for updating documents
  */
 export type DocumentUpdate<T extends Document> = Partial<
-  Omit<T, '_id' | '_rev' | '_updatedAt' | '_vclock'>
+  Omit<T, '_id' | '_rev' | '_createdAt' | '_updatedAt' | '_vclock'>
 >;
 
 /**
