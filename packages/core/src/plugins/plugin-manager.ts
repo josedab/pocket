@@ -337,7 +337,11 @@ export class PluginManager {
 
     for (const plugin of plugins) {
       if (plugin.definition.afterInsert) {
-        await plugin.definition.afterInsert(document, context as InsertContext);
+        try {
+          await plugin.definition.afterInsert(document, context as InsertContext);
+        } catch {
+          // After-hooks must not block other plugins or fail the operation
+        }
       }
     }
   }
@@ -395,7 +399,11 @@ export class PluginManager {
 
     for (const plugin of plugins) {
       if (plugin.definition.afterUpdate) {
-        await plugin.definition.afterUpdate(document, context as UpdateContext);
+        try {
+          await plugin.definition.afterUpdate(document, context as UpdateContext);
+        } catch {
+          // After-hooks must not block other plugins or fail the operation
+        }
       }
     }
   }
@@ -442,7 +450,11 @@ export class PluginManager {
 
     for (const plugin of plugins) {
       if (plugin.definition.afterDelete) {
-        await plugin.definition.afterDelete(context as DeleteContext);
+        try {
+          await plugin.definition.afterDelete(context as DeleteContext);
+        } catch {
+          // After-hooks must not block other plugins or fail the operation
+        }
       }
     }
   }
@@ -506,13 +518,17 @@ export class PluginManager {
     for (const plugin of plugins) {
       if (!plugin.definition.afterQuery) continue;
 
-      const transformedResults = await plugin.definition.afterQuery(
-        currentResults,
-        context as QueryContext
-      );
+      try {
+        const transformedResults = await plugin.definition.afterQuery(
+          currentResults,
+          context as QueryContext
+        );
 
-      if (Array.isArray(transformedResults)) {
-        currentResults = transformedResults as T[];
+        if (Array.isArray(transformedResults)) {
+          currentResults = transformedResults as T[];
+        }
+      } catch {
+        // After-hooks must not block other plugins or fail the operation
       }
     }
 
@@ -570,10 +586,14 @@ export class PluginManager {
     for (const plugin of plugins) {
       if (!plugin.definition.afterGet) continue;
 
-      const transformedDoc = await plugin.definition.afterGet(currentDoc, context);
+      try {
+        const transformedDoc = await plugin.definition.afterGet(currentDoc, context);
 
-      if (transformedDoc !== undefined) {
-        currentDoc = transformedDoc as T | null;
+        if (transformedDoc !== undefined) {
+          currentDoc = transformedDoc as T | null;
+        }
+      } catch {
+        // After-hooks must not block other plugins or fail the operation
       }
     }
 
