@@ -22,6 +22,7 @@ export class ChangeFeed<T extends Document> {
   private buffer: ChangeEvent<T>[] = [];
   private sequence = 0;
   private lastCheckpoint = '0';
+  private droppedEvents = 0;
 
   constructor(options: ChangeFeedOptions = {}) {
     this.options = {
@@ -45,6 +46,8 @@ export class ChangeFeed<T extends Document> {
 
     // Trim buffer if needed
     if (this.buffer.length > this.options.bufferSize) {
+      const dropped = this.buffer.length - this.options.bufferSize;
+      this.droppedEvents += dropped;
       this.buffer = this.buffer.slice(-this.options.bufferSize);
     }
 
@@ -92,6 +95,14 @@ export class ChangeFeed<T extends Document> {
    */
   getSequence(): number {
     return this.sequence;
+  }
+
+  /**
+   * Number of events dropped due to buffer overflow.
+   * Non-zero values indicate subscribers may have missed events.
+   */
+  getDroppedEventCount(): number {
+    return this.droppedEvents;
   }
 
   /**
