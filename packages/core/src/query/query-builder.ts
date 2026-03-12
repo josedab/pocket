@@ -1,4 +1,5 @@
 import type { Observable } from 'rxjs';
+import { QueryError } from '../errors/pocket-error.js';
 import type { LiveQuery, LiveQueryOptions } from '../observable/live-query.js';
 import type { PopulateSpec } from '../relations/types.js';
 import type { Document } from '../types/document.js';
@@ -160,6 +161,9 @@ export class QueryBuilder<T extends Document> {
    * ```
    */
   and(...filters: QueryFilter<T>[]): this {
+    if (filters.length === 0) {
+      throw new QueryError('POCKET_Q200', 'and() requires at least one filter condition');
+    }
     const existing = this.spec.filter?.$and ?? [];
     this.spec.filter = {
       ...this.spec.filter,
@@ -187,6 +191,9 @@ export class QueryBuilder<T extends Document> {
    * ```
    */
   or(...filters: QueryFilter<T>[]): this {
+    if (filters.length === 0) {
+      throw new QueryError('POCKET_Q200', 'or() requires at least one filter condition');
+    }
     const existing = this.spec.filter?.$or ?? [];
     this.spec.filter = {
       ...this.spec.filter,
@@ -251,6 +258,9 @@ export class QueryBuilder<T extends Document> {
    * ```
    */
   skip(count: number): this {
+    if (!Number.isInteger(count) || count < 0) {
+      throw new QueryError('POCKET_Q200', `skip() requires a non-negative integer, got ${count}`);
+    }
     this.spec.skip = count;
     return this;
   }
@@ -268,6 +278,9 @@ export class QueryBuilder<T extends Document> {
    * ```
    */
   limit(count: number): this {
+    if (!Number.isInteger(count) || count < 1) {
+      throw new QueryError('POCKET_Q200', `limit() requires a positive integer, got ${count}`);
+    }
     this.spec.limit = count;
     return this;
   }
