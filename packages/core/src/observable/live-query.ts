@@ -117,6 +117,7 @@ export class LiveQuery<T extends Document> {
   });
 
   private readonly destroy$ = new Subject<void>();
+  private isDestroyed = false;
   private subscription: Subscription | null = null;
   private debounceTimer: ReturnType<typeof setTimeout> | null = null;
   private pendingChanges: ChangeEvent<T>[] = [];
@@ -199,6 +200,7 @@ export class LiveQuery<T extends Document> {
    * Always call this when done with a manually-managed LiveQuery.
    */
   destroy(): void {
+    this.isDestroyed = true;
     this.stop();
     this.destroy$.next();
     this.destroy$.complete();
@@ -316,7 +318,7 @@ export class LiveQuery<T extends Document> {
    * Execute the query
    */
   private async execute(): Promise<void> {
-    if (this.isExecuting) return;
+    if (this.isExecuting || this.isDestroyed) return;
 
     this.isExecuting = true;
     this.state$.next({
@@ -347,6 +349,8 @@ export class LiveQuery<T extends Document> {
    * Handle a change event
    */
   private handleChange(event: ChangeEvent<T>): void {
+    if (this.isDestroyed) return;
+
     if (this.options.debounceMs && this.options.debounceMs > 0) {
       this.pendingChanges.push(event);
       this.scheduleUpdate();
