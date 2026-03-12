@@ -351,11 +351,23 @@ export class Schema<T extends Document = Document> {
   /**
    * Validate a single field value
    */
+  private static readonly MAX_VALIDATION_DEPTH = 32;
+
   private validateField(
     path: string,
     value: unknown,
-    def: FieldDefinition
+    def: FieldDefinition,
+    depth = 0
   ): FieldValidationError[] {
+    if (depth > Schema.MAX_VALIDATION_DEPTH) {
+      return [
+        {
+          path,
+          message: `Validation exceeded maximum nesting depth of ${Schema.MAX_VALIDATION_DEPTH}`,
+        },
+      ];
+    }
+
     const errors: FieldValidationError[] = [];
 
     // Check type
@@ -434,7 +446,7 @@ export class Schema<T extends Document = Document> {
         });
       }
       for (let i = 0; i < value.length; i++) {
-        const itemErrors = this.validateField(`${path}[${i}]`, value[i], def.items);
+        const itemErrors = this.validateField(`${path}[${i}]`, value[i], def.items, depth + 1);
         errors.push(...itemErrors);
       }
     }
@@ -444,7 +456,12 @@ export class Schema<T extends Document = Document> {
       for (const [name, nestedDef] of Object.entries(def.properties)) {
         const nestedValue = (value as Record<string, unknown>)[name];
         if (nestedValue !== undefined) {
-          const nestedErrors = this.validateField(`${path}.${name}`, nestedValue, nestedDef);
+          const nestedErrors = this.validateField(
+            `${path}.${name}`,
+            nestedValue,
+            nestedDef,
+            depth + 1
+          );
           errors.push(...nestedErrors);
         } else if (nestedDef.required) {
           errors.push({
