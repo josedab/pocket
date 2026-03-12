@@ -450,7 +450,7 @@ export class SearchIndex<T extends Document = Document> {
 
     this.documentFrequencies.set(term, {
       documentCount: Math.max(0, current.documentCount + delta),
-      totalOccurrences: Math.max(0, current.totalOccurrences + Math.abs(delta)),
+      totalOccurrences: Math.max(0, current.totalOccurrences + delta),
     });
   }
 
