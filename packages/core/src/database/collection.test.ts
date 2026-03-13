@@ -280,8 +280,8 @@ describe('Collection', () => {
         expect(events[0].previousDocument?.title).toBe('Test');
       });
 
-      it('should not throw for non-existent document', async () => {
-        await expect(collection.delete('non-existent')).resolves.not.toThrow();
+      it('should throw for non-existent document', async () => {
+        await expect(collection.delete('non-existent')).rejects.toThrow();
       });
     });
 
