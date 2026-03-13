@@ -172,7 +172,7 @@ describe('SyncEngine', () => {
       currentMockTransport = createMockTransport();
       const transport = currentMockTransport;
 
-      engine = new SyncEngine(mockDb, { ...defaultConfig, direction: 'pull' });
+      engine = new SyncEngine(mockDb, { ...defaultConfig, direction: 'pull', autoRetry: false });
       await engine.start();
 
       // Now make transport fail for the forceSync
@@ -589,6 +589,10 @@ describe('SyncEngine', () => {
 
       engine = new SyncEngine(mockDb, defaultConfig);
       await engine.start();
+
+      // Reset counter and mocks after start() which may perform an initial pull
+      pullCallCount = 0;
+      mockDb.collection('todos').applyRemoteChange.mockClear();
 
       await engine.pull();
 
