@@ -233,10 +233,13 @@ export function zodSchema<T extends Document>(
     fields = extractFields(schema as unknown as z.ZodObject<z.ZodRawShape>);
   }
 
-  // Add document fields if requested
+  // Add document fields if requested, or strip them if not
   if (includeDocumentFields) {
     fields._id = fields._id ?? { type: 'string', required: true };
     fields._rev = fields._rev ?? { type: 'string', required: false };
+  } else {
+    delete fields._id;
+    delete fields._rev;
   }
 
   // Create validation function that returns proper ValidationResult
