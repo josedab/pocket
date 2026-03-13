@@ -1,19 +1,15 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { firstValueFrom } from 'rxjs';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import {
+  BackgroundSyncManager,
+  createBackgroundSyncManager,
+  type BackgroundSyncStatus,
+} from '../background-sync.js';
 import {
   NativeSQLiteStorage,
   createNativeSQLiteStorage,
   type SQLiteDatabase,
   type SQLiteTransaction,
 } from '../native-storage.js';
-import {
-  BackgroundSyncManager,
-  createBackgroundSyncManager,
-  type AppStateProvider,
-  type NetworkInfoProvider,
-  type BackgroundSyncAppState,
-  type SyncState,
-} from '../background-sync.js';
 
 // ────────────────────────────── Mock SQLite Database ──────────────────────────────
 
@@ -50,50 +46,52 @@ function createMockSQLiteDatabase(): SQLiteDatabase & { _store: Map<string, Map<
       }
     }),
 
-    queryAll: vi.fn(async <T = Record<string, unknown>>(sql: string, params?: unknown[]): Promise<T[]> => {
-      const table = getTable(sql);
+    queryAll: vi.fn(
+      async <T = Record<string, unknown>>(sql: string, params?: unknown[]): Promise<T[]> => {
+        const table = getTable(sql);
 
-      if (sql.includes('WHERE key IN')) {
-        const keys = params as string[];
-        return keys
-          .filter((k) => table.has(k))
-          .map((k) => ({ key: k, value: table.get(k)! }) as unknown as T);
-      }
-
-      if (sql.includes('WHERE key LIKE')) {
-        const prefix = (params?.[0] as string).replace('%', '');
-        return Array.from(table.entries())
-          .filter(([k]) => k.startsWith(prefix))
-          .map(([k, v]) => ({ key: k, value: v }) as unknown as T);
-      }
-
-      if (sql.includes('WHERE key = ?')) {
-        const key = params?.[0] as string;
-        if (table.has(key)) {
-          return [{ key, value: table.get(key)! } as unknown as T];
+        if (sql.includes('WHERE key IN')) {
+          const keys = params as string[];
+          return keys
+            .filter((k) => table.has(k))
+            .map((k) => ({ key: k, value: table.get(k)! }) as unknown as T);
         }
-        return [];
+
+        if (sql.includes('WHERE key LIKE')) {
+          const prefix = (params?.[0] as string).replace('%', '');
+          return Array.from(table.entries())
+            .filter(([k]) => k.startsWith(prefix))
+            .map(([k, v]) => ({ key: k, value: v }) as unknown as T);
+        }
+
+        if (sql.includes('WHERE key = ?')) {
+          const key = params?.[0] as string;
+          if (table.has(key)) {
+            return [{ key, value: table.get(key)! } as unknown as T];
+          }
+          return [];
+        }
+
+        if (sql.includes('COUNT(*)')) {
+          return [{ count: table.size } as unknown as T];
+        }
+
+        if (sql.includes('SUM(LENGTH')) {
+          let size = 0;
+          for (const v of table.values()) size += v.length;
+          return [{ size } as unknown as T];
+        }
+
+        return Array.from(table.entries()).map(([k, v]) => ({ key: k, value: v }) as unknown as T);
       }
+    ),
 
-      if (sql.includes('COUNT(*)')) {
-        return [{ count: table.size } as unknown as T];
+    queryFirst: vi.fn(
+      async <T = Record<string, unknown>>(sql: string, params?: unknown[]): Promise<T | null> => {
+        const results = await db.queryAll<T>(sql, params);
+        return results[0] ?? null;
       }
-
-      if (sql.includes('SUM(LENGTH')) {
-        let size = 0;
-        for (const v of table.values()) size += v.length;
-        return [{ size } as unknown as T];
-      }
-
-      return Array.from(table.entries()).map(
-        ([k, v]) => ({ key: k, value: v }) as unknown as T
-      );
-    }),
-
-    queryFirst: vi.fn(async <T = Record<string, unknown>>(sql: string, params?: unknown[]): Promise<T | null> => {
-      const results = await db.queryAll<T>(sql, params);
-      return results[0] ?? null;
-    }),
+    ),
 
     transaction: vi.fn(async (fn: (tx: SQLiteTransaction) => Promise<void>): Promise<void> => {
       const tx: SQLiteTransaction = {
@@ -107,48 +105,6 @@ function createMockSQLiteDatabase(): SQLiteDatabase & { _store: Map<string, Map<
   };
 
   return db;
-}
-
-// ────────────────────────────── Mock App State Provider ──────────────────────────────
-
-function createMockAppStateProvider(initialState: BackgroundSyncAppState = 'active'): AppStateProvider & {
-  _setState: (state: BackgroundSyncAppState) => void;
-} {
-  let currentState = initialState;
-  let listener: ((state: BackgroundSyncAppState) => void) | null = null;
-
-  return {
-    getCurrentState: () => currentState,
-    addEventListener: (callback) => {
-      listener = callback;
-      return () => { listener = null; };
-    },
-    _setState: (state) => {
-      currentState = state;
-      listener?.(state);
-    },
-  };
-}
-
-// ────────────────────────────── Mock Network Info Provider ──────────────────────────────
-
-function createMockNetworkInfoProvider(initialConnected = true): NetworkInfoProvider & {
-  _setConnected: (connected: boolean) => void;
-} {
-  let connected = initialConnected;
-  let listener: ((isConnected: boolean) => void) | null = null;
-
-  return {
-    isConnected: () => connected,
-    addEventListener: (callback) => {
-      listener = callback;
-      return () => { listener = null; };
-    },
-    _setConnected: (value) => {
-      connected = value;
-      listener?.(value);
-    },
-  };
 }
 
 // ════════════════════════════════════════════════════════════════════════════════
@@ -439,172 +395,153 @@ describe('NativeSQLiteStorage', () => {
 // ════════════════════════════════════════════════════════════════════════════════
 
 describe('BackgroundSyncManager', () => {
-  let appState: ReturnType<typeof createMockAppStateProvider>;
-  let network: ReturnType<typeof createMockNetworkInfoProvider>;
-  let syncFn: ReturnType<typeof vi.fn>;
   let manager: BackgroundSyncManager;
 
   beforeEach(() => {
     vi.useFakeTimers();
-    appState = createMockAppStateProvider('active');
-    network = createMockNetworkInfoProvider(true);
-    syncFn = vi.fn(async () => {});
     manager = createBackgroundSyncManager({
-      syncFn,
-      appStateProvider: appState,
-      networkInfoProvider: network,
-      foregroundIntervalMs: 1000,
-      backgroundIntervalMs: 5000,
+      minIntervalMs: 1000,
+      batchSize: 10,
     });
   });
 
   afterEach(() => {
-    manager.stop();
+    manager.destroy();
     vi.useRealTimers();
   });
 
-  // ──────────────── Sync State Transitions ────────────────
+  // ──────────────── Status Transitions ────────────────
 
   describe('sync state transitions', () => {
-    it('should start in idle state', () => {
-      expect(manager.currentState).toBe('idle');
+    it('should start in disabled state', () => {
+      expect(manager.getStatus()).toBe('disabled');
     });
 
-    it('should transition to syncing when sync runs', async () => {
-      const states: SyncState[] = [];
-      manager.syncState$.subscribe((s) => states.push(s));
+    it('should transition to idle when enabled', () => {
+      manager.enable();
+      expect(manager.getStatus()).toBe('idle');
+    });
 
-      manager.start();
-      await manager.forceSync();
+    it('should transition to syncing during triggerSync', async () => {
+      const statuses: BackgroundSyncStatus[] = [];
+      manager.status$.subscribe((s) => statuses.push(s));
 
-      expect(states).toContain('syncing');
+      manager.enable();
+      await manager.triggerSync();
+
+      expect(statuses).toContain('syncing');
     });
 
     it('should transition back to idle after successful sync', async () => {
-      manager.start();
-      await manager.forceSync();
+      manager.enable();
+      manager.setPendingChanges([{ id: 1 }]);
+      await manager.triggerSync();
 
-      expect(manager.currentState).toBe('idle');
+      expect(manager.getStatus()).toBe('idle');
     });
 
-    it('should transition to error on sync failure', async () => {
-      syncFn.mockRejectedValueOnce(new Error('Sync failed'));
-      manager.start();
-      await manager.forceSync();
+    it('should transition to disabled on disable', () => {
+      manager.enable();
+      manager.disable();
 
-      expect(manager.currentState).toBe('error');
+      expect(manager.getStatus()).toBe('disabled');
     });
 
-    it('should transition to paused when offline', () => {
-      manager.start();
-      network._setConnected(false);
+    it('should transition to disabled on destroy', () => {
+      manager.enable();
+      const statuses: BackgroundSyncStatus[] = [];
+      manager.status$.subscribe((s) => statuses.push(s));
+      manager.destroy();
 
-      expect(manager.currentState).toBe('paused');
-    });
-
-    it('should return to idle state on stop', async () => {
-      manager.start();
-      await manager.forceSync();
-      manager.stop();
-
-      expect(manager.currentState).toBe('idle');
+      expect(statuses).toContain('disabled');
     });
   });
 
-  // ──────────────── AppState Handling ────────────────
+  // ──────────────── Enable / Disable ────────────────
 
-  describe('app state handling', () => {
-    it('should use foreground interval when active', () => {
-      manager.start();
+  describe('enable and disable', () => {
+    it('should not enable twice', () => {
+      manager.enable();
+      manager.enable();
 
-      vi.advanceTimersByTime(999);
-      expect(syncFn).not.toHaveBeenCalled();
-
-      vi.advanceTimersByTime(1);
-      expect(syncFn).toHaveBeenCalledTimes(1);
+      expect(manager.isEnabled()).toBe(true);
     });
 
-    it('should reschedule on app state change to background', () => {
-      manager.start();
+    it('should disable cleanly', () => {
+      manager.enable();
+      manager.disable();
 
-      appState._setState('background');
-
-      syncFn.mockClear();
-      vi.advanceTimersByTime(1000);
-      expect(syncFn).not.toHaveBeenCalled();
-
-      vi.advanceTimersByTime(4000);
-      expect(syncFn).toHaveBeenCalledTimes(1);
+      expect(manager.isEnabled()).toBe(false);
+      expect(manager.getStatus()).toBe('disabled');
     });
 
-    it('should reschedule on app state change back to active', () => {
-      manager.start();
-
-      appState._setState('background');
-      syncFn.mockClear();
-
-      appState._setState('active');
-      vi.advanceTimersByTime(1000);
-      expect(syncFn).toHaveBeenCalledTimes(1);
-    });
-
-    it('should not sync when force synced while offline', async () => {
-      manager.start();
-      network._setConnected(false);
-
-      await manager.forceSync();
-      expect(syncFn).not.toHaveBeenCalled();
-      expect(manager.currentState).toBe('paused');
-    });
-  });
-
-  // ──────────────── Battery Handling ────────────────
-
-  describe('battery handling', () => {
-    it('should pause sync when battery is low', async () => {
-      const lowBatteryManager = createBackgroundSyncManager({
-        syncFn,
-        appStateProvider: appState,
-        networkInfoProvider: network,
-        batteryInfoProvider: { getBatteryLevel: () => 0.1 },
-        minBatteryLevel: 0.2,
-        foregroundIntervalMs: 1000,
-      });
-
-      lowBatteryManager.start();
-      await lowBatteryManager.forceSync();
-
-      expect(syncFn).not.toHaveBeenCalled();
-      expect(lowBatteryManager.currentState).toBe('paused');
-
-      lowBatteryManager.stop();
-    });
-  });
-
-  // ──────────────── Start / Stop ────────────────
-
-  describe('start and stop', () => {
-    it('should not start twice', () => {
-      manager.start();
-      manager.start();
-
-      expect(manager.running).toBe(true);
-    });
-
-    it('should stop cleanly', () => {
-      manager.start();
-      manager.stop();
-
-      expect(manager.running).toBe(false);
-      expect(manager.currentState).toBe('idle');
-    });
-
-    it('should not sync after stop', () => {
-      manager.start();
-      manager.stop();
+    it('should not sync after disable', () => {
+      manager.enable();
+      manager.setPendingChanges([{ id: 1 }]);
+      manager.disable();
 
       vi.advanceTimersByTime(10000);
-      expect(syncFn).not.toHaveBeenCalled();
+      expect(manager.getStatus()).toBe('disabled');
+    });
+  });
+
+  // ──────────────── Sync Operations ────────────────
+
+  describe('sync operations', () => {
+    it('should process pending changes in batch', async () => {
+      manager.enable();
+      manager.setPendingChanges([{ id: 1 }, { id: 2 }, { id: 3 }]);
+
+      const result = await manager.triggerSync();
+
+      expect(result.synced).toBe(3);
+      expect(result.failed).toBe(0);
+      expect(manager.getPendingCount()).toBe(0);
+    });
+
+    it('should respect batch size', async () => {
+      const smallBatch = createBackgroundSyncManager({ batchSize: 2 });
+      smallBatch.enable();
+      smallBatch.setPendingChanges([{ id: 1 }, { id: 2 }, { id: 3 }]);
+
+      const result = await smallBatch.triggerSync();
+
+      expect(result.synced).toBe(2);
+      expect(smallBatch.getPendingCount()).toBe(1);
+
+      smallBatch.destroy();
+    });
+
+    it('should track sync history', async () => {
+      manager.enable();
+      manager.setPendingChanges([{ id: 1 }]);
+      await manager.triggerSync();
+
+      const history = manager.getHistory();
+      expect(history.length).toBe(1);
+      expect(history[0].synced).toBe(1);
+    });
+
+    it('should return last result on duplicate sync call', async () => {
+      manager.enable();
+      const result = await manager.triggerSync();
+      expect(result.synced).toBe(0);
+    });
+  });
+
+  // ──────────────── Timer-Based Sync ────────────────
+
+  describe('timer-based sync', () => {
+    it('should trigger sync on interval when changes are pending', async () => {
+      manager.enable();
+      manager.setPendingChanges([{ id: 1 }]);
+
+      vi.advanceTimersByTime(999);
+      expect(manager.getPendingCount()).toBe(1);
+
+      // Advance past the interval and let the async sync complete
+      await vi.advanceTimersByTimeAsync(1);
+      expect(manager.getPendingCount()).toBe(0);
     });
   });
 
@@ -612,13 +549,9 @@ describe('BackgroundSyncManager', () => {
 
   describe('createBackgroundSyncManager', () => {
     it('should create a BackgroundSyncManager instance', () => {
-      const instance = createBackgroundSyncManager({
-        syncFn: async () => {},
-        appStateProvider: appState,
-        networkInfoProvider: network,
-      });
-
+      const instance = createBackgroundSyncManager();
       expect(instance).toBeInstanceOf(BackgroundSyncManager);
+      instance.destroy();
     });
   });
 });
