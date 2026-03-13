@@ -22,11 +22,11 @@ npm install pocket
 ## Quick Start
 
 ```tsx
-import { Database, useLiveQuery, useMutation, PocketProvider } from 'pocket';
+import { createDatabase, useLiveQuery, useMutation, PocketProvider } from 'pocket';
 
 // Create database
-const db = await Database.create({
-  name: 'my-app'
+const db = await createDatabase({
+  name: 'my-app',
   // IndexedDB storage is used by default
 });
 

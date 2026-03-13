@@ -169,64 +169,65 @@ function TodoList() {
 > **Package Maturity Levels:** 🟢 Stable (tested, documented) · 🟡 Beta (functional, limited tests) · 🔵 Experimental (API may change)
 
 <details>
-<summary><strong>Full Package Status Matrix</strong> (49+ packages)</summary>
+<summary><strong>Full Package Status Matrix</strong> (80+ packages)</summary>
 
 | Package | Status | Tests | Category |
 |---------|--------|-------|----------|
-| `@pocket/core` | 🟢 Stable | 6 | Core |
-| `@pocket/react` | 🟢 Stable | 5 | Framework |
-| `@pocket/sync` | 🟡 Beta | 3 | Core |
-| `@pocket/server` | 🟡 Beta | 2 | Core |
-| `@pocket/storage-indexeddb` | 🟡 Beta | 2 | Storage |
-| `@pocket/storage-memory` | 🟡 Beta | 1 | Storage |
-| `@pocket/storage-opfs` | 🟡 Beta | 1 | Storage |
-| `@pocket/storage-sqlite` | 🔵 Experimental | 0 | Storage |
-| `@pocket/storage-edge` | 🟡 Beta | 2 | Storage |
-| `@pocket/storage-wa-sqlite` | 🟡 Beta | 1 | Storage |
-| `@pocket/storage-expo-sqlite` | 🟡 Beta | 1 | Storage |
-| `@pocket/cloud` | 🟡 Beta | 8 | Cloud |
-| `@pocket/sync-server` | 🟡 Beta | 3 | Core |
-| `@pocket/ai` | 🟡 Beta | 3 | Extension |
-| `@pocket/codegen` | 🟡 Beta | 3 | Tooling |
-| `@pocket/studio` | 🟡 Beta | 6 | Tooling |
-| `@pocket/encryption` | 🟡 Beta | 2 | Extension |
-| `@pocket/graphql` | 🟡 Beta | 2 | Extension |
-| `@pocket/graphql-gateway` | 🟡 Beta | 6 | Extension |
-| `@pocket/collaboration` | 🟡 Beta | 5 | Extension |
-| `@pocket/crdt` | 🟡 Beta | 2 | Extension |
-| `@pocket/analytics` | 🟡 Beta | 2 | Extension |
-| `@pocket/plugin-sdk` | 🟡 Beta | 2 | Extension |
-| `@pocket/time-travel` | 🟡 Beta | 4 | Extension |
-| `@pocket/migration` | 🟡 Beta | 1 | Tooling |
-| `@pocket/query-builder` | 🟡 Beta | 4 | Extension |
-| `@pocket/schema-inference` | 🟡 Beta | 4 | Tooling |
-| `@pocket/vectors` | 🟡 Beta | 3 | Extension |
-| `@pocket/mobile` | 🟡 Beta | 5 | Platform |
-| `@pocket/sync-blockchain` | 🔵 Experimental | 4 | Extension |
-| `@pocket/angular` | 🔵 Experimental | 0 | Framework |
-| `@pocket/vue` | 🔵 Experimental | 0 | Framework |
-| `@pocket/svelte` | 🔵 Experimental | 0 | Framework |
-| `@pocket/solid` | 🔵 Experimental | 0 | Framework |
-| `@pocket/react-native` | 🟡 Beta | 1 | Framework |
-| `@pocket/electron` | 🔵 Experimental | 0 | Platform |
-| `@pocket/expo` | 🔵 Experimental | 0 | Platform |
-| `@pocket/tauri` | 🔵 Experimental | 0 | Platform |
-| `@pocket/cli` | 🟡 Beta | 4 | Tooling |
-| `@pocket/devtools` | 🔵 Experimental | 0 | Tooling |
-| `@pocket/auth` | 🟡 Beta | 1 | Extension |
-| `@pocket/permissions` | 🔵 Experimental | 0 | Extension |
-| `@pocket/forms` | 🔵 Experimental | 0 | Extension |
-| `@pocket/views` | 🟡 Beta | 1 | Extension |
-| `@pocket/subscriptions` | 🟡 Beta | 1 | Extension |
-| `@pocket/presence` | 🟡 Beta | 4 | Extension |
-| `@pocket/cross-tab` | 🟡 Beta | 1 | Extension |
-| `@pocket/opentelemetry` | 🟡 Beta | 1 | Extension |
-| `@pocket/conflict-resolution` | 🔵 Experimental | 0 | Extension |
-| `@pocket/zod` | 🔵 Experimental | 0 | Extension |
-| `@pocket/query` | 🔵 Experimental | 0 | Extension |
-| `@pocket/pwa` | 🟡 Beta | 1 | Extension |
-| `@pocket/create-pocket-app` | 🔵 Experimental | 0 | Tooling |
-| `pocket` | 🔵 Experimental | 0 | Meta |
+| `@pocket/core` | 🟢 Stable | 770 | Core |
+| `@pocket/react` | 🟢 Stable | 100 | Framework |
+| `@pocket/sync` | 🟢 Stable | 211 | Core |
+| `@pocket/server` | 🟢 Stable | 52 | Core |
+| `@pocket/storage-indexeddb` | 🟢 Stable | 60 | Storage |
+| `@pocket/storage-memory` | 🟢 Stable | 55 | Storage |
+| `@pocket/storage-opfs` | 🟡 Beta | 26 | Storage |
+| `@pocket/storage-sqlite` | 🟡 Beta | 13 | Storage |
+| `@pocket/storage-edge` | 🟢 Stable | 107 | Storage |
+| `@pocket/storage-wa-sqlite` | 🟢 Stable | 100 | Storage |
+| `@pocket/storage-expo-sqlite` | 🟢 Stable | 113 | Storage |
+| `@pocket/cloud` | 🟢 Stable | 373 | Cloud |
+| `@pocket/sync-server` | 🟢 Stable | 157 | Core |
+| `@pocket/ai` | 🟢 Stable | 149 | Extension |
+| `@pocket/codegen` | 🟢 Stable | 190 | Tooling |
+| `@pocket/studio` | 🟢 Stable | 340 | Tooling |
+| `@pocket/encryption` | 🟡 Beta | 63 | Extension |
+| `@pocket/graphql` | 🟡 Beta | 41 | Extension |
+| `@pocket/graphql-gateway` | 🟢 Stable | 110 | Extension |
+| `@pocket/collaboration` | 🟢 Stable | 242 | Extension |
+| `@pocket/crdt` | 🟢 Stable | 116 | Extension |
+| `@pocket/analytics` | 🟢 Stable | 94 | Extension |
+| `@pocket/plugin-sdk` | 🟢 Stable | 165 | Extension |
+| `@pocket/time-travel` | 🟢 Stable | 98 | Extension |
+| `@pocket/migration` | 🟡 Beta | 53 | Tooling |
+| `@pocket/query-builder` | 🟢 Stable | 90 | Extension |
+| `@pocket/schema-inference` | 🟢 Stable | 87 | Tooling |
+| `@pocket/vectors` | 🟢 Stable | 85 | Extension |
+| `@pocket/mobile` | 🟢 Stable | 163 | Platform |
+| `@pocket/sync-blockchain` | 🟡 Beta | 126 | Extension |
+| `@pocket/angular` | 🟡 Beta | 43 | Framework |
+| `@pocket/vue` | 🟡 Beta | 39 | Framework |
+| `@pocket/svelte` | 🟡 Beta | 30 | Framework |
+| `@pocket/solid` | 🟡 Beta | 11 | Framework |
+| `@pocket/react-native` | 🟡 Beta | 57 | Framework |
+| `@pocket/next` | 🟡 Beta | 45 | Framework |
+| `@pocket/electron` | 🟡 Beta | 9 | Platform |
+| `@pocket/expo` | 🟡 Beta | 6 | Platform |
+| `@pocket/tauri` | 🟡 Beta | 13 | Platform |
+| `@pocket/cli` | 🟢 Stable | 132 | Tooling |
+| `@pocket/devtools` | 🟡 Beta | 42 | Tooling |
+| `@pocket/auth` | 🟡 Beta | 53 | Extension |
+| `@pocket/permissions` | 🟡 Beta | 80 | Extension |
+| `@pocket/forms` | 🟢 Stable | 101 | Extension |
+| `@pocket/views` | 🟢 Stable | 94 | Extension |
+| `@pocket/subscriptions` | 🟡 Beta | 78 | Extension |
+| `@pocket/presence` | 🟢 Stable | 89 | Extension |
+| `@pocket/cross-tab` | 🟡 Beta | 36 | Extension |
+| `@pocket/opentelemetry` | 🟢 Stable | 97 | Extension |
+| `@pocket/conflict-resolution` | 🟡 Beta | 48 | Extension |
+| `@pocket/zod` | 🟡 Beta | 46 | Extension |
+| `@pocket/query` | 🟡 Beta | 66 | Extension |
+| `@pocket/pwa` | 🟡 Beta | 62 | Extension |
+| `@pocket/create-pocket-app` | 🟡 Beta | 11 | Tooling |
+| `pocket` | 🟡 Beta | 15 | Meta |
 
 </details>
 
