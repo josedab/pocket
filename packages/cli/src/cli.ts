@@ -471,13 +471,45 @@ async function main(): Promise<void> {
           ? parseInt(args.flags.iterations as string, 10)
           : 100;
 
+        // Use in-memory maps to benchmark core operations
+        const benchStore = new Map<string, Record<string, unknown>>();
+        let benchSeq = 0;
+
         const benchReport = await runBenchmark({
-          insert: async () => {
-            /* no-op benchmark placeholder */
+          insert: async (count: number) => {
+            for (let i = 0; i < count; i++) {
+              const id = `bench-${benchSeq++}`;
+              benchStore.set(id, {
+                _id: id,
+                title: `Item ${id}`,
+                value: Math.random(),
+                tags: ['bench', 'test'],
+                _createdAt: Date.now(),
+              });
+            }
           },
-          query: async () => 0,
-          update: async () => {},
-          remove: async () => {},
+          query: async () => {
+            let count = 0;
+            for (const doc of benchStore.values()) {
+              if ((doc.value as number) > 0.5) count++;
+            }
+            return count;
+          },
+          update: async () => {
+            const keys = Array.from(benchStore.keys());
+            if (keys.length === 0) return;
+            const key = keys[Math.floor(Math.random() * keys.length)]!;
+            const doc = benchStore.get(key);
+            if (doc) {
+              benchStore.set(key, { ...doc, value: Math.random(), _updatedAt: Date.now() });
+            }
+          },
+          remove: async () => {
+            const keys = Array.from(benchStore.keys());
+            if (keys.length === 0) return;
+            const key = keys[Math.floor(Math.random() * keys.length)]!;
+            benchStore.delete(key);
+          },
           iterations,
         });
 
