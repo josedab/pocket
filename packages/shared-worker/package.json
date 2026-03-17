@@ -2,6 +2,15 @@
   "name": "@pocket/shared-worker",
   "version": "0.1.0",
   "description": "Multi-Tab/Multi-Worker coordination with leader election, SharedWorker DB proxy, query deduplication, and BroadcastChannel sync",
+  "keywords": [
+    "pocket",
+    "database",
+    "multi-tab",
+    "shared-worker",
+    "coordination",
+    "leader-election",
+    "broadcast-channel"
+  ],
   "license": "MIT",
   "type": "module",
   "exports": {

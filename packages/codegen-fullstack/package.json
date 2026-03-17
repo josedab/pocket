@@ -2,6 +2,15 @@
   "name": "@pocket/codegen-fullstack",
   "version": "0.1.0",
   "description": "Schema-driven full-stack code generation for Pocket",
+  "keywords": [
+    "pocket",
+    "database",
+    "codegen",
+    "fullstack",
+    "generator",
+    "schema",
+    "typescript"
+  ],
   "license": "MIT",
   "type": "module",
   "exports": {

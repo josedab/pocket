@@ -2,6 +2,15 @@
   "name": "@pocket/incremental-views",
   "version": "0.1.0",
   "description": "Incremental view maintenance for Pocket - materialized views that automatically update when underlying data changes, supporting reactive aggregations",
+  "keywords": [
+    "pocket",
+    "database",
+    "incremental",
+    "views",
+    "materialized",
+    "reactive",
+    "aggregation"
+  ],
   "license": "MIT",
   "repository": {
     "type": "git",
