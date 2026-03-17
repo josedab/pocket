@@ -190,9 +190,28 @@ export function createUseLiveQueryHook(React: ReactHooks) {
     }, []) as () => void;
 
     const loadMore = React.useCallback(() => {
-      // For live queries, loadMore requires updating the subscription's query
-      // which is not yet fully implemented. This is a no-op placeholder.
-    }, []) as () => void;
+      if (!result.hasMore || !result.cursor) return;
+
+      // Re-subscribe with cursor to append more results
+      const paginatedQuery: QueryDefinition = {
+        ...query,
+        live: true,
+        pagination: {
+          ...query.pagination,
+          cursor: result.cursor,
+        },
+      };
+
+      try {
+        const moreResult = manager.execute(paginatedQuery, options);
+        setResult((prev) => ({
+          ...moreResult,
+          data: [...prev.data, ...moreResult.data],
+        }));
+      } catch (err) {
+        setError(err instanceof Error ? err : new Error('Load more failed'));
+      }
+    }, [manager, query, result, options]) as () => void;
 
     const clearEvents = React.useCallback(() => {
       setEvents([]);
