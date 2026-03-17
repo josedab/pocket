@@ -49,7 +49,7 @@ Wrap your app with `PocketProvider`:
 
 ```tsx
 // src/App.tsx
-import { PocketProvider } from 'pocket/react';
+import { PocketProvider } from '@pocket/react';
 import { db } from './db';
 
 function App() {
@@ -68,7 +68,7 @@ function App() {
 Subscribe to live-updating query results:
 
 ```tsx
-import { useLiveQuery } from 'pocket/react';
+import { useLiveQuery } from '@pocket/react';
 import type { Todo } from './db';
 
 function TodoList() {
@@ -135,7 +135,7 @@ interface LiveQueryResult<T> {
 A simpler hook when you just need basic filtering:
 
 ```tsx
-import { useQuery } from 'pocket/react';
+import { useQuery } from '@pocket/react';
 
 function CompletedTodos() {
   const { data: todos } = useQuery<Todo>('todos', { completed: true });
@@ -155,7 +155,7 @@ function CompletedTodos() {
 Execute write operations with loading and error states:
 
 ```tsx
-import { useMutation } from 'pocket/react';
+import { useMutation } from '@pocket/react';
 
 function AddTodoButton() {
   const { mutate, isLoading, error } = useMutation(
@@ -204,7 +204,7 @@ addTodo({ title: 'Learn Pocket', priority: 'high' });
 Fetch and subscribe to a single document:
 
 ```tsx
-import { useDocument } from 'pocket/react';
+import { useDocument } from '@pocket/react';
 
 function TodoDetail({ id }: { id: string }) {
   const { data: todo, isLoading } = useDocument<Todo>('todos', id);
@@ -226,7 +226,7 @@ function TodoDetail({ id }: { id: string }) {
 Monitor sync status when using the sync engine:
 
 ```tsx
-import { useSyncStatus } from 'pocket/react';
+import { useSyncStatus } from '@pocket/react';
 
 function SyncIndicator() {
   const { status, stats } = useSyncStatus();
@@ -248,7 +248,7 @@ function SyncIndicator() {
 Get direct access to a collection:
 
 ```tsx
-import { useCollection } from 'pocket/react';
+import { useCollection } from '@pocket/react';
 
 function TodoActions({ id }: { id: string }) {
   const todos = useCollection<Todo>('todos');

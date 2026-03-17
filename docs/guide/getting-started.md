@@ -129,7 +129,7 @@ Subscribe to query results to get real-time updates:
 const activeUsers$ = users
   .find()
   .where('status').equals('active')
-  .observe();
+  .live();
 
 // Subscribe to changes
 const subscription = activeUsers$.subscribe(users => {

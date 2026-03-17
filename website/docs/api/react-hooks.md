@@ -9,7 +9,7 @@ description: React hooks API reference
 Pocket provides React hooks for reactive data fetching. Import from the react package:
 
 ```typescript
-import { PocketProvider, useLiveQuery, useMutation } from 'pocket/react';
+import { PocketProvider, useLiveQuery, useMutation } from '@pocket/react';
 ```
 
 ## Setup
@@ -19,7 +19,7 @@ import { PocketProvider, useLiveQuery, useMutation } from 'pocket/react';
 Provides the database context to child components.
 
 ```tsx
-import { PocketProvider } from 'pocket/react';
+import { PocketProvider } from '@pocket/react';
 import { db } from './db';
 
 function App() {
