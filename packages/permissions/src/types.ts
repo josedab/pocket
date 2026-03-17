@@ -111,6 +111,8 @@ export interface RLSFilter {
   expression?: string;
   /** For function type: function name */
   function?: string;
+  /** For function type: evaluation function called with the document and user context */
+  fn?: (document: Record<string, unknown>, userContext: UserContext) => boolean;
   /** Combined filters with AND */
   and?: RLSFilter[];
   /** Combined filters with OR */

@@ -209,7 +209,11 @@ function evaluateSafeExpression(
   }
 
   const left = resolveExpressionOperand(expression.substring(0, opIndex), doc, user);
-  const right = resolveExpressionOperand(expression.substring(opIndex + matchedOp.length), doc, user);
+  const right = resolveExpressionOperand(
+    expression.substring(opIndex + matchedOp.length),
+    doc,
+    user
+  );
 
   switch (matchedOp) {
     case '===':
@@ -281,9 +285,10 @@ function evaluateRLSFilter(
     }
 
     case 'function': {
-      // Function-based filters would be implemented here
-      // For now, return true as placeholder
-      return true;
+      if (typeof filter.fn === 'function') {
+        return filter.fn(document, userContext);
+      }
+      throw new Error('Function-based filter defined but no evaluation function provided');
     }
 
     default:
