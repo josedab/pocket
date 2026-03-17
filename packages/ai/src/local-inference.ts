@@ -63,8 +63,23 @@ export class LocalInferenceAdapter implements LLMAdapter {
     try {
       if (this.inferenceConfig.runtime === 'custom' && this.inferenceConfig.inferenceFn) {
         this.modelStatus = 'ready';
+      } else if (this.inferenceConfig.runtime === 'webllm') {
+        this.modelStatus = 'error';
+        throw new Error(
+          'WebLLM runtime requires the "@mlc-ai/web-llm" peer dependency. ' +
+            'Install it with: npm install @mlc-ai/web-llm — ' +
+            'see https://webllm.mlc.ai for docs.'
+        );
+      } else if (this.inferenceConfig.runtime === 'onnx') {
+        this.modelStatus = 'error';
+        throw new Error(
+          'ONNX runtime requires the "onnxruntime-web" peer dependency. ' +
+            'Install it with: npm install onnxruntime-web — ' +
+            'see https://onnxruntime.ai for docs.'
+        );
       } else {
-        this.modelStatus = 'ready';
+        this.modelStatus = 'error';
+        throw new Error(`Unsupported runtime: ${this.inferenceConfig.runtime as string}`);
       }
     } catch {
       this.modelStatus = 'error';
@@ -80,8 +95,11 @@ export class LocalInferenceAdapter implements LLMAdapter {
   /** Generate a completion from messages */
   async complete(
     messages: Message[],
-    _options?: { maxTokens?: number; temperature?: number; stop?: string[] },
-  ): Promise<{ content: string; usage?: { promptTokens: number; completionTokens: number; totalTokens: number } }> {
+    _options?: { maxTokens?: number; temperature?: number; stop?: string[] }
+  ): Promise<{
+    content: string;
+    usage?: { promptTokens: number; completionTokens: number; totalTokens: number };
+  }> {
     if (this.modelStatus !== 'ready') {
       throw new Error('Local model not loaded. Call loadModel() first.');
     }
@@ -91,17 +109,15 @@ export class LocalInferenceAdapter implements LLMAdapter {
       return { content };
     }
 
-    const lastMessage = messages[messages.length - 1];
-    return {
-      content: `[Local inference stub] Processed: "${lastMessage?.content?.slice(0, 50) ?? ''}"`,
-      usage: { promptTokens: 0, completionTokens: 0, totalTokens: 0 },
-    };
+    throw new Error(
+      'Local inference engine not loaded. Call loadModel() first or provide a custom inference function.'
+    );
   }
 
   /** Stream a completion (yields chunks) */
   async *stream(
     messages: Message[],
-    _options?: { maxTokens?: number; temperature?: number; stop?: string[] },
+    _options?: { maxTokens?: number; temperature?: number; stop?: string[] }
   ): AsyncIterable<AIStreamChunk> {
     const result = await this.complete(messages);
     yield { text: result.content, done: true, accumulated: result.content };
