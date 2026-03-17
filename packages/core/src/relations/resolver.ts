@@ -201,10 +201,10 @@ export async function resolveRelations<T extends Document>(
 }
 
 /**
- * Batch resolve relations for multiple documents
+ * Batch resolve relations for multiple documents.
  *
- * More efficient than resolving relations individually as it can
- * batch fetch related documents.
+ * Optimized to collect all referenced IDs across documents and fetch them
+ * in a single batch call per relation, avoiding the N+1 query problem.
  *
  * @param docs - Documents to populate
  * @param specs - Populate specifications
@@ -218,13 +218,120 @@ export async function resolveRelationsBatch<T extends Document>(
   collectionName: string,
   context: RelationContext
 ): Promise<T[]> {
-  // For now, resolve each document individually
-  // A more optimized version would batch the ID lookups
-  const results: T[] = [];
+  if (docs.length === 0) return [];
 
+  const parsedSpecs = specs.map(parsePopulateSpec);
+
+  // Group specs by relation type for batch optimization
+  const oneToOneSpecs: { option: PopulateOption; relation: RelationDef }[] = [];
+  const otherSpecs: { option: PopulateOption; relation: RelationDef }[] = [];
+
+  for (const option of parsedSpecs) {
+    const relation = context.getRelation(collectionName, option.path);
+    if (!relation) continue;
+
+    if (relation.type === 'one' && !option.filter && !option.sort && !option.limit) {
+      oneToOneSpecs.push({ option, relation });
+    } else {
+      otherSpecs.push({ option, relation });
+    }
+  }
+
+  // Batch-resolve one-to-one relations: collect all IDs, fetch once, distribute
+  const batchCaches = new Map<string, Map<string, Document | null>>();
+
+  for (const { option, relation } of oneToOneSpecs) {
+    const localKey = relation.localKey ?? option.path;
+    const allIds = new Set<string>();
+
+    for (const doc of docs) {
+      const localValue = getNestedValue(doc, localKey);
+      if (localValue === null || localValue === undefined) continue;
+
+      const toId = (v: unknown): string => (typeof v === 'string' ? v : JSON.stringify(v));
+      if (Array.isArray(localValue)) {
+        for (const v of localValue) allIds.add(toId(v));
+      } else {
+        allIds.add(toId(localValue));
+      }
+    }
+
+    if (allIds.size === 0) continue;
+
+    const collection = context.getCollection(relation.collection);
+    const idArray = Array.from(allIds);
+    const fetched = await collection.getMany(idArray);
+
+    const cache = new Map<string, Document | null>();
+    for (let i = 0; i < idArray.length; i++) {
+      cache.set(idArray[i]!, fetched[i] ?? null);
+    }
+    batchCaches.set(option.path, cache);
+  }
+
+  // Now populate each document using cached results for one-to-one
+  const results: T[] = [];
   for (const doc of docs) {
-    const { document } = await resolveRelations(doc, specs, collectionName, context);
-    results.push(document);
+    const result = { ...doc } as Record<string, unknown>;
+
+    // Apply cached one-to-one relations
+    for (const { option, relation } of oneToOneSpecs) {
+      const localKey = relation.localKey ?? option.path;
+      const localValue = getNestedValue(doc, localKey);
+
+      if (localValue === null || localValue === undefined) {
+        setNestedValue(result, option.path, null);
+        continue;
+      }
+
+      const cache = batchCaches.get(option.path);
+      if (!cache) continue;
+
+      const toId = (v: unknown): string => (typeof v === 'string' ? v : JSON.stringify(v));
+      const id = Array.isArray(localValue) ? toId(localValue[0]) : toId(localValue);
+      const resolved = cache.get(id) ?? null;
+      setNestedValue(result, option.path, resolved);
+
+      // Handle nested populations for cached results
+      if (option.populate && resolved) {
+        const { document: populatedNested } = await resolveRelations(
+          resolved,
+          option.populate,
+          relation.collection,
+          context
+        );
+        setNestedValue(result, option.path, populatedNested);
+      }
+    }
+
+    // Resolve non-batchable relations (one-to-many with filters/sort/limit)
+    for (const { option, relation } of otherSpecs) {
+      const { resolved } = await resolveRelation(doc, option, relation, context);
+      setNestedValue(result, option.path, resolved);
+
+      if (option.populate && resolved) {
+        const nestedDocs = Array.isArray(resolved) ? resolved : [resolved];
+        for (let i = 0; i < nestedDocs.length; i++) {
+          const nestedDoc = nestedDocs[i];
+          if (!nestedDoc) continue;
+
+          const { document: populatedNested } = await resolveRelations(
+            nestedDoc as Document,
+            option.populate,
+            relation.collection,
+            context
+          );
+
+          if (Array.isArray(resolved)) {
+            (resolved as Document[])[i] = populatedNested;
+          } else {
+            setNestedValue(result, option.path, populatedNested);
+          }
+        }
+      }
+    }
+
+    results.push(result as T);
   }
 
   return results;
