@@ -4,6 +4,7 @@
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
+      "inputs": ["src/**", "package.json", "tsconfig.json", "tsup.config.ts"],
       "outputs": ["dist/**", "build/**"]
     },
     "dev": {
@@ -11,17 +12,29 @@
       "persistent": true
     },
     "lint": {
-      "dependsOn": ["^build", "typecheck"]
+      "dependsOn": ["^build"],
+      "inputs": ["src/**", "eslint.config.*"]
     },
     "typecheck": {
-      "dependsOn": ["^build"]
+      "dependsOn": ["^build"],
+      "inputs": ["src/**", "tsconfig.json", "tsconfig.*.json"]
     },
     "test": {
       "dependsOn": ["build"],
+      "inputs": ["src/**", "vitest.config.*"],
       "outputs": ["coverage/**"]
     },
     "clean": {
       "cache": false
+    },
+    "format": {
+      "inputs": ["src/**", ".prettierrc", ".prettierignore"],
+      "cache": false
+    },
+    "docs": {
+      "dependsOn": ["build"],
+      "inputs": ["src/**", "typedoc.json", "tsconfig.docs.json", "README.md"],
+      "outputs": ["website/docs/api/**"]
     }
   }
 }
