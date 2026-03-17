@@ -22,10 +22,10 @@ import {
   BehaviorSubject,
   bufferTime,
   map,
+  Observable,
   filter as rxFilter,
   Subject,
   takeUntil,
-  type Observable,
 } from 'rxjs';
 
 // ── Types ──────────────────────────────────────────────────
@@ -38,9 +38,17 @@ export interface PipelineStage<TIn = unknown, TOut = unknown> {
 export type AggregateOp = 'count' | 'sum' | 'avg' | 'min' | 'max';
 
 export interface WindowConfig {
-  type: 'tumbling' | 'sliding';
+  type: 'tumbling' | 'sliding' | 'session';
+  /** Duration of the window in milliseconds (used by tumbling/sliding) */
   durationMs: number;
+  /** Slide interval for sliding windows */
   slideMs?: number;
+  /**
+   * Inactivity gap for session windows (in ms).
+   * A session window closes when no new events arrive within this gap.
+   * Only used when type is 'session'. Defaults to durationMs if not specified.
+   */
+  gapMs?: number;
 }
 
 export interface WindowResult<T = unknown> {
@@ -188,6 +196,10 @@ export class StreamingPipeline<T extends Record<string, unknown>> {
    */
   operator(): (source: Observable<T>) => Observable<WindowResult<T>> {
     return (source: Observable<T>) => {
+      if (this.windowConfig?.type === 'session') {
+        return this.sessionWindowOperator(source);
+      }
+
       const windowMs = this.windowConfig?.durationMs ?? 1000;
 
       return source.pipe(
@@ -197,6 +209,50 @@ export class StreamingPipeline<T extends Record<string, unknown>> {
         map((items) => this.processWindow(items))
       );
     };
+  }
+
+  /**
+   * Session window operator: collects events and emits a window when no
+   * new event arrives within the configured gap period.
+   */
+  private sessionWindowOperator(source: Observable<T>): Observable<WindowResult<T>> {
+    const gapMs = this.windowConfig?.gapMs ?? this.windowConfig?.durationMs ?? 1000;
+
+    return new Observable<WindowResult<T>>((subscriber) => {
+      let buffer: T[] = [];
+      let timer: ReturnType<typeof setTimeout> | null = null;
+
+      const flush = () => {
+        if (buffer.length > 0) {
+          const items = buffer;
+          buffer = [];
+          subscriber.next(this.processWindow(items));
+        }
+      };
+
+      const resetTimer = () => {
+        if (timer !== null) clearTimeout(timer);
+        timer = setTimeout(flush, gapMs);
+      };
+
+      const sub = source.pipe(takeUntil(this.destroy$)).subscribe({
+        next: (item) => {
+          buffer.push(item);
+          resetTimer();
+        },
+        error: (err) => subscriber.error(err),
+        complete: () => {
+          if (timer !== null) clearTimeout(timer);
+          flush();
+          subscriber.complete();
+        },
+      });
+
+      return () => {
+        if (timer !== null) clearTimeout(timer);
+        sub.unsubscribe();
+      };
+    });
   }
 
   /**
