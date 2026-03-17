@@ -242,34 +242,96 @@ function generateMigrationFile(collection: string, diff: SchemaDiffResult): stri
   lines.push(`  const result = { ...doc };`);
 
   for (const change of diff.changes) {
+    const field = change.path.split('.').pop()!;
     if (change.type === 'field_added') {
-      const field = change.path.split('.').pop()!;
       lines.push(`  // ${change.description}`);
+      const defaultValue = extractDefault(change.description);
       lines.push(`  if (result['${field}'] === undefined) {`);
-      lines.push(`    result['${field}'] = undefined; // TODO: set default`);
+      lines.push(`    result['${field}'] = ${defaultValue};`);
       lines.push(`  }`);
     } else if (change.type === 'field_removed') {
-      const field = change.path.split('.').pop()!;
       lines.push(`  // ${change.description}`);
       lines.push(`  delete result['${field}'];`);
     } else if (change.type === 'field_type_changed') {
       lines.push(`  // ${change.description}`);
-      lines.push(`  // TODO: add type coercion for '${change.path}'`);
+      const targetType = extractTargetType(change.description);
+      lines.push(`  if (result['${field}'] !== undefined) {`);
+      lines.push(`    result['${field}'] = ${generateCoercion(`result['${field}']`, targetType)};`);
+      lines.push(`  }`);
     }
   }
 
   lines.push(`  return result;`);
   lines.push(`}`);
   lines.push(``);
+
+  // Generate reverse migration
   lines.push(
     `export function down(doc: Record<string, unknown>, _ctx: MigrationContext): Record<string, unknown> {`
   );
   lines.push(`  const result = { ...doc };`);
-  lines.push(`  // TODO: implement reverse migration`);
+
+  // Reverse each change
+  for (const change of [...diff.changes].reverse()) {
+    const field = change.path.split('.').pop()!;
+    if (change.type === 'field_added') {
+      lines.push(`  // Reverse: ${change.description}`);
+      lines.push(`  delete result['${field}'];`);
+    } else if (change.type === 'field_removed') {
+      lines.push(`  // Reverse: ${change.description}`);
+      lines.push(`  if (result['${field}'] === undefined) {`);
+      lines.push(`    result['${field}'] = null;`);
+      lines.push(`  }`);
+    } else if (change.type === 'field_type_changed') {
+      lines.push(`  // Reverse: ${change.description}`);
+      const sourceType = extractSourceType(change.description);
+      lines.push(`  if (result['${field}'] !== undefined) {`);
+      lines.push(`    result['${field}'] = ${generateCoercion(`result['${field}']`, sourceType)};`);
+      lines.push(`  }`);
+    }
+  }
+
   lines.push(`  return result;`);
   lines.push(`}`);
 
   return lines.join('\n');
+}
+
+/** Extract the default value from a change description like '+ Added field "x" (default: "hello")' */
+function extractDefault(description: string): string {
+  const match = /\(default:\s*(.+)\)/.exec(description);
+  if (match?.[1]) return match[1];
+  return 'null';
+}
+
+/** Extract target type from description like '~ Changed "x" type: string → number' */
+function extractTargetType(description: string): string {
+  const match = /→\s*(\S+)/.exec(description);
+  return match?.[1] ?? 'unknown';
+}
+
+/** Extract source type from description like '~ Changed "x" type: string → number' */
+function extractSourceType(description: string): string {
+  const match = /type:\s*(\S+)\s*→/.exec(description);
+  return match?.[1] ?? 'unknown';
+}
+
+/** Generate a type coercion expression for the target type */
+function generateCoercion(expr: string, targetType: string): string {
+  switch (targetType) {
+    case 'string':
+      return `String(${expr})`;
+    case 'number':
+      return `Number(${expr})`;
+    case 'boolean':
+      return `Boolean(${expr})`;
+    case 'array':
+      return `Array.isArray(${expr}) ? ${expr} : [${expr}]`;
+    case 'object':
+      return `typeof ${expr} === 'object' && ${expr} !== null ? ${expr} : {}`;
+    default:
+      return expr;
+  }
 }
 
 // ── Main Command ──────────────────────────────────────────
