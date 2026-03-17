@@ -36,7 +36,10 @@
 
 // Types
 export type {
+  CollectionAccessor,
+  CollectionChangeEvent,
   CollectionMapping,
+  FindOptions,
   GatewayConfig,
   GraphQLFieldDef,
   GraphQLQueryDef,
