@@ -18,6 +18,13 @@ export interface TTLConfig {
   cleanupIntervalMs?: number;
   /** Whether to use soft delete instead of hard delete */
   softDelete?: boolean;
+  /**
+   * Grace period in milliseconds after soft deletion before hard deletion.
+   * Only applies when softDelete is true. Defaults to 0 (no hard cleanup).
+   * When set, documents that were soft-deleted longer than this period ago
+   * will be permanently removed on the next cleanup cycle.
+   */
+  gracePeriodMs?: number;
 }
 
 /**
@@ -30,6 +37,8 @@ export interface TTLCollection<T extends Document = Document> {
   find: (filter: Record<string, unknown>) => { exec: () => Promise<T[]> };
   /** Delete a document by ID */
   delete: (id: string) => Promise<void>;
+  /** Update a document by ID (required for soft delete) */
+  update?: (id: string, changes: Partial<T>) => Promise<void>;
   /** Get all documents */
   getAll: () => Promise<T[]>;
 }
@@ -38,8 +47,12 @@ export interface TTLCollection<T extends Document = Document> {
  * TTL cleanup result
  */
 export interface TTLCleanupResult {
-  /** Number of documents deleted */
+  /** Number of documents removed (hard deleted or soft deleted) */
   deletedCount: number;
+  /** Number of documents soft-deleted (marked as _deleted) */
+  softDeletedCount: number;
+  /** Number of documents permanently removed after grace period */
+  hardDeletedCount: number;
   /** Collection name */
   collection: string;
   /** Execution time in ms */
@@ -96,6 +109,7 @@ export class TTLManager {
       config: {
         cleanupIntervalMs: 60000,
         softDelete: false,
+        gracePeriodMs: 0,
         ...config,
       },
     });
@@ -181,29 +195,84 @@ export class TTLManager {
     const { collection, config } = entry;
     const now = new Date();
     const errors: TTLCleanupResult['errors'] = [];
-    let deletedCount = 0;
+    let softDeletedCount = 0;
+    let hardDeletedCount = 0;
 
     try {
-      // Find expired documents
+      // Find expired documents (not already soft-deleted)
       const expiredDocs = await collection
         .find({
           [config.field]: { $lte: now },
+          _deleted: { $ne: true },
         })
         .exec();
 
-      // Delete each expired document
-      for (const doc of expiredDocs) {
-        try {
-          await collection.delete(doc._id);
-          deletedCount++;
-        } catch (error) {
-          errors.push({
-            id: doc._id,
-            error: error instanceof Error ? error : new Error(String(error)),
-          });
+      if (config.softDelete) {
+        // Soft delete: mark documents as _deleted with a deletion timestamp
+        if (!collection.update) {
+          throw new Error(
+            `Collection "${collectionName}" does not support update(), which is required for soft delete. ` +
+              'Provide an update method on the collection or disable softDelete.'
+          );
+        }
+
+        for (const doc of expiredDocs) {
+          try {
+            await collection.update(doc._id, {
+              _deleted: true,
+              _deletedAt: Date.now(),
+            } as Partial<Document>);
+            softDeletedCount++;
+          } catch (error) {
+            errors.push({
+              id: doc._id,
+              error: error instanceof Error ? error : new Error(String(error)),
+            });
+          }
+        }
+
+        // Hard-delete documents past the grace period
+        if (config.gracePeriodMs && config.gracePeriodMs > 0) {
+          const graceThreshold = Date.now() - config.gracePeriodMs;
+          const allDocs = await collection.getAll();
+
+          for (const doc of allDocs) {
+            const deletedDoc = doc as Document & { _deletedAt?: number };
+            if (
+              deletedDoc._deleted &&
+              typeof deletedDoc._deletedAt === 'number' &&
+              deletedDoc._deletedAt <= graceThreshold
+            ) {
+              try {
+                await collection.delete(doc._id);
+                hardDeletedCount++;
+              } catch (error) {
+                errors.push({
+                  id: doc._id,
+                  error: error instanceof Error ? error : new Error(String(error)),
+                });
+              }
+            }
+          }
+        }
+      } else {
+        // Hard delete: permanently remove expired documents
+        for (const doc of expiredDocs) {
+          try {
+            await collection.delete(doc._id);
+            hardDeletedCount++;
+          } catch (error) {
+            errors.push({
+              id: doc._id,
+              error: error instanceof Error ? error : new Error(String(error)),
+            });
+          }
         }
       }
     } catch (error) {
+      if (error instanceof Error && error.message.includes('does not support update()')) {
+        throw error;
+      }
       throw new Error(
         `TTL cleanup failed for ${collectionName}: ${error instanceof Error ? error.message : String(error)}`
       );
@@ -212,7 +281,9 @@ export class TTLManager {
     const endTime = performance.now();
 
     return {
-      deletedCount,
+      deletedCount: softDeletedCount + hardDeletedCount,
+      softDeletedCount,
+      hardDeletedCount,
       collection: collectionName,
       executionTimeMs: Math.round((endTime - startTime) * 100) / 100,
       errors,
@@ -234,6 +305,8 @@ export class TTLManager {
       } catch (error) {
         results.push({
           deletedCount: 0,
+          softDeletedCount: 0,
+          hardDeletedCount: 0,
           collection: name,
           executionTimeMs: 0,
           errors: [

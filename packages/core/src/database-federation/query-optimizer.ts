@@ -60,6 +60,28 @@ export interface FederatedRegistry {
 /** Threshold above which hash join is preferred over nested loop */
 const HASH_JOIN_THRESHOLD = 100;
 
+/**
+ * Estimate selectivity of a filter based on the number of conditions.
+ * Uses heuristic: each independent condition retains ~30% of rows,
+ * compounded across all conditions.
+ */
+function estimateSelectivity(filter?: Record<string, unknown>): number {
+  if (!filter) return 1.0;
+
+  const keys = Object.keys(filter);
+  if (keys.length === 0) return 1.0;
+
+  // Each filter condition independently retains ~30% of rows on average.
+  // This is a well-known heuristic from query optimization literature.
+  const PER_CONDITION_SELECTIVITY = 0.3;
+
+  // Compound selectivity: s1 * s2 * ... for independent conditions
+  const selectivity = Math.pow(PER_CONDITION_SELECTIVITY, keys.length);
+
+  // Clamp to a minimum of 1% to avoid zero-row estimates
+  return Math.max(selectivity, 0.01);
+}
+
 // ── Implementation ────────────────────────────────────────
 
 export class FederatedQueryOptimizer {
@@ -93,12 +115,13 @@ export class FederatedQueryOptimizer {
     });
 
     if (spec.filter) {
-      const filteredCount = Math.ceil(primaryCount * 0.5); // estimate 50% selectivity
+      const selectivity = estimateSelectivity(spec.filter);
+      const filteredCount = Math.max(1, Math.ceil(primaryCount * selectivity));
       steps.push({
         operation: 'filter',
         target: `${spec.from.db}.${spec.from.collection}`,
         estimatedRows: filteredCount,
-        description: `Apply global filter`,
+        description: `Apply global filter (estimated ${Math.round(selectivity * 100)}% selectivity)`,
       });
     }
 
