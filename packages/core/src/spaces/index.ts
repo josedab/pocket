@@ -1,9 +1,12 @@
 export {
   SpaceManager,
   createSpaceManager,
+  type CrossSpaceQueryOptions,
+  type CrossSpaceQueryResolver,
+  type CrossSpaceResult,
   type Space,
-  type SpaceMember,
   type SpaceManagerConfig,
-  type SpaceStats,
+  type SpaceMember,
   type SpaceQuery,
+  type SpaceStats,
 } from './space-manager.js';
