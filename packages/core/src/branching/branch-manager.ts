@@ -30,15 +30,15 @@
 import { BehaviorSubject, type Observable, Subject } from 'rxjs';
 import type { Document } from '../types/document.js';
 import type {
-  BranchMetadata,
-  BranchManagerConfig,
+  BranchDiff,
   BranchEvent,
   BranchEventType,
+  BranchManagerConfig,
+  BranchMetadata,
   BranchSnapshot,
-  BranchDiff,
+  MergeConflict,
   MergeResult,
   MergeStrategy,
-  MergeConflict,
   SnapshotCollectionState,
 } from './types.js';
 
@@ -146,10 +146,7 @@ export class BranchManager {
   /**
    * Create a new branch, optionally from another branch.
    */
-  branch(
-    name: string,
-    options: { from?: string; description?: string } = {}
-  ): BranchMetadata {
+  branch(name: string, options: { from?: string; description?: string } = {}): BranchMetadata {
     if (this.branches.has(name)) {
       throw new Error(`Branch "${name}" already exists`);
     }
@@ -184,7 +181,10 @@ export class BranchManager {
     if (this.config.enableCopyOnWrite) {
       this.branchData.set(name, cloneBranchData(sourceData));
     } else {
-      this.branchData.set(name, deepClone(sourceData) as unknown as Map<string, Map<string, Document>>);
+      this.branchData.set(
+        name,
+        deepClone(sourceData) as unknown as Map<string, Map<string, Document>>
+      );
     }
 
     this.updateState();
@@ -343,7 +343,70 @@ export class BranchManager {
           mergedDocuments++;
         }
       }
-    } else if (strategy === 'three-way-merge' || strategy === 'rebase') {
+    } else if (strategy === 'rebase') {
+      // Rebase: replay source branch changes on top of target.
+      // Unlike three-way merge, rebase applies source-only changes sequentially,
+      // treating target as the new base. This creates a linear history.
+      const allCollections = new Set([
+        ...baseData.keys(),
+        ...sourceData.keys(),
+        ...targetData.keys(),
+      ]);
+
+      for (const col of allCollections) {
+        const baseDocs = baseData.get(col) ?? new Map<string, Document>();
+        const ourDocs = targetData.get(col) ?? new Map<string, Document>();
+        const theirDocs = sourceData.get(col) ?? new Map<string, Document>();
+
+        const allIds = new Set([...baseDocs.keys(), ...theirDocs.keys()]);
+
+        if (!targetData.has(col)) {
+          targetData.set(col, new Map());
+        }
+
+        for (const id of allIds) {
+          const baseDoc = baseDocs.get(id) ?? null;
+          const theirDoc = theirDocs.get(id) ?? null;
+
+          const baseJson = baseDoc ? JSON.stringify(baseDoc) : null;
+          const theirJson = theirDoc ? JSON.stringify(theirDoc) : null;
+
+          // Source didn't change this doc from base → skip (nothing to replay)
+          if (theirJson === baseJson) {
+            continue;
+          }
+
+          // Source changed or added this doc → replay on top of target
+          const ourDoc = ourDocs.get(id) ?? null;
+          const ourJson = ourDoc ? JSON.stringify(ourDoc) : null;
+
+          // If target hasn't diverged from base, apply source change directly
+          if (ourJson === baseJson) {
+            if (theirDoc) {
+              targetData.get(col)!.set(id, theirDoc);
+            } else {
+              targetData.get(col)!.delete(id);
+            }
+            mergedDocuments++;
+            continue;
+          }
+
+          // Target also changed this doc → conflict during rebase
+          // Try field-level merge to auto-resolve
+          const conflict = this.resolveFieldConflict(col, id, baseDoc, ourDoc, theirDoc);
+          if (conflict.autoResolved && conflict.resolution) {
+            targetData.get(col)!.set(id, conflict.resolution);
+            mergedDocuments++;
+          } else {
+            conflicts.push(conflict);
+          }
+        }
+
+        if (targetData.get(col)!.size === 0) {
+          targetData.delete(col);
+        }
+      }
+    } else if (strategy === 'three-way-merge') {
       // Three-way merge: compare base vs ours (target) vs theirs (source)
       const allCollections = new Set([
         ...baseData.keys(),
@@ -356,11 +419,7 @@ export class BranchManager {
         const ourDocs = targetData.get(col) ?? new Map<string, Document>();
         const theirDocs = sourceData.get(col) ?? new Map<string, Document>();
 
-        const allIds = new Set([
-          ...baseDocs.keys(),
-          ...ourDocs.keys(),
-          ...theirDocs.keys(),
-        ]);
+        const allIds = new Set([...baseDocs.keys(), ...ourDocs.keys(), ...theirDocs.keys()]);
 
         if (!targetData.has(col)) {
           targetData.set(col, new Map());
@@ -639,9 +698,9 @@ export class BranchManager {
     const sourceData = this.branchData.get(sourceBranch)!;
     const targetData = this.branchData.get(targetBranch)!;
 
-    const added: Array<{ collection: string; documentId: string }> = [];
-    const modified: Array<{ collection: string; documentId: string }> = [];
-    const deleted: Array<{ collection: string; documentId: string }> = [];
+    const added: { collection: string; documentId: string }[] = [];
+    const modified: { collection: string; documentId: string }[] = [];
+    const deleted: { collection: string; documentId: string }[] = [];
 
     const allCollections = new Set([...sourceData.keys(), ...targetData.keys()]);
 
@@ -760,11 +819,7 @@ export class BranchManager {
     });
   }
 
-  private emitEvent(
-    type: BranchEventType,
-    branch: string,
-    data?: Record<string, unknown>
-  ): void {
+  private emitEvent(type: BranchEventType, branch: string, data?: Record<string, unknown>): void {
     this.events$.next({ type, timestamp: Date.now(), branch, data });
   }
 }
