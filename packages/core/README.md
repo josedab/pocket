@@ -114,6 +114,85 @@ const db = await Database.create({
 | `exec()` | Execute query |
 | `$` | Observable stream |
 
+## Advanced Features
+
+### TTL & Soft Delete
+
+Automatically expire documents with configurable TTL policies. Supports soft delete with a grace period before permanent removal.
+
+```typescript
+import { createTTLManager } from '@pocket/core';
+
+const ttl = createTTLManager();
+ttl.register('sessions', sessionsCollection, {
+  field: 'expiresAt',
+  softDelete: true,
+  gracePeriodMs: 24 * 60 * 60 * 1000, // 24h recovery window
+});
+ttl.start();
+```
+
+### Spaces (Logical Partitioning)
+
+Group collections into isolated spaces for multi-tenant or multi-context applications. Supports cross-space queries.
+
+```typescript
+import { createSpaceManager } from '@pocket/core';
+
+const spaces = createSpaceManager({ allowCrossSpaceQueries: true });
+const space = spaces.createSpace('team-alpha', ownerId);
+spaces.registerCollection(space.id, 'tasks');
+
+const results = await spaces.queryAcrossSpaces(
+  { collection: 'tasks', filter: { status: 'open' } },
+  async (resolvedName, filter) => db.collection(resolvedName).find(filter).exec()
+);
+```
+
+### Relations & Population
+
+Define relationships between collections and batch-resolve related documents efficiently.
+
+```typescript
+import { resolveRelationsBatch } from '@pocket/core';
+
+const populated = await resolveRelationsBatch(orders, ['customer', 'items'], 'orders', context);
+```
+
+### Streaming Pipelines
+
+Build reactive data pipelines with tumbling, sliding, and session windows.
+
+```typescript
+import { createStreamingPipeline } from '@pocket/core';
+
+const pipeline = createStreamingPipeline<Order>()
+  .filter({ status: 'completed' })
+  .aggregate('sum', 'amount')
+  .window({ type: 'session', durationMs: 60000, gapMs: 5000 })
+  .build();
+```
+
+### Database Branching
+
+Git-like branching for data with merge strategies (fast-forward, three-way, rebase).
+
+```typescript
+const manager = createBranchManager();
+manager.branch('experiment', { from: 'main' });
+manager.checkout('experiment');
+// ... make changes ...
+manager.merge('experiment', { strategy: 'rebase' });
+```
+
+### Full-Text Search
+
+Built-in BM25 search with Porter stemming, fuzzy matching, and highlighting.
+
+### Schema Evolution
+
+Safe schema migrations with backward/forward compatibility checking and automatic type coercion.
+
 ## Documentation
 
 - [Full Documentation](https://pocket.dev/docs)
