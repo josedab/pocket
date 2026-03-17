@@ -122,7 +122,7 @@ export class DataVault {
       syncMetadata: config.includeSyncMetadata ? {} : null,
     });
 
-    const checksum = this.simpleChecksum(serialized);
+    const checksum = await this.computeChecksum(serialized);
 
     const header: VaultHeader = {
       magic: 'POCKET_VAULT',
@@ -139,7 +139,7 @@ export class DataVault {
 
     let payload = serialized;
     if (config.passphrase) {
-      payload = this.encrypt(payload, config.passphrase);
+      payload = await this.encrypt(payload, config.passphrase);
     }
 
     const vaultData = JSON.stringify({ header, payload });
@@ -174,11 +174,11 @@ export class DataVault {
       if (!config.passphrase) {
         throw new Error('Vault is encrypted but no passphrase provided');
       }
-      payloadStr = this.decrypt(payloadStr, config.passphrase);
+      payloadStr = await this.decrypt(payloadStr, config.passphrase);
     }
 
     // Verify checksum
-    const checksum = this.simpleChecksum(payloadStr);
+    const checksum = await this.computeChecksum(payloadStr);
     if (checksum !== vault.header.checksum) {
       errors.push('Checksum mismatch — vault may be corrupted');
     }
@@ -247,45 +247,83 @@ export class DataVault {
     };
   }
 
-  // ── Encryption (simplified — production would use Web Crypto API) ──
+  // ── Encryption (Web Crypto API — AES-GCM + PBKDF2) ──
 
-  private encrypt(data: string, passphrase: string): string {
-    // XOR-based obfuscation (NOT production crypto — placeholder for Web Crypto API)
-    const key = this.deriveKey(passphrase);
-    let result = '';
-    for (let i = 0; i < data.length; i++) {
-      result += String.fromCharCode(data.charCodeAt(i) ^ key.charCodeAt(i % key.length));
-    }
-    return btoa(result);
+  private async encrypt(data: string, passphrase: string): Promise<string> {
+    const encoder = new TextEncoder();
+    const plaintext = encoder.encode(data);
+    const salt = crypto.getRandomValues(new Uint8Array(16));
+    const iv = crypto.getRandomValues(new Uint8Array(12));
+    const key = await this.deriveKey(passphrase, salt);
+
+    const ciphertext = await crypto.subtle.encrypt({ name: 'AES-GCM', iv }, key, plaintext);
+
+    // Pack salt + iv + ciphertext into a single buffer, then base64 encode
+    const packed = new Uint8Array(salt.length + iv.length + ciphertext.byteLength);
+    packed.set(salt, 0);
+    packed.set(iv, salt.length);
+    packed.set(new Uint8Array(ciphertext), salt.length + iv.length);
+
+    return this.uint8ToBase64(packed);
   }
 
-  private decrypt(data: string, passphrase: string): string {
-    const key = this.deriveKey(passphrase);
-    const decoded = atob(data);
-    let result = '';
-    for (let i = 0; i < decoded.length; i++) {
-      result += String.fromCharCode(decoded.charCodeAt(i) ^ key.charCodeAt(i % key.length));
+  private async decrypt(data: string, passphrase: string): Promise<string> {
+    const packed = this.base64ToUint8(data);
+
+    const salt = packed.slice(0, 16);
+    const iv = packed.slice(16, 28);
+    const ciphertext = packed.slice(28);
+    const key = await this.deriveKey(passphrase, salt);
+
+    try {
+      const plaintext = await crypto.subtle.decrypt({ name: 'AES-GCM', iv }, key, ciphertext);
+      return new TextDecoder().decode(plaintext);
+    } catch {
+      throw new Error('Decryption failed — incorrect passphrase or corrupted data');
     }
-    return result;
   }
 
-  private deriveKey(passphrase: string): string {
-    // Simple key derivation (production would use PBKDF2)
-    let hash = 0;
-    for (let i = 0; i < passphrase.length; i++) {
-      hash = ((hash << 5) - hash + passphrase.charCodeAt(i)) | 0;
-    }
-    return String(Math.abs(hash)).repeat(8);
+  private async deriveKey(passphrase: string, salt: Uint8Array): Promise<CryptoKey> {
+    const encoder = new TextEncoder();
+    const keyMaterial = await crypto.subtle.importKey(
+      'raw',
+      encoder.encode(passphrase),
+      'PBKDF2',
+      false,
+      ['deriveKey']
+    );
+
+    return crypto.subtle.deriveKey(
+      { name: 'PBKDF2', salt, iterations: 100_000, hash: 'SHA-256' },
+      keyMaterial,
+      { name: 'AES-GCM', length: 256 },
+      false,
+      ['encrypt', 'decrypt']
+    );
   }
 
-  private simpleChecksum(data: string): string {
-    let hash = 0;
-    for (let i = 0; i < data.length; i++) {
-      const char = data.charCodeAt(i);
-      hash = (hash << 5) - hash + char;
-      hash |= 0;
+  private async computeChecksum(data: string): Promise<string> {
+    const encoder = new TextEncoder();
+    const hashBuffer = await crypto.subtle.digest('SHA-256', encoder.encode(data));
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    return hashArray.map((b) => b.toString(16).padStart(2, '0')).join('');
+  }
+
+  private uint8ToBase64(bytes: Uint8Array): string {
+    let binary = '';
+    for (const byte of bytes) {
+      binary += String.fromCharCode(byte);
     }
-    return `sha256_${Math.abs(hash).toString(16)}`;
+    return btoa(binary);
+  }
+
+  private base64ToUint8(base64: string): Uint8Array {
+    const binary = atob(base64);
+    const bytes = new Uint8Array(binary.length);
+    for (let i = 0; i < binary.length; i++) {
+      bytes[i] = binary.charCodeAt(i);
+    }
+    return bytes;
   }
 }
 
